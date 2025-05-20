@@ -1,0 +1,98 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title%}Kitchen{%endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+{% endblock %} {% block content %}
+
+<div class="container page-content">
+  {% csrf_token %}
+  <div class="text-center">
+    <h1 class="mb-3">
+      <span class="fancy-title">It's Time To Burn The Kitchen</span>
+    </h1>
+  </div>
+
+  <!-- Add search bar -->
+  <div class="search-container mb-5">
+    <div class="search-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        id="recipe-search"
+        class="search-input"
+        placeholder="Search recipes..."
+      />
+    </div>
+  </div>
+
+  <div class="row g-4 mt-4" id="recipe-grid">
+    {% if recipes %} {% for recipe in recipes %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="recipe-card">
+        {% if recipe.image_url %}
+        <img
+          src="{{ recipe.image_url }}"
+          class="recipe-card-img"
+          alt="{{ recipe.name }}"
+        />
+        {% else %}
+        <img
+          src="{% static 'images/default-recipe.jpg' %}"
+          class="recipe-card-img"
+          alt="Default recipe image"
+        />
+        {% endif %}
+        <div class="recipe-card-body">
+          <h5 class="recipe-card-title">
+            <a href="{% url 'display_recipe' recipe.id %}">{{ recipe.name }}</a>
+          </h5>
+          <p class="recipe-card-time">
+            <i class="bi bi-clock"></i> {{ recipe.cooking_time }} minutes
+          </p>
+          <div class="recipe-actions">
+            <button
+              class="btn btn-light save-btn"
+              data-recipe-id="{{ recipe.id }}"
+              {%
+              if
+              user
+              in
+              recipe.saved_by.all
+              %}data-saved="true"
+              {%
+              endif
+              %}
+            >
+              <i class="fas fa-bookmark"></i>
+              <span class="save-count">{{ recipe.saved_by.count }}</span>
+            </button>
+            <button
+              class="btn btn-light like-btn"
+              data-recipe-id="{{ recipe.id }}"
+              {%
+              if
+              user
+              in
+              recipe.likes.all
+              %}data-liked="true"
+              {%
+              endif
+              %}
+            >
+              <i class="fas fa-heart"></i>
+              <span class="like-count">{{ recipe.likes.count }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <div class="col-12">
+      <p class="text-center text-muted">
+        No recipes available in your kitchen yet.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<script src="{% static 'js/kitchen.js' %}"></script>
+{% endblock %}

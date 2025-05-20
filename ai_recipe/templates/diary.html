@@ -1,0 +1,93 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title %}My Diary{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/diary.css' %}" />
+{% endblock %} {% block content %}
+
+<div class="page-content">
+  <h1><i class="fas fa-book"></i> My Diary</h1>
+
+  <div class="diary-sections">
+    <div class="section">
+      <h2><i class="fas fa-heart"></i> My Likes</h2>
+      <div class="stats">
+        <span id="likes-count">{{ user.liked_recipes.count }}</span>
+        <div class="stats-label">Liked Recipes</div>
+      </div>
+      <a href="{% url 'likes' %}" class="btn">
+        <i class="fas fa-chevron-right"></i>
+        View All Likes
+      </a>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-folder"></i> My Collection</h2>
+      <div class="stats">
+        <span id="saved-count">{{ user.saved_recipes.count }}</span>
+        <div class="stats-label">Saved Recipes</div>
+      </div>
+      <a href="{% url 'collection' %}" class="btn">
+        <i class="fas fa-chevron-right"></i>
+        View Collection
+      </a>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-share-alt"></i> My Recipes</h2>
+      <div class="stats">
+        <span id="recipes-count">{{ user.recipes.count }}</span>
+        <div class="stats-label">Shared Recipes</div>
+      </div>
+      <a href="{% url 'sharing' %}" class="btn">
+        <i class="fas fa-chevron-right"></i>
+        View My Recipes
+      </a>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-hand-holding-heart"></i> My Donations</h2>
+      <div class="stats">
+        <span id="donations-count">{{ total_donations|default:"0" }}</span>
+        <div class="stats-numbers">
+          <div class="stat-item">
+            <span class="stat-value">{{ active_donations|default:"0" }}</span>
+            <span class="stat-label">Active</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value"
+              >{{ completed_donations|default:"0" }}</span
+            >
+            <span class="stat-label">Donated</span>
+          </div>
+        </div>
+      </div>
+      <a href="{% url 'community:donation_food' %}" class="btn">
+        <i class="fas fa-chevron-right"></i>
+        View My Donations
+      </a>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-hand-holding"></i> Claimed Food</h2>
+      <div class="stats">
+        <span id="claims-count">{{ total_claims|default:"0" }}</span>
+        <div class="stats-numbers">
+          <div class="stat-item">
+            <span class="stat-value">{{ pending_claims|default:"0" }}</span>
+            <span class="stat-label">Pending</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ completed_claims|default:"0" }}</span>
+            <span class="stat-label">Received</span>
+          </div>
+        </div>
+      </div>
+      <a href="{% url 'community:claimed_food' %}" class="btn">
+        <i class="fas fa-chevron-right"></i>
+        View Claims
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/diary.js' %}"></script>
+{% endblock %}

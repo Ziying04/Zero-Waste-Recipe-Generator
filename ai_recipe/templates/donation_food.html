@@ -1,0 +1,115 @@
+{% extends 'base_template.html' %} {% load static %} {% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/donation_food.css' %}" />
+
+{% endblock %} {% block content %}
+
+<div class="container mx-auto py-12 px-4 max-w-6xl">
+  <!-- Back to Diary -->
+  <div class="mb-8">
+    <a
+      href="{% url 'diary' %}"
+      class="flex items-center text-green-600 hover:text-green-700"
+    >
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Back to Diary
+    </a>
+  </div>
+
+  <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">My Food Donations</h1>
+    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+      Track and manage your food donations
+    </p>
+  </div>
+
+  <!-- New Donation Button -->
+  <div class="mb-8">
+    <button
+      onclick="openDonationModal()"
+      class="button bg-green-600 text-white"
+    >
+      <i class="fa-solid fa-plus mr-2"></i>
+      Add New Donation
+    </button>
+  </div>
+
+  <!-- Donations List -->
+  <div class="space-y-6">
+    {% for donation in donations %}
+    <div class="card flex flex-col md:flex-row overflow-hidden">
+      <div class="p-4 md:p-6 flex-1">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="card-title">{{ donation.food_name }}</h3>
+            <p class="card-description">{{ donation.category }}</p>
+          </div>
+          <span
+            class="badge {% if donation.status == 'Available' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+          >
+            {{ donation.status }}
+          </span>
+        </div>
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center text-sm text-gray-600">
+            <i class="fa-regular fa-calendar mr-2"></i>
+            <span>Expires: {{ donation.expiration|date:"Y-m-d" }}</span>
+          </div>
+          <div class="flex items-center text-sm text-gray-600">
+            <i class="fa-solid fa-location-pin mr-2"></i>
+            <span>{{ donation.location }}</span>
+          </div>
+          <div class="flex items-center text-sm text-gray-600">
+            <i class="fa-regular fa-clock mr-2"></i>
+            <span>Quantity: {{ donation.quantity }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 p-4 md:p-6 md:w-64 flex flex-col justify-between">
+        <div class="space-y-4">
+          {% if donation.claimer %}
+          <div>
+            <p class="font-medium text-gray-700">Claimed by</p>
+            <p class="font-semibold text-gray-800">
+              {{ donation.claimer_name }}
+            </p>
+          </div>
+          {% endif %}
+          <div class="flex flex-col gap-2">
+            {% if donation.status == 'Available' %}
+            <button
+              class="button bg-red-600 hover:bg-red-700"
+              onclick="deleteDonation({{ donation.id }})"
+            >
+              <i class="fa-solid fa-trash mr-2"></i>
+              Delete
+            </button>
+            <button
+              class="button bg-blue-600 hover:bg-blue-700"
+              onclick="editDonation({{ donation.id }})"
+            >
+              <i class="fa-solid fa-edit mr-2"></i>
+              Edit
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-12 bg-gray-50 rounded-lg">
+      <p class="text-gray-500 mb-4">
+        You haven't posted any food donations yet.
+      </p>
+      <button
+        onclick="openDonationModal()"
+        class="button bg-green-600 text-white"
+      >
+        <i class="fa-solid fa-plus mr-2"></i>
+        Add Your First Donation
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base_template.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup.css' %}" />
+{% endblock %} {% block content %}
+<div class="container mx-auto max-w-md py-16 px-4">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="text-center">Create an Account</h2>
+      <p class="text-center">Join our community to start reducing food waste</p>
+    </div>
+    <div class="card-content">
+      <form method="POST" id="signupForm">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your full name"
+            required
+          />
+          <span id="error-name" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+          />
+          <span id="error-email" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            required
+          />
+          <span id="error-password" class="error-message">
+            {% if error %}
+              <p class="text-red-500">{{ error }}</p>
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Confirm your password"
+            required
+          />
+          <span id="error-confirmPassword" class="error-message"></span>
+        </div>
+
+        <span id="error-form" class="error-message"></span>
+        
+
+        <button type="submit" class="submit-btn" id="submitBtn">Sign Up</button>
+      </form>
+    </div>
+    <div class="card-footer">
+      <p class="footer-text">
+        Already have an account?
+        <a href="{% url 'login' %}" class="sign-up-link">Log in</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<!--<script src="{% static 'js/signup.js' %}"></script> --> 
+{% endblock %}

@@ -1,0 +1,261 @@
+{% extends 'base_template.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/donors.css' %}" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+{% endblock %} {% block content %}
+
+<div class="container">
+  <!-- Back to Community -->
+  <a href="{% url 'community:community' %}" class="back-button">
+    <i class="fa-solid fa-arrow-left"></i>
+    Back to Community
+  </a>
+
+  <h1 class="form-title">Food Donation Center</h1>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-container">
+    <div class="tabs-nav">
+      <button
+        class="tab-btn active"
+        data-target="tab-content-donations"
+        id="tab-donations"
+        onclick="showTab('donations')"
+      >
+        <i class="fas fa-list"></i> My Donations
+      </button>
+      <button
+        class="tab-btn"
+        data-target="tab-content-add"
+        id="tab-add"
+        onclick="showTab('add')"
+      >
+        <i class="fas fa-plus"></i> Add New Donation
+      </button>
+    </div>
+  </div>
+
+  <!-- Add New Donation Form -->
+  <div id="tab-content-add" class="tab-content">
+    <div class="form-section">
+      <h2 class="form-title">Share Food with Your Community</h2>
+
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="donation-form space-y-6"
+      >
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Food Name -->
+          <div class="form-group">
+            <label class="label">Food Name</label>
+            <input
+              type="text"
+              name="title"
+              required
+              class="input"
+              placeholder="Enter food name"
+            />
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label class="label">Category</label>
+            <select name="category" required class="select">
+              <option value="">Select Category</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Grains & Bread">Grains & Bread</option>
+              <option value="Protein">Protein & Meat</option>
+              <option value="Prepared Meals">Prepared Meals</option>
+              <option value="Canned Goods">Canned Goods</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="label">Description</label>
+          <textarea
+            name="description"
+            required
+            class="textarea"
+            rows="4"
+            placeholder="Describe the food item, its condition, and any special notes"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Location -->
+          <div class="form-group">
+            <label class="label">Pickup Location</label>
+            <input
+              type="text"
+              name="location"
+              required
+              class="input"
+              placeholder="Enter pickup location"
+            />
+          </div>
+
+          <!-- Quantity -->
+          <div class="form-group">
+            <label class="label">Quantity</label>
+            <input
+              type="text"
+              name="quantity"
+              required
+              class="input"
+              placeholder="E.g., 2 boxes, 500g, etc."
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Image Upload -->
+          <div class="form-group">
+            <label class="label">Food Image</label>
+            <div class="file-upload">
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                required
+                class="file-input"
+              />
+              <div class="file-label">
+                <i class="fas fa-camera"></i>
+                <span class="file-label-text"
+                  >Upload a clear image of the food</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Expiration Date -->
+          <div class="form-group">
+            <label class="label">Expiration Date</label>
+            <input
+              type="date"
+              name="expiration_date"
+              required
+              class="input"
+              min="{{ today|date:'Y-m-d' }}"
+            />
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="button primary w-full">
+          <i class="fas fa-share-alt"></i> Share Food
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- My Donations Tab -->
+  <div id="tab-content-donations" class="tab-content active">
+    <div class="posts-feed">
+      {% for post in DonationFoodPost %}
+      <div
+        class="post-card"
+        data-post-id="{{ post.id }}"
+        data-post-title="{{ post.food_name }}"
+      >
+        <div class="post-header">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="avatar">
+                {{ post.donor.username|make_list|first }}
+              </div>
+              <div>
+                <h3 class="font-semibold">{{ post.donor.username }}</h3>
+                <span class="text-sm text-gray-500">
+                  {{ post.created_at|timesince }} ago
+                </span>
+              </div>
+            </div>
+            <span class="status-badge available"> Active </span>
+          </div>
+        </div>
+
+        <div class="post-content">
+          {% if post.image %}
+          <img
+            src="{{ post.image.url }}"
+            alt="{{ post.food_name }}"
+            class="post-image"
+          />
+          {% endif %}
+
+          <h2 class="post-title">{{ post.food_name }}</h2>
+          <p class="post-description">{{ post.description }}</p>
+
+          <div class="post-details">
+            <div class="post-details-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ post.location }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-box"></i>
+              <span>{{ post.quantity }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-calendar"></i>
+              <span>Expires: {{ post.expiry_date }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-tag"></i>
+              <span>{{ post.category }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-info-circle"></i>
+              <span
+                >Status:
+                <span
+                  class="status-badge {% if post.status == 'Available' %}available{% elif post.status == 'Claimed' %}claimed{% else %}completed{% endif %}"
+                >
+                  {{ post.status }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="post-actions">
+            <button
+              class="button danger delete-post-btn"
+              data-post-id="{{ post.id }}"
+              data-post-title="{{ post.food_name }}"
+            >
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class="fas fa-box-open"></i>
+        </div>
+        <h3 class="empty-state-title">No Donations Yet</h3>
+        <p class="empty-state-text">
+          You haven't shared any food items. Add your first donation to help
+          reduce food waste.
+        </p>
+        <button class="button primary" onclick="showTab('add')">
+          <i class="fas fa-plus"></i> Add Your First Donation
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/donors.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title %}AI Recipe Generator{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/recipe_ai.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+{% endblock %} {% block content %}
+
+<div class="page-content">
+  <h1><i class="fas fa-utensils"></i> AI Recipe Generator</h1>
+  <p class="lead">
+    Your personal AI chef to help create delicious recipes with ingredients you
+    have!
+  </p>
+  <label for="user-input" class="form-label">
+    <h3><i class="fas fa-clipboard-list"></i> What would you like to cook?  </h3>
+    <span class="tooltip-text"
+      >Choose how you want to generate your recipe</span
+    >
+  </label>
+
+  <!--tabs-->
+  <div class="tabs">
+    <button id="use-text" class="tab active" data-tab="input">By input ingredient</button>
+    <button  id="use-inventory" class="tab" data-tab="available_ingredient">By available ingredient</button>
+  </div>
+
+  <!--form2 from ingredient inventory-->
+  <div class="display-available-ingredient hidden" id="available-ingredient">
+  <div class="ingredient-container">
+    <label for="user-input" class="form-label">
+      <h3>Your Ingredient Inventory</h3>
+      <span class="tooltip-text">Select ingredients to use in your recipe</span>
+    </label>
+
+    <form action="{% url 'generate_recipe' %}" method="POST" id="ingredient-form">
+      {% csrf_token %}
+      <ul class="ingredient-list">
+        {% for ingredient in ingredients %}
+        <li>
+          <label class="ingredient-card" data-status="{{ ingredient.status|lower }}">
+            <input type="checkbox" class="select-checkbox" name="selected_ingredients" value="{{ ingredient.id }}" onchange="toggleSelect(this)">
+            <div class="ingredient-content">
+              <h3>🥬 {{ ingredient.name }}</h3>
+              <p>Quantity: {{ ingredient.quantity }}</p>
+              <p>Status: 
+                <span class="badge {{ ingredient.status|slugify }}">{{ ingredient.status }}</span>
+              </p>
+              <p>Expires: {{ ingredient.expiry_date|date:"M d, Y" }}</p>
+            </div>
+          </label>
+        </li>
+        {% empty %}
+        <p>No ingredients in your inventory.</p>
+        <a href="{% url 'ingredient_tracker:expiring_tracker' %}" class="add-ingredient">
+          Add ingredients to your inventory
+        </a>
+        {% endfor %}
+      </ul>
+    </form>
+  </div>
+</div>
+
+
+ <!--form1 user input-->
+  <form method="POST" id="recipe-form" action="{% url 'recipe_ai' %}" >
+    {% csrf_token %}
+    <textarea
+      class="form-control"
+      id="user-input"
+      name="user_input"
+      placeholder="Example: chicken, garlic, lemon, herbs"
+      required
+    ></textarea>
+  </form>
+
+  <!--submit button-->
+  <button type="submit" class="btn btn-success" id="generate-btn" data-target="recipe-form">
+    <i class="fas fa-wand-magic-sparkles"></i> Generate Recipe
+    <span class="spinner" style="display: none">
+      <i class="fas fa-spinner fa-spin"></i>
+    </span>
+  </button>
+
+  <!--output section-->
+  <div id="output-section" class="hidden">
+    <h3 class="yourRecipe"><i class="fas fa-book-open"></i> Your Recipe</h3>
+      <div class="recipe-container">
+        <textarea id="recipe-output" readonly>
+  {% if recipe %}{{ recipe }}{% endif %}</textarea
+        >
+        <button class="btn copy-btn" onclick="copyRecipe()">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/recipe_ai.js' %}"></script>
+
+{% endblock %}

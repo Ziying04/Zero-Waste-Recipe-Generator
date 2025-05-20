@@ -1,0 +1,160 @@
+{% extends 'base_template.html' %} 
+{% load static %} 
+
+{% block title %}Inventory{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/expiring_tracker.css' %}" />
+{% endblock %} 
+
+{% block content %}
+<div class="container">
+  <h1 class="title"><i class="nav-icon fas fa-carrot"></i>Ingredient Inventory</h1>
+
+  <div class="actions">
+    <button class="btn green" onclick="toggleForm()">+ Add Ingredient</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="all">All Ingredients</button>
+    <button class="tab" data-tab="expiring">Expiring Soon</button>
+    <button class="tab" data-tab="expired">Expired</button>
+    <button class="tab" data-tab="fresh">Fresh</button>
+  </div>
+
+  <div id="form" class="card hidden" >
+    <h2 class="card-title">Add New Ingredient</h2>
+    <p class="card-description">Track your ingredient's expiry date</p>
+    <form method="POST" id="ingredient-form" action="{% url 'ingredient_tracker:add_ingredient' %}">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="">Select Category</option>
+            <option value="Vegetables">Vegetables</option>
+            <option value="Fruits">Fruits</option>
+            <option value="Dairy">Dairy</option>
+            <option value="Meat">Meat</option>
+            <option value="Seafood">Seafood</option>
+            <option value="Grains & Pasta">Grains & Pasta</option>
+            <option value="Bakery">Bakery</option>
+            <option value="Frozen Foods">Frozen Foods</option>
+            <option value="Beverages">Beverages</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Others">Others</option>
+          </select>
+          <input type="text" id="custom-category" name="custom-category" placeholder="Enter custom category" class="hidden mt" />
+        </div>
+        
+        <div class="form-group">
+          <label for="name">Ingredient Name</label>
+          <select id="name" name="name" required>
+            <option value="">Select Ingredient</option>
+          </select>
+          <input type="text" id="custom-name" name="custom-name" placeholder="Enter custom ingredient name" class="hidden mt" />
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity</label>
+          <input type="text" id="quantity" name="quantity" placeholder="e.g., 500g, 2 packs" required/>
+        </div>
+        <div class="form-group">
+          <label for="location">Storage Location</label>
+          <select id="location" name="location" required> 
+            <option value="fridge">Refrigerator</option>
+            <option value="freezer">Freezer</option>
+            <option value="pantry">Pantry</option>
+            <option value="counter">Counter</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="purchaseDate">Purchase Date</label>
+          <input type="date" id="purchaseDate" name="purchaseDate" required/>
+        </div>
+        <div class="form-group">
+          <label for="expiryDate">Expiry Date</label>
+          <input type="date" id="expiryDate" name="expiryDate" required/>
+        </div>
+        <div class="form-group full-width">
+          <label for="notes">Notes</label>
+          <input type="text" id="notes" name="notes" placeholder="Any additional notes" />
+        </div>
+      </div>
+      <button class="btn green mt">Add to Inventory</button>
+    </form>
+  </div>
+
+  {% if messages %}
+    <div class="notification-container">
+      {% for message in messages %}
+        <div class="notification-message {{ message.tags }}">
+          <span>{{ message }}</span>
+          <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+        </div>
+      {% endfor %}
+      <script>
+        setTimeout(() => {
+          document.querySelectorAll('.notification-message').forEach(el => {
+            el.style.display = 'none';
+          });
+        }, 5000); // 5 seconds
+      </script>
+    </div>
+  {% endif %}
+
+  
+  <p>Ingredient count: {{ ingredients|length }}</p>
+  {% if ingredients %}
+    {% if any_expiring_soon %}
+      <div class="alert-banner">
+        ⚠️ Warning: You have ingredients expiring soon! Check and use them quickly.
+      </div>
+    {% endif %}
+    <div class="grid" >
+      {% for ingredient in ingredients %}
+      <div class="card ingredient {% if ingredient.status == 'Expiring Soon' %}highlight-expiring float-alert{% endif %}" 
+      data-status="{{ ingredient.status|lower }}">
+        <div class="card-header">
+          <div>
+            <h3 class="ingredient-name">🥬 {{ ingredient.name }}</h3>
+            <p class="ingredient-quantity">{{ ingredient.quantity }}</p>
+          </div>
+          <form method="POST" action="{% url 'ingredient_tracker:delete_ingredient' ingredient.id %}"  class="delete-form">
+            {% csrf_token %}
+            <button type="submit" class="icon-btn">🗑</button>
+          </form>
+        </div> 
+        <div class="card-body">
+          <p><span class="label"><b>Expires:  {{ ingredient.expiry_date|date:"M d, Y" }}</b></span></p>
+          <p>
+            <span class="label">Status:</span>
+            {% if ingredient.days_left and ingredient.days_left < 1 %}
+              <span class="badge danger">{{ ingredient.status }}</span>
+            {% elif ingredient.days_left and ingredient.days_left <= 3 %}
+              <span class="badge warning">{{ ingredient.status }}</span>
+            {% elif ingredient.days_left %}
+              <span class="badge success">{{ ingredient.status }}</span>
+            {% else %}
+              <span class="badge">No info</span>
+            {% endif %}
+          </p>
+          <p><span class="label">Location:</span> {{ ingredient.location|capfirst }}</p>
+          <p><span class="label">Category:</span> {{ ingredient.category }}</p>
+          <p><span class="label">Notes:</span> {{ ingredient.notes }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="no-data" id="no-data">
+        <p>No ingredients found.</p>
+        <button class="btn green" onclick="toggleForm()">+ Add Your First Ingredient</button>
+      </div>
+      {% endif %}
+  </div>
+
+  {% endblock %} {% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="{% static 'js/expiring_tracker.js' %}"></script>
+  
+  {% endblock %}

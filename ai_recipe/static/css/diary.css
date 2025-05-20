@@ -1,0 +1,228 @@
+.page-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+h1 {
+    text-align: center;
+    color: #2d3436;
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+h1 i {
+    color: #0984e3;
+    margin-right: 0.5rem;
+}
+
+.diary-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+@media (min-width: 1200px) {
+    .diary-sections {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1500px) {
+    .diary-sections {
+        grid-template-columns: repeat(5, 1fr);
+        max-width: 1400px; /* Limit maximum width to maintain card sizes */
+        margin: 0 auto;
+    }
+}
+
+.section {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    height: 280px; /* Fixed height for all cards */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.section h2 {
+    color: #2d3436;
+    font-size: 1.5rem;
+    margin-bottom: 1rem; /* Reduced margin to help with spacing */
+}
+
+.section h2 i {
+    margin-right: 0.5rem;
+    color: #16A34A;
+}
+
+.section .btn {
+    background: #16A34A;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section .btn:hover {
+    background: #15803d;
+}
+
+.stats {
+    margin: 1rem 0; /* Adjusted margin for better spacing */
+    font-size: 2rem;
+    font-weight: 700;
+    color: #16A34A;
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    color: #636e72;
+    margin-top: 0.5rem;
+}
+
+.stats-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #16A34A;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #636e72;
+}
+
+.shared-recipe {
+    position: relative;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.edit-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.edit-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.edit-button:hover {
+    background-color: #45a049;
+}
+
+.save-button {
+    background-color: #2196F3;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+}
+
+.save-button:hover {
+    background-color: #1976D2;
+}
+
+.editable-field {
+    padding: 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.editable-field:focus {
+    border-color: #4CAF50;
+    outline: none;
+    background-color: #fff;
+}
+
+.editing .editable-field {
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #fff;
+    min-height: 24px;
+    margin: 4px 0;
+}
+
+.editing .editable-field:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    outline: none;
+}
+
+.editing .editable-field {
+    border-color: #ddd;
+    background-color: #fff;
+}
+
+.cancel-button {
+    background-color: #f44336;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: none;
+}
+
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+    .page-content {
+        padding: 1rem;
+    }
+    
+    .diary-sections {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .section {
+        height: auto; /* Allow dynamic height on mobile */
+        min-height: 250px; /* Minimum height on mobile */
+    }
+}

@@ -1,0 +1,65 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title %}My Likes{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+{% endblock %} {% block content %}
+
+<div class="container page-content">
+  <div class="text-center">
+    <h1 class="mb-4"><i class="fas fa-heart"></i> My Liked Recipes</h1>
+  </div>
+
+  <div class="row g-4" id="recipe-grid">
+    {% if liked_recipes %} {% for like in liked_recipes %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="recipe-card">
+        {% if like.recipe.image_url %}
+        <img
+          src="{{ like.recipe.image_url }}"
+          class="recipe-card-img"
+          alt="{{ like.recipe.name }}"
+        />
+        {% else %}
+        <img
+          src="{% static 'images/default-recipe.jpg' %}"
+          class="recipe-card-img"
+          alt="Default recipe image"
+        />
+        {% endif %}
+        <div class="recipe-card-body">
+          <h5 class="recipe-card-title">
+            <a href="{% url 'display_recipe' like.recipe.id %}"
+              >{{ like.recipe.name }}</a
+            >
+          </h5>
+          <p class="recipe-card-time">
+            <i class="bi bi-clock"></i> {{ like.recipe.cooking_time }} minutes
+          </p>
+          <div class="recipe-actions">
+            <button
+              class="btn btn-light like-btn"
+              data-recipe-id="{{ like.recipe.id }}"
+              data-liked="true"
+            >
+              <i class="fas fa-heart" style="color: #ff4b4b"></i>
+              <span class="like-count">{{ like.recipe.likes.count }}</span>
+            </button>
+            <a
+              href="{% url 'display_recipe' like.recipe.id %}"
+              class="btn btn-light"
+            >
+              <i class="fas fa-eye"></i> View Recipe
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <div class="col-12 text-center">
+      <p class="text-muted">You haven't liked any recipes yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script src="{% static 'js/kitchen.js' %}"></script>
+{% endblock %}

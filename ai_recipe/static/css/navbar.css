@@ -1,0 +1,357 @@
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+    /* Increase right padding */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-start;
+    /* Change to flex-start to align items from left */
+    gap: 0.5rem;
+    /* Reduce from 4rem to 2rem */
+    align-items: center;
+    width: 100%;
+    /* Ensure full width */
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    /* Consistent font */
+}
+
+.navbar-brand {
+    font-size: 2rem;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.brand-text {
+    color: #2d3436;
+}
+
+.brand-highlight {
+    color: #047857;
+    background: linear-gradient(120deg, #5cf193 0%, #16A34A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-right: 0;
+    /* Remove auto margin */
+    flex: 1;
+    max-width: 800px;
+    /* Prevent excessive spreading */
+}
+
+.navbar-nav {
+    display: flex;
+    gap: 2rem;
+    /* Reduce gap between nav items */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-items: center;
+    flex-wrap: nowrap;
+    /* Prevent wrapping */
+    min-width: fit-content;
+    margin-right: 1rem;
+    /* Add space between nav items and auth section */
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    color: #2d3436;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.nav-icon {
+    font-size: 1.1rem;
+    color: #16A34A;
+}
+
+.nav-link:hover {
+    color: #16A34A;
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    color: #16A34A;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4eff8f 0%, #16A34A 100%);
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* Add padding to body to account for fixed navbar */
+body {
+    padding-top: 80px;
+    /* Ensure consistent padding for all pages */
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    /* Consistent font */
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+        /* Adjust padding for smaller screens */
+        gap: 1rem;
+        /* Further reduce gap on mobile */
+    }
+
+    .navbar-nav {
+        gap: 1.5rem;
+    }
+
+    .nav-link span {
+        display: none;
+    }
+
+    .nav-icon {
+        font-size: 1.3rem;
+    }
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 40px;
+    /* Set fixed width */
+    height: 40px;
+    /* Set fixed height */
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    display: none;
+}
+
+.profile-dropdown.active {
+    display: block;
+}
+
+.profile-dropdown a {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #2d3436;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.profile-dropdown a i {
+    width: 20px;
+    color: #16A34A;
+}
+
+.profile-dropdown a:hover {
+    background-color: #f5f6fa;
+    color: #16A34A;
+}
+
+.auth-section {
+    margin-left: 0;
+    /* Remove auto margin */
+    padding-left: 1rem;
+    /* Add padding to separate from nav items */
+    border-left: 1px solid #eee;
+    /* Optional: adds a subtle divider */
+    min-width: fit-content;
+    /* Ensure it doesn't get squeezed */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.login-btn,
+.signup-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.login-btn {
+    color: #16A34A;
+}
+
+.signup-btn {
+    background: #16A34A;
+    color: white;
+}
+
+.profile-button {
+    cursor: pointer;
+    position: relative;
+}
+
+.profile-button i {
+    font-size: 24px;
+    /* Make icon bigger */
+    color: #16A34A;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    display: none;
+}
+
+.profile-dropdown.show {
+    display: block;
+}
+
+.profile-info {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-info span {
+    display: block;
+}
+
+.profile-info .email {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.profile-dropdown a {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #2d3436;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.profile-dropdown a i {
+    width: 20px;
+    color: #16A34A;
+}
+
+.profile-dropdown a:hover {
+    background-color: #f5f6fa;
+    color: #16A34A;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+    }
+
+    .profile-button {
+        width: 35px;
+        height: 35px;
+    }
+
+    .profile-button i {
+        font-size: 20px;
+    }
+}
+
+.notification-button i{
+    font-size: 20px;
+    color: #16A34A;
+}
+
+.notification-button {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-count {
+  background-color: red;
+  color: white;
+  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 300px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 10;
+}
+
+.notification-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-dropdown li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-dropdown li.unread {
+  background-color: #f9f9f9;
+}
+
+.notification-dropdown .timestamp {
+  display: block;
+  font-size: 0.75em;
+  color: gray;
+}

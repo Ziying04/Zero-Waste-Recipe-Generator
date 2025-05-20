@@ -1,0 +1,134 @@
+{% extends 'base_template.html' %} {% load static %} {% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/forum.css' %}" />
+
+{% endblock %} {% block content %}
+
+<div class="forum-container">
+  <div class="post-form-section">
+    <h2>Share Food with Community</h2>
+    <form method="POST" enctype="multipart/form-data" class="post-form">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Food Title</label>
+          <input type="text" name="title" required />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="Fruits">Fruits</option>
+            <option value="Vegetables">Vegetables</option>
+            <option value="Dairy">Dairy</option>
+            <option value="Grains & Bread">Grains & Bread</option>
+            <option value="Protein">Protein & Meat</option>
+            <option value="Prepared Meals">Prepared Meals</option>
+            <option value="Canned Goods">Canned Goods</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="3" required></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" required />
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="text" name="quantity" required />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Food Image</label>
+          <div class="file-upload">
+            <input type="file" name="image" accept="image/*" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Expiration Date</label>
+          <input type="date" name="expiration_date" required />
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-share"></i> Share Food
+      </button>
+    </form>
+  </div>
+
+  <div class="posts-section">
+    {% for post in posts %}
+    <article class="post-card">
+      <div class="post-header">
+        <div class="user-info">
+          <div class="user-avatar">{{ post.user.username|first }}</div>
+          <div class="post-meta">
+            <h3>{{ post.user.username }}</h3>
+            <span>{{ post.created_at|timesince }} ago</span>
+          </div>
+        </div>
+        {% if post.user == request.user %}
+        <div class="post-actions">
+          <button onclick="editPost('{{ post.id }}')">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button onclick="deletePost('{{ post.id }}')"></button>
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="post-content">
+        {% if post.image %}
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" />
+        {% endif %}
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.description }}</p>
+
+        <div class="post-details">
+          <span><i class="fas fa-map-marker-alt"></i> {{ post.location }}</span>
+          <span><i class="fas fa-box"></i> {{ post.quantity }}</span>
+          <span
+            ><i class="fas fa-calendar"></i> Expires: {{ post.expiration_date
+            }}</span
+          >
+          <span><i class="fas fa-tag"></i> {{ post.category }}</span>
+        </div>
+      </div>
+
+      <div class="post-comments">
+        {% for comment in post.comments.all %}
+        <div class="comment">
+          <div class="comment-header">
+            <div class="comment-avatar">{{ comment.user.username|first }}</div>
+            <div class="comment-meta">
+              <strong>{{ comment.user.username }}</strong>
+              <span>{{ comment.created_at|timesince }} ago</span>
+            </div>
+          </div>
+          <p>{{ comment.content }}</p>
+        </div>
+        {% endfor %}
+
+        <form class="comment-form" data-post-id="{{ post.id }}">
+          <input type="text" placeholder="Write a comment..." />
+          <button type="submit">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

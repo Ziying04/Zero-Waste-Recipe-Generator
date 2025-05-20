@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}ZeroWasteRecipe{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'bootstrap/css/bootstrap.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+    {% comment %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+    {% endcomment %} {% comment %}
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}" />
+    {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/recipe_ai.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/adminPage.css' %}">
+    
+    <!-- Your existing CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+
+    <!-- Add Font Awesome here -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-..."
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+</head>
+<body>
+    <style>
+      body {
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif; /* Ensure consistent font globally */
+      }
+    </style>
+    {% block extra_css %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    {% include 'navbar.html' %} {% block content %}{% endblock %}
+
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

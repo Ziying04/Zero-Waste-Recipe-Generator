@@ -1,0 +1,81 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title %}Shared Recipes{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+{% endblock %} {% block content %}
+
+<div class="container page-content">
+  {% csrf_token %}
+  <div class="text-center">
+    <h1 class="mb-4">
+      <span class="fancy-title">My Recipe Collection</span>
+    </h1>
+    <p class="lead text-muted mb-5">
+      Share your culinary creations with the world!
+    </p>
+  </div>
+
+  <!-- Add search bar -->
+  <div class="search-container mb-5">
+    <div class="search-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        id="recipe-search"
+        class="search-input"
+        placeholder="Search your recipes..."
+      />
+    </div>
+  </div>
+
+  <div class="row g-4" id="recipe-grid">
+    {% if user_recipes %} {% for recipe in user_recipes %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="recipe-card">
+        {% if recipe.image_url %}
+        <img
+          src="{{ recipe.image_url }}"
+          class="recipe-card-img"
+          alt="{{ recipe.name }}"
+        />
+        {% else %}
+        <img
+          src="{% static 'images/default-recipe.jpg' %}"
+          class="recipe-card-img"
+          alt="Default recipe image"
+        />
+        {% endif %}
+        <div class="recipe-card-body">
+          <h5 class="recipe-card-title">
+            <a href="{% url 'edit_recipe' recipe.id %}">{{ recipe.name }}</a>
+          </h5>
+          <p class="recipe-card-time">
+            <i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes
+          </p>
+          <div class="recipe-actions">
+            <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-primary">
+              <i class="fas fa-edit"></i> Edit Recipe
+            </a>
+            <a
+              href="{% url 'display_recipe' recipe.id %}"
+              class="btn btn-light"
+            >
+              <i class="fas fa-eye"></i> View Recipe
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <div class="col-12 text-center">
+      <p class="text-muted mb-4">You haven't shared any recipes yet.</p>
+      <a href="{% url 'recipe_ai' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create Your First Recipe
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script src="{% static 'js/kitchen.js' %}"></script>
+<script src="{% static 'js/sharing.js' %}"></script>
+{% endblock %}

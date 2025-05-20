@@ -1,0 +1,49 @@
+{% extends 'base_template.html' %} {% load static %}
+{% block title %}Edit {{ recipe.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container page-content">
+  {% csrf_token %}
+  <div class="recipe-detail-card">
+    <div class="recipe-edit" data-recipe-id="{{ recipe.id }}">
+      <div class="mb-4">
+        <h3>Recipe Name</h3>
+        <div class="editable-field form-control" data-field="name">{{ recipe.name }}</div>
+      </div>
+
+      <div class="mb-4">
+        <h3>Cooking Time (minutes)</h3>
+        <div class="editable-field form-control" data-field="cooking_time">{{ recipe.cooking_time }}</div>
+      </div>
+
+      <div class="mb-4">
+        <h3>Ingredients</h3>
+        <div class="editable-field form-control" data-field="ingredients">{{ recipe.ingredients }}</div>
+      </div>
+
+      <div class="mb-4">
+        <h3>Steps</h3>
+        <div class="editable-field form-control" data-field="steps">{{ recipe.steps }}</div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary save-button">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+        <a href="{% url 'sharing' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/edit_recipe.js' %}"></script>
+{% endblock %}

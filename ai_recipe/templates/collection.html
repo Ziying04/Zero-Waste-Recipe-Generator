@@ -1,0 +1,45 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title %} Recipe Collection{% endblock %} 
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+
+{% endblock %} {% block content %}
+
+<div class="page-content">
+  <h1><i class="fas fa-folder"></i> My Collection</h1>
+  <div class="recipes-grid">
+    {% if saved_recipes %} {% for recipe in saved_recipes %}
+    <div class="recipe-card">
+      {% if recipe.image_url %}
+      <img
+        src="{{ recipe.image_url }}"
+        class="recipe-card-img"
+        alt="{{ recipe.name }}"
+      />
+      {% else %}
+      <img
+        src="{% static 'images/default-recipe.jpg' %}"
+        class="recipe-card-img"
+        alt="Default recipe image"
+      />
+      {% endif %}
+      <div class="recipe-card-body">
+        <h3>{{ recipe.name }}</h3>
+        <p><i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes</p>
+        <div class="recipe-actions">
+          <a
+            href="{% url 'display_recipe' recipe.id %}"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-eye"></i> View
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <p class="no-recipes">No recipes in your collection yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

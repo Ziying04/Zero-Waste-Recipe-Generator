@@ -1,0 +1,63 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/claimed_food.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-12 px-4 max-w-6xl">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">My Claimed Food</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Track food items you've claimed and their pickup status.
+        </p>
+    </div>
+
+    <div class="space-y-6">
+        {% for claim in claimed_food %}
+        <div class="card flex flex-col md:flex-row overflow-hidden">
+            <div class="p-4 md:p-6 flex-1">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="card-title">{{ claim.food_name }}</h3>
+                        <p class="card-description">{{ claim.category }}</p>
+                    </div>
+                    <span class="badge {% if claim.status == 'Completed' %}bg-gray-200 text-gray-800{% else %}bg-purple-100 text-purple-800{% endif %}">
+                        {{ claim.status }}
+                    </span>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa-solid fa-location-pin mr-2"></i>
+                        <span>{{ claim.location }}</span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa-regular fa-clock mr-2"></i>
+                        <span>Quantity: {{ claim.quantity }}</span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fa-regular fa-calendar mr-2"></i>
+                        <span>Pickup Date: {{ claim.pickup_date|date:"Y-m-d" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 p-4 md:p-6 md:w-64 flex flex-col justify-between">
+                <div>
+                    <p class="font-medium text-gray-700">Donor</p>
+                    <p class="font-semibold text-gray-800">{{ claim.donor_name }}</p>
+                </div>
+                <button class="button mt-4">
+                    <i class="fa-regular fa-comment-dots mr-2"></i> Message
+                </button>
+                {% if claim.status != 'Completed' %}
+                <button class="button mt-2 bg-green-600 text-white">
+                    Mark as Completed
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

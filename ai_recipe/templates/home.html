@@ -1,0 +1,90 @@
+{% extends 'base_template.html' %} {% load static %} 
+{% block title %}Home{% endblock %}{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
+{% endblock %} {% block content %}
+
+    <!-- Hero Section -->
+    <section class="hero bg-green-50 py-16 px-4">
+        <div class="container">
+        <div class="flex-container">
+            <div class="text-section">
+            <h1 class="heading">Turn Leftover Ingredients into Delicious Meals</h1>
+            <p class="subheading">Reduce food waste by discovering AI-generated recipes that use exactly what you have in your kitchen.</p>
+            <div class="button-group">
+                <a href="{% url 'signup' %}" class="btn-primary">Get Started</a>
+                <a href="#" class="btn-outline">How It Works</a>
+            </div>
+            </div>
+            <div class="image-section">
+            <img src="placeholder.svg" alt="Food waste reduction concept" class="hero-img">
+            </div>
+        </div>
+        </div>
+    </section>
+  
+  
+      <!-- How It Works Section -->
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="how-steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Enter Your Ingredients</h3>
+        <p>List the ingredients you have in your kitchen that you want to use up.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>AI Creates Recipes</h3>
+        <p>Our AI generates personalized recipes based on your available ingredients.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Cook & Enjoy</h3>
+        <p>Follow the recipe instructions to create delicious meals while reducing food waste.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features">
+    <h2>Features to Help You Reduce Food Waste</h2>
+    <div class="feature-list">
+      <div class="feature">
+        <div class="feature-icon">🥘</div>
+        <h3>AI Recipe Generation</h3>
+        <p>Get custom recipes created by AI based on your ingredients.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔍</div>
+        <h3>Ingredient-Based Search</h3>
+        <p>Find recipes based on what you already have, not what you need to buy.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⏰</div>
+        <h3>Expiration Tracking</h3>
+        <p>Get alerts when your food is about to expire so you can use it in time.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌱</div>
+        <h3>Community Sharing</h3>
+        <p>Share surplus food with neighbors through our community forum.</p>
+      </div>
+    </div>
+  </section>
+  
+      <!-- CTA Section -->
+      <section class="cta py-16 px-4 bg-green-600 text-white">
+        <div class="container">
+          <h2>Join Our Zero-Waste Community Today</h2>
+          <p>Sign up now to start saving food, money, and the planet.</p>
+          <div class="cta-buttons">
+            <a href="{% url 'signup' %}" class="btn-primary">Sign Up</a>
+            <a href="{% url 'login' %}" class="btn-outline">Log In</a>
+          </div>
+        </div>
+      </section>
+
+  {% endblock %} {% block extra_js %}
+<script src="{% static 'js/home.js' %}"></script>
+
+{% endblock %}

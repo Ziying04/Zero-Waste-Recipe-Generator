@@ -1,0 +1,444 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{% static 'css/seekers.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero section with background image -->
+<div class="hero-banner">
+  <div class="hero-content container">
+    <h1 class="hero-title">Find Available Food</h1>
+    <p class="hero-subtitle">Browse food donations in your area and reduce waste together</p>
+  </div>
+</div>
+
+<div class="container">
+    <!-- Tabs for Browse/Claimed with enhanced design -->
+    <div class="tabs-wrapper mb-8">
+      <div class="tabs-container">
+        <button
+          id="tab-browse"
+          class="tab-btn active"
+          onclick="showTab('browse')"
+        >
+          <i class="fa-solid fa-search mr-2"></i> Browse Food
+        </button>
+        <button
+          id="tab-claimed"
+          class="tab-btn"
+          onclick="showTab('claimed')"
+        >
+          <i class="fa-solid fa-hand-holding-heart mr-2"></i> My Claimed Food
+        </button>
+      </div>
+    </div>
+
+    <!-- Browse Food Tab -->
+    <div id="tab-content-browse">
+        <!-- Improved filter section -->
+        <form method="get" id="filterForm" class="filter-section">
+            <!-- Hidden inputs -->
+            <input type="hidden" id="user_lat" name="user_lat" value="{{ user_lat }}">
+            <input type="hidden" id="user_lon" name="user_lon" value="{{ user_lon }}">
+
+            <!-- Enhanced map container with loading indicator -->
+            <div id="map-container" class="hidden mb-6">
+                <div class="map-header flex justify-between items-center mb-2">
+                    <h4 class="font-semibold text-gray-700">
+                        <i class="fa-solid fa-location-dot mr-2 text-green-600"></i> Select Your Location
+                    </h4>
+                    <button type="button" class="text-gray-500 hover:text-gray-700" onclick="hideMap()">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <div id="map" class="h-80 rounded-lg shadow-md relative">
+                    <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 rounded-lg">
+                        <div class="text-center">
+                            <div class="spinner-border inline-block w-8 h-8 border-4 border-t-green-500 border-r-green-300 border-b-green-200 border-l-green-400 rounded-full animate-spin"></div>
+                            <p class="mt-2 text-gray-700">Loading map...</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mt-2 italic"><i class="fa-solid fa-info-circle mr-1"></i> Click anywhere on the map to set your location</p>
+            </div>
+
+            <div class="search-bar">
+                <!-- Improved search bar layout for better responsiveness -->
+                <div class="search-inputs">
+                    <div class="search-field relative">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search_term }}"
+                            placeholder="Search by food name or description..."
+                            class="input pl-12 w-full"
+                            aria-label="Search food donations"
+                        />
+                        <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                        {% if search_term %}
+                        <button type="button" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600" 
+                                onclick="clearSearch(this)">
+                            <i class="fa-solid fa-times-circle"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="category-select">
+                        <select name="category" id="category" class="select" aria-label="Filter by category">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="distance" class="slider-label">
+                        Maximum Distance
+                    </label>
+                    <div class="slider-value">
+                        <span id="mile-display">10</span> miles
+                    </div>
+                </div>
+                <div class="slider-wrapper relative">
+                    <div class="slider-line absolute top-1/2 transform -translate-y-1/2 h-2 bg-green-600" style="width: 20%"></div>
+                    <input type="range" id="distance" name="distance" min="1" max="50" value="10" class="slider">
+                    <div id="mile-tooltip" class="hidden">10 mi</div>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="button" class="button location-button" onclick="showMap()">
+                    <i class="fa-solid fa-location-crosshairs mr-2"></i> Use My Location
+                </button>
+                <button type="submit" class="button search-button">
+                    <i class="fa-solid fa-filter mr-2"></i> Apply Filters
+                </button>
+            </div>
+        </form>
+
+        <!-- Food cards grid with animation -->
+        <div class="food-cards-grid">
+            {% for donation in donations %}
+            <div class="food-card" data-category="{{ donation.category|lower }}">
+                <div class="food-card-header">
+                    <div class="food-card-donor">
+                        <div class="donor-avatar">{{ donation.donor.username|first }}</div>
+                        <div class="donor-name">{{ donation.donor.username }}</div>
+                    </div>
+                    <div class="food-badge">Available</div>
+                </div>
+                {% if donation.image %}
+                <div class="food-card-image">
+                    <img src="{{ donation.image.url }}" alt="{{ donation.food_name }}" />
+                </div>
+                {% endif %}
+                <div class="food-card-content">
+                    <h3 class="food-card-title">{{ donation.food_name }}</h3>
+                    <p class="food-card-description">{{ donation.description|truncatechars:100 }}</p>
+                    
+                    <div class="food-card-details">
+                        <div class="detail-item">
+                            <i class="fa-solid fa-tag"></i>
+                            <span>{{ donation.category }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fa-solid fa-calendar"></i>
+                            <span>Expires: {{ donation.expiry_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>{{ donation.location }}{% if donation.distance %} ({{ donation.distance|floatformat:1 }} km){% endif %}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fa-solid fa-cubes"></i>
+                            <span>{{ donation.quantity }}</span>
+                        </div>
+                    </div>
+                    
+                    <form method="post" action="{% url 'community:claim_donation' donation.id %}" class="claim-form">
+                        {% csrf_token %}
+                        <button type="submit" class="claim-button">
+                            <i class="fa-solid fa-hand-holding-heart mr-2"></i> Claim This Food
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                <h3 class="empty-state-title">No Food Available</h3>
+                <p class="empty-state-message">There are currently no food donations that match your filters.</p>
+                <a href="{% url 'community:seekers' %}" class="empty-state-button">
+                    Reset Filters
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Claimed Food Tab -->
+    <div id="tab-content-claimed" style="display: none">
+        <div class="food-cards-grid">
+            {% for claim in claimed_food %}
+            <div class="food-card claimed">
+                <div class="food-card-header">
+                    <div class="food-card-donor">
+                        <div class="donor-avatar">{{ claim.food_post.donor.username|first }}</div>
+                        <div class="donor-name">{{ claim.food_post.donor.username }}</div>
+                    </div>
+                    <div class="food-badge {% if claim.status == 'Completed' %}completed{% else %}claimed{% endif %}">
+                        {{ claim.status }}
+                    </div>
+                </div>
+                {% if claim.food_post.image %}
+                <div class="food-card-image">
+                    <img src="{{ claim.food_post.image.url }}" alt="{{ claim.food_post.food_name }}" />
+                </div>
+                {% endif %}
+                <div class="food-card-content">
+                    <h3 class="food-card-title">{{ claim.food_post.food_name }}</h3>
+                    <p class="food-card-description">{{ claim.food_post.description|truncatechars:100 }}</p>
+                    
+                    <div class="food-card-details">
+                        <div class="detail-item">
+                            <i class="fa-solid fa-tag"></i>
+                            <span>{{ claim.food_post.category }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fa-solid fa-calendar"></i>
+                            <span>Expires: {{ claim.food_post.expiry_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>{{ claim.food_post.location }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <span>Claimed: {{ claim.claimed_date|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if claim.status != 'Completed' %}
+                    <form method="post" action="{% url 'community:mark_received' claim.id %}" class="claim-form">
+                        {% csrf_token %}
+                        <button type="submit" class="received-button">
+                            <i class="fa-solid fa-check-circle mr-2"></i> Mark as Received
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="completed-message">
+                        <i class="fa-solid fa-circle-check mr-2"></i> You have received this food
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                </div>
+                <h3 class="empty-state-title">No Claimed Food</h3>
+                <p class="empty-state-message">You haven't claimed any food items yet.</p>
+                <button onclick="showTab('browse')" class="empty-state-button">
+                    Browse Available Food
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Food stats section - only show if there are items to display -->
+    {% if donations.count > 0 or claimed_food.count > 0 %}
+    <div class="food-stats">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fa-solid fa-bread-slice"></i>
+            </div>
+            <div class="stat-count">{{ donations.count }}</div>
+            <div class="stat-label">Available Food Items</div>
+        </div>
+        {% if donations.count > 0 %}
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-count">{{ donations|dictsortreversed:"created_at"|slice:":1"|length }}</div>
+            <div class="stat-label">Active Donors</div>
+        </div>
+        {% endif %}
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fa-solid fa-hand-holding-heart"></i>
+            </div>
+            <div class="stat-count">{{ claimed_food.count }}</div>
+            <div class="stat-label">Your Claimed Items</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Improved message for sustainability -->
+<div class="sustainability-message">
+    <div class="container py-12 px-4 text-center">
+        <h2>Together We Can Reduce Food Waste</h2>
+        <p>Every food item you claim helps reduce waste and supports our community</p>
+        <div class="eco-icons">
+            <div class="eco-icon"><i class="fa-solid fa-seedling"></i></div>
+            <div class="eco-icon"><i class="fa-solid fa-leaf"></i></div>
+            <div class="eco-icon"><i class="fa-solid fa-earth-americas"></i></div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/slider.js' %}"></script>
+<script src="{% static 'js/seekers.js' %}"></script>
+<script>
+let map;
+let marker;
+
+function showMap() {
+    document.getElementById("map").style.display = "block";
+
+    if (!map) {
+        map = L.map('map').setView([3.1390, 101.6869], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker(e.latlng).addTo(map);
+            document.getElementById("user_lat").value = e.latlng.lat;
+            document.getElementById("user_lon").value = e.latlng.lng;
+            document.getElementById("filterForm").submit();
+        });
+        
+        // Force map to recalculate size when displayed
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 100);
+    }
+    
+    // Smooth scroll to map
+    document.getElementById("map").scrollIntoView({behavior: "smooth"});
+}
+
+function showTab(tab) {
+    const browseTab = document.getElementById("tab-content-browse");
+    const claimedTab = document.getElementById("tab-content-claimed");
+    const browseBtn = document.getElementById("tab-browse");
+    const claimedBtn = document.getElementById("tab-claimed");
+    
+    if(tab === "browse") {
+        browseTab.style.display = "block";
+        claimedTab.style.display = "none";
+        browseBtn.classList.add("active");
+        claimedBtn.classList.remove("active");
+    } else {
+        browseTab.style.display = "none";
+        claimedTab.style.display = "block";
+        browseBtn.classList.remove("active");
+        claimedBtn.classList.add("active");
+    }
+}
+
+// Animate cards on page load with staggered delay
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate food cards
+    const cards = document.querySelectorAll('.food-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Show messages if they exist
+    {% if messages %}
+    setTimeout(() => {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container';
+        
+        {% for message in messages %}
+        const message = document.createElement('div');
+        message.className = 'message {% if message.tags %}{{ message.tags }}{% endif %}';
+        message.innerHTML = `
+            <div class="message-icon">
+                <i class="fa-solid {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+            </div>
+            <div class="message-content">{{ message }}</div>
+            <button class="message-close">&times;</button>
+        `;
+        messageContainer.appendChild(message);
+        {% endfor %}
+        
+        document.body.appendChild(messageContainer);
+        
+        // Close button functionality
+        const closeButtons = document.querySelectorAll('.message-close');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.classList.add('fade-out');
+                setTimeout(() => {
+                    this.parentElement.remove();
+                    if(messageContainer.children.length === 0) {
+                        messageContainer.remove();
+                    }
+                }, 300);
+            });
+        });
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if(messageContainer.parentNode) {
+                messageContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    if(messageContainer.parentNode) {
+                        messageContainer.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }, 500);
+    {% endif %}
+    
+    // Adjust map size when window is resized
+    window.addEventListener('resize', function() {
+        if (map) {
+            map.invalidateSize();
+        }
+    });
+    
+    // Fix search bar and category select positioning
+    function adjustSearchLayout() {
+        const searchField = document.querySelector('.search-field');
+        const categorySelect = document.querySelector('.category-select');
+        
+        if (window.innerWidth <= 640) {
+            // Stack them on mobile
+            if (searchField) searchField.style.width = '100%';
+            if (categorySelect) categorySelect.style.width = '100%';
+        } else {
+            // Side by side on larger screens
+            if (searchField) searchField.style.width = '';
+            if (categorySelect) categorySelect.style.width = '200px';
+        }
+    }
+    
+    // Run on load and resize
+    adjustSearchLayout();
+    window.addEventListener('resize', adjustSearchLayout);
+});
+</script>
+{% endblock %}

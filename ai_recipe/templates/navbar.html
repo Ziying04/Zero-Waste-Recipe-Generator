@@ -1,0 +1,104 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a class="navbar-brand">
+      <span class="brand-text">ZeroWaste</span
+      ><span class="brand-highlight">Recipe</span>
+    </a>
+    <ul class="navbar-nav">
+      {% if user.is_authenticated %}
+      <li class="nav-item">
+        <a
+          class="nav-link {% if 'ai-generator' in request.path %}active{% endif %}"
+          href="{% url 'recipe_ai' %}"
+        >
+          <i class="nav-icon fas fa-robot"></i>
+          <span>AI Generator</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link {% if 'expiry-date-tracker' in request.path %}active{% endif %}"
+          href="{% url 'ingredient_tracker:expiring_tracker' %}"
+        >
+          <i class="nav-icon fas fa-carrot"></i>
+          <span>Ingredient Inventory</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a
+          class="nav-link {% if request.path == '/' %}active{% endif %}"
+          href="{% url 'home' %}"
+        >
+          <i class="nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      {% endif %}
+      <li class="nav-item">
+        <a
+          class="nav-link {% if 'kitchen' in request.path %}active{% endif %}"
+          href="{% url 'kitchen' %}"
+        >
+          <i class="nav-icon fas fa-utensils"></i>
+          <span>Kitchen</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link {% if 'community' in request.path %}active{% endif %}"
+          href="{% url 'community:community' %}"
+        >
+          <i class="nav-icon fas fa-users"></i>
+          <span>Community</span>
+        </a>
+      </li>
+    </ul>
+
+    
+    
+    <div class="auth-section">
+      {% if user.is_authenticated %}
+      
+        <div class="notification-button" onclick="toggleNotificationDropdown()">
+          <i class="fas fa-bell fa-fw"></i>
+          {% if notifications_unread_count > 0 %}
+            <span class="notification-count">{{ notifications_unread_count }}</span>
+          {% endif %}
+          <div class="notification-dropdown" id="notificationDropdown">
+            <h4>Notifications</h4>
+          
+          </div>
+        </div>
+
+      <div
+        class="profile-button"
+        data-authenticated="true"
+        onclick="toggleProfileDropdown()"
+      >
+        <i class="fas fa-user-circle fa-fw"></i>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-info">
+            <span>{{ user.userprofile.name }}</span>
+            <span class="email">{{ user.email }}</span>
+          </div>
+          <a href="{% url 'profile' %}"
+            ><i class="fas fa-user me-2"></i>My Profile</a
+          >
+          <a href="{% url 'diary' %}"
+            ><i class="fas fa-book me-2"></i>My Diary</a
+          >
+          <a href="{% url 'logout' %}"
+            ><i class="fas fa-sign-out-alt me-2"></i>Logout</a
+          >
+        </div>
+      </div>
+      {% else %}
+      <div class="auth-buttons">
+        <a href="{% url 'login' %}" class="nav-link login-btn">Login</a>
+        <a href="{% url 'signup' %}" class="nav-link login-btn">Sign Up</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 400px;
+    width: 100%;
+    padding: 16px;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    padding: 24px;
+    text-align: center;
+}
+
+.card-header h2 {
+    margin-bottom: 8px;
+    font-size: 24px;
+    color: #333;
+}
+
+.card-header p {
+    font-size: 16px;
+    color: #666;
+}
+
+.card-content {
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.error-message {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #16A34A;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #16A34A;
+}
+
+.card-footer {
+    padding: 16px;
+    text-align: center;
+    background-color: #ffffff;
+    border-radius: 0 0 8px 8px;
+}
+
+.footer-text {
+    font-size: 14px;
+    color: #333;
+}
+
+.sign-up-link {
+    color: #16A34A;
+    text-decoration: none;
+}
+
+.sign-up-link:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Optional: Add basic spacing between fields on small screens */
+@media (max-width: 576px) {
+    .container {
+        padding: 1rem;
+    }
+}
