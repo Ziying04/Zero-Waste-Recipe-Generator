@@ -121,6 +121,8 @@ document.querySelectorAll('.tab').forEach(tab => {
     const selected = this.getAttribute('data-tab');
     const cards = document.querySelectorAll('.ingredient');
 
+    let visibleCount = 0;
+
     cards.forEach(card => {
       const status = card.getAttribute('data-status');
 
@@ -131,10 +133,21 @@ document.querySelectorAll('.tab').forEach(tab => {
         (selected === 'fresh' && status === 'fresh')
       ) {
         card.style.display = 'block';
+        visibleCount++;
       } else {
         card.style.display = 'none';
       }
     });
+
+     const ingredientCount = document.getElementById("ingredient-count");
+    if (visibleCount === 0) {
+      ingredientCount.innerHTML = 
+      `<p> Ingredient Count: ${visibleCount} </p>
+      <p>No ingredient ${selected}.</p>`;
+    } else {
+      ingredientCount.innerHTML = 
+      `<p> Ingredient Count: ${visibleCount} </p>`; 
+    }
   });
 });
 

@@ -33,7 +33,7 @@
       <span class="tooltip-text">Select ingredients to use in your recipe</span>
     </label>
 
-    <form action="{% url 'generate_recipe' %}" method="POST" id="ingredient-form">
+    <form action="{% url 'recipe_ai' %}" method="POST" id="ingredient-form">
       {% csrf_token %}
       <ul class="ingredient-list">
         {% for ingredient in ingredients %}

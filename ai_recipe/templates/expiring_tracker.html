@@ -103,7 +103,7 @@
   {% endif %}
 
   
-  <p>Ingredient count: {{ ingredients|length }}</p>
+  <div id="ingredient-count"></div>
   {% if ingredients %}
     {% if any_expiring_soon %}
       <div class="alert-banner">
