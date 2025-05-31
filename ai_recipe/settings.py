@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'recipe',
     'community',  # Add community app
     'ingredient_tracker',  
+    'adminPanel',  # Add adminPanel app
 ]
 
 MIDDLEWARE = [
