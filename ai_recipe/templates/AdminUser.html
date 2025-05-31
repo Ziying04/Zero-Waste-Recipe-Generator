@@ -1,0 +1,200 @@
+{% load static %}
+{% extends "base_template.html" %}
+{% block title %}Admin Users{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/AdminUser.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <a class="sidebar-link" href="#">
+                <i class="fa fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="sidebar-link active" href="#">
+                <i class="fa fa-users"></i>
+                <span>Users</span>
+            </a>
+            <a class="sidebar-link" href="#">
+                <i class="fa fa-heart"></i>
+                <span>Donations</span>
+            </a>
+            <a class="sidebar-link" href="#">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span>Issues</span>
+            </a>
+            <a class="sidebar-link" href="#">
+                <i class="fa fa-chart-bar"></i>
+                <span>Analytics</span>
+            </a>
+            <a class="sidebar-link" href="#">
+                <i class="fa fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <div class="sidebar-bottom">
+                <button class="btn">
+                    <i class="fa fa-external-link-alt"></i>
+                    Back to Site
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-title">Admin Panel</h1>
+                <div class="admin-user">
+                    <span class="avatar">AD</span>
+                    <span>Admin</span>
+                    <i class="fa fa-chevron-down"></i>
+                </div>
+            </header>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="section-header">
+                        <div class="section-info">
+                            <h5>User Management</h5>
+                            <div class="text-muted">Manage user accounts and permissions</div>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline">
+                                <i class="fa fa-filter"></i>
+                                Filter
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fa fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="user-tabs">
+                    <button class="tab-btn active">All Users</button>
+                    <button class="tab-btn">Active</button>
+                    <button class="tab-btn">Inactive</button>
+                    <button class="tab-btn">Suspended</button>
+                </div>
+
+                <div class="card-body">
+                    <div style="padding: 24px; border-bottom: 1px solid #f3f4f6;">
+                        <div class="section-header">
+                            <div class="section-info">
+                                <h5 style="font-size: 1.25rem;">Users</h5>
+                                <div class="text-muted">Manage user accounts and permissions</div>
+                            </div>
+                            <div class="section-actions">
+                                <div class="search-container">
+                                    <i class="fa fa-search"></i>
+                                    <input type="text" placeholder="Search users...">
+                                </div>
+                                <button class="btn btn-success">
+                                    <i class="fa fa-plus"></i>
+                                    Add User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>USER</th>
+                                    <th>EMAIL</th>
+                                    <th>ROLE</th>
+                                    <th>STATUS</th>
+                                    <th>JOINED</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar">{{ user.username|slice:":1"|upper }}</div>
+                                            <div class="user-info">
+                                                <div class="user-name">{{ user.username }}</div>
+                                                <div class="user-handle">@{{ user.username|lower }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.is_superuser %}
+                                            <span class="badge badge-admin">Admin</span>
+                                        {% elif user.role == 'donor' %}
+                                            <span class="badge badge-donor">Donor</span>
+                                        {% elif user.role == 'seeker' %}
+                                            <span class="badge badge-seeker">Seeker</span>
+                                        {% else %}
+                                            <span class="badge badge-seeker">User</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge badge-active">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-inactive">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                    <td>
+                                        <button class="actions-btn" data-user-id="{{ user.id }}" aria-label="User actions" title="User actions">
+                                            <i class="fa fa-ellipsis-h"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 60px; color: #7d8597;">
+                                        <i class="fa fa-users" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.3;"></i>
+                                        <div style="font-size: 1.1rem; font-weight: 500;">No users found</div>
+                                        <div style="font-size: 0.9rem; margin-top: 8px;">Try adjusting your search or filter criteria</div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-container input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Actions menu functionality
+        document.querySelectorAll('.actions-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Add dropdown menu logic here
+                console.log('Actions menu clicked');
+            });
+        });
+    </script>
+</body>
+{% endblock %}
