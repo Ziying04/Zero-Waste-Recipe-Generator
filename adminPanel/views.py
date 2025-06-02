@@ -12,7 +12,7 @@ def admin_dashboard(request):
     
     return render(request, "adminPage.html", {'total_users': total_users})
 
-def admin_user(request):
+def admin_user(request):  
     users = User.objects.all()
     total_users = users.count()
-    return render(request, "adminUser.html", {"users": users, "total_users": total_users})
+    return render(request, "AdminUser.html", {"users": users, "total_users": total_users})
