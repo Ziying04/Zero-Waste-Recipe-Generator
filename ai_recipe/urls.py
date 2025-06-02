@@ -40,6 +40,7 @@ urlpatterns = [
     # Login and admin dashboard
     path('login/', custom_login, name='login'),
     path('admin-dashboard/', TemplateView.as_view(template_name="adminPage.html"), name='admin_dashboard'),
+    path('admin-users/', TemplateView.as_view(template_name="AdminUser.html"), name='admin_user'),
 ]
 
 # Serve media files in development
