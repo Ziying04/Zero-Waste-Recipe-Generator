@@ -2,17 +2,11 @@
 {% load static %}
 {% block title %}ZeroWasteRecipe{% endblock %}
 
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/adminPage.css' %}">
-<style>
-/* Test style to check if this block is rendered */
-#css-test { background: #ff0; color: #000; padding: 8px; }
-</style>
 {% endblock %}
 
 {% block content %}
-<div id="css-test">If this box is yellow, your extra_css block is rendered.</div>
 <div class="admin-container">
   <!-- Sidebar -->
   <aside class="admin-sidebar">
@@ -41,8 +35,7 @@
         <div class="icon-bg green"><i class="fa fa-users"></i></div>
         <div class="card-info">
           <div class="card-title">Total Users</div>
-          <div class="card-value">2,845</div>
-          <div class="card-change positive">+12% <span class="text-gray-500">from last month</span></div>
+            <div class="card-value">{{ total_users }}</div>
         </div>
       </div>
       <div class="admin-card">
