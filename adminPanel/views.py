@@ -2,24 +2,34 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from .models import Recipe, Donation, ForumPost, Comment, SharedResource
 
-# def admin_dashboard(request):
-    # Count the number of users
-  #  total_users = User.objects.count()
-    ## context = {
-    ##    "total_users": total_users,
-    ## } 
-
-   # print(f"Total Users: {total_users}")  # Check the console for the total user count
-    
-    #return render(request, "adminPage.html", {'total_users': total_users})
-
 def admin_dashboard(request):
-    total_users = User.objects.count()
+    print("=== ADMIN DASHBOARD VIEW CALLED ===")  # This should always appear
+    
+    try:
+        total_users = User.objects.count()
+        print(f"SUCCESS: Total Users = {total_users}")
+        
+        # Check if we have any users
+        if total_users == 0:
+            print("WARNING: No users found in database")
+        else:
+            # Show first few usernames
+            users = User.objects.all()[:3]
+            usernames = [user.username for user in users]
+            print(f"Sample users: {usernames}")
+            
+    except Exception as e:
+        print(f"ERROR: Could not count users - {e}")
+        total_users = 0
+    
     context = {
         'total_users': total_users,
     }
+    
+    print(f"Context being sent to template: {context}")
+    print("=== END ADMIN DASHBOARD VIEW ===")
+    
     return render(request, "adminPage.html", context)
-
 
 def admin_user(request):
     users = User.objects.all()
