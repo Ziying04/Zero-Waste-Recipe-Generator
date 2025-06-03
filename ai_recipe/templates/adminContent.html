@@ -1,0 +1,337 @@
+{% extends "base_template.html" %}
+{% load static %}
+{% block title %}Content Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/adminContent.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <aside class="admin-sidebar">
+    <a class="sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+    <a class="sidebar-link" href="{% url 'admin_user' %}"><i class="fa fa-users"></i><span>Users</span></a>
+    <a class="sidebar-link active" href="{% url 'admin_content' %}"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
+    <a class="sidebar-link" href="#"><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a>
+    <div class="sidebar-bottom">
+      <button class="btn"><i class="fa fa-arrow-left"></i>Back to Site</button>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="admin-title">Content Management</h1>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary btn-sm"><i class="fa fa-filter me-2"></i>Filter</button>
+        <button class="btn btn-outline-secondary btn-sm"><i class="fa fa-download me-2"></i>Export</button>
+      </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3">
+        <div class="admin-card">
+          <div class="card-info">
+            <div class="card-title">Pending Review</div>
+            <div class="card-value">23</div>
+            <div class="card-change text-warning">+5 <span class="text-muted">since yesterday</span></div>
+          </div>
+          <div class="icon-bg yellow"><i class="fa fa-clock"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="admin-card">
+          <div class="card-info">
+            <div class="card-title">Published Content</div>
+            <div class="card-value">1,247</div>
+            <div class="card-change text-success">+12% <span class="text-muted">from last month</span></div>
+          </div>
+          <div class="icon-bg green"><i class="fa fa-file-text"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="admin-card">
+          <div class="card-info">
+            <div class="card-title">Reported Content</div>
+            <div class="card-value">8</div>
+            <div class="card-change text-danger">+2 <span class="text-muted">since yesterday</span></div>
+          </div>
+          <div class="icon-bg red"><i class="fa fa-flag"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="admin-card">
+          <div class="card-info">
+            <div class="card-title">Total Comments</div>
+            <div class="card-value">3,456</div>
+            <div class="card-change text-success">+8% <span class="text-muted">from last week</span></div>
+          </div>
+          <div class="icon-bg blue"><i class="fa fa-comments"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="contentTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Pending Review</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="published-tab" data-bs-toggle="tab" data-bs-target="#published" type="button" role="tab">Published Content</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reported-tab" data-bs-toggle="tab" data-bs-target="#reported" type="button" role="tab">Reported Content</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All Content</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="contentTabsContent">
+      <!-- Pending Review Tab -->
+      <div class="tab-pane fade show active" id="pending" role="tabpanel">
+        <div class="card mb-4">
+          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+              <h5 class="mb-1">Pending Review</h5>
+              <div class="text-muted small">Content awaiting moderation approval</div>
+            </div>
+            <div class="d-flex gap-2 w-100 w-md-auto">
+              <input type="text" class="form-control" placeholder="Search content..." style="max-width:200px;">
+              <select class="form-select" style="max-width:140px;">
+                <option>All Types</option>
+                <option>Recipes</option>
+                <option>Forum Posts</option>
+                <option>Comments</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive rounded border">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Content</th>
+                    <th>Author</th>
+                    <th>Type</th>
+                    <th>Submitted</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div>
+                        <strong>Zero-Waste Banana Bread Recipe</strong>
+                        <div class="text-muted small">A delicious recipe using overripe bananas and leftover ingredients...</div>
+                      </div>
+                    </td>
+                    <td>Sarah Johnson</td>
+                    <td><span class="badge bg-success">Recipe</span></td>
+                    <td>2 hours ago</td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-success btn-sm" title="Approve"><i class="fa fa-check"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Reject"><i class="fa fa-times"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Tips for Reducing Food Waste at Home</strong>
+                      <div class="text-muted small">Sharing my experience with meal planning and storage techniques...</div>
+                    </td>
+                    <td>Michael Brown</td>
+                    <td><span class="badge bg-primary">Post</span></td>
+                    <td>4 hours ago</td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-success btn-sm" title="Approve"><i class="fa fa-check"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Reject"><i class="fa fa-times"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Great recipe! I modified it slightly...</strong>
+                      <div class="text-muted small">I tried this recipe and made some adjustments that worked well...</div>
+                    </td>
+                    <td>Emma Wilson</td>
+                    <td><span class="badge bg-purple">Comment</span></td>
+                    <td>6 hours ago</td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-success btn-sm" title="Approve"><i class="fa fa-check"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Reject"><i class="fa fa-times"></i></button>
+                    </td>
+                  </tr>
+                  <!-- Add more rows as needed -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Published Content Tab -->
+      <div class="tab-pane fade" id="published" role="tabpanel">
+        <div class="card mb-4">
+          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+              <h5 class="mb-1">Published Content</h5>
+              <div class="text-muted small">All approved and published content</div>
+            </div>
+            <div class="d-flex gap-2 w-100 w-md-auto">
+              <input type="text" class="form-control" placeholder="Search content..." style="max-width:200px;">
+              <select class="form-select" style="max-width:140px;">
+                <option>All Types</option>
+                <option>Recipes</option>
+                <option>Forum Posts</option>
+                <option>Comments</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive rounded border">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Content</th>
+                    <th>Author</th>
+                    <th>Type</th>
+                    <th>Published</th>
+                    <th>Engagement</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>Ultimate Guide to Meal Planning</strong>
+                      <div class="text-muted small">Comprehensive guide to planning meals and reducing waste...</div>
+                    </td>
+                    <td>Alex Taylor</td>
+                    <td><span class="badge bg-primary">Post</span></td>
+                    <td>May 10, 2023</td>
+                    <td>
+                      <span>👍 45</span> <span class="ms-2">💬 12</span>
+                    </td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-primary btn-sm" title="Edit"><i class="fa fa-edit"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Carrot Top Pesto Recipe</strong>
+                      <div class="text-muted small">Don't throw away those carrot tops! Make this delicious pesto...</div>
+                    </td>
+                    <td>Olivia Smith</td>
+                    <td><span class="badge bg-success">Recipe</span></td>
+                    <td>May 9, 2023</td>
+                    <td>
+                      <span>👍 78</span> <span class="ms-2">💬 23</span>
+                    </td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-primary btn-sm" title="Edit"><i class="fa fa-edit"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
+                    </td>
+                  </tr>
+                  <!-- Add more rows as needed -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Reported Content Tab -->
+      <div class="tab-pane fade" id="reported" role="tabpanel">
+        <div class="card mb-4">
+          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+              <h5 class="mb-1">Reported Content</h5>
+              <div class="text-muted small">Content flagged by users for review</div>
+            </div>
+            <div class="d-flex gap-2 w-100 w-md-auto">
+              <input type="text" class="form-control" placeholder="Search reports..." style="max-width:200px;">
+              <select class="form-select" style="max-width:140px;">
+                <option>All Reports</option>
+                <option>Spam</option>
+                <option>Inappropriate</option>
+                <option>Misinformation</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive rounded border">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Content</th>
+                    <th>Report Reason</th>
+                    <th>Reported By</th>
+                    <th>Date</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>Questionable Food Safety Advice</strong>
+                      <div class="text-muted small">Recipe suggests unsafe food handling practices...</div>
+                    </td>
+                    <td><span class="badge bg-warning">Misinformation</span></td>
+                    <td>FoodSafetyExpert</td>
+                    <td>May 10, 2023</td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Spam promotional content</strong>
+                      <div class="text-muted small">This post is clearly advertising a commercial product...</div>
+                    </td>
+                    <td><span class="badge bg-danger">Spam</span></td>
+                    <td>CommunityModerator</td>
+                    <td>May 9, 2023</td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
+                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
+                    </td>
+                  </tr>
+                  <!-- Add more rows as needed -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- All Content Tab -->
+      <div class="tab-pane fade" id="all" role="tabpanel">
+        <div class="card mb-4">
+          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+              <h5 class="mb-1">All Content</h5>
+              <div class="text-muted small">Complete overview of all platform content</div>
+            </div>
+            <div class="d-flex gap-2 w-100 w-md-auto">
+              <input type="text" class="form-control" placeholder="Search all content..." style="max-width:200px;">
+              <select class="form-select" style="max-width:140px;">
+                <option>All Status</option>
+                <option>Published</option>
+                <option>Pending</option>
+                <option>Rejected</option>
+              </select>
+              <button class="btn btn-success">Export All</button>
+            </div>
+          </div>
+          <div class="card-body text-center text-muted py-5">
+            <i class="fa fa-file-text fa-3x mb-3 opacity-50"></i>
+            <p>All content overview will be displayed here</p>
+            <p class="small">Use the filters above to view specific content types and statuses</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
