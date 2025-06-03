@@ -8,6 +8,12 @@ from django.utils.decorators import method_decorator
 # Import any utility function you use
 from recipe.utils import generate_recipe
 
+# Import your models here
+# from recipe.models import SharedResource  # Remove or comment out this line
+from recipe.models import Recipe  # Import Recipe model
+# from recipe.models import ForumPost  # Remove or comment out this line
+# from recipe.models import Comment  # Remove or comment out this line
+
 
 # Home view (redirects to recipe_ai if authenticated)
 def home(request):
@@ -85,3 +91,115 @@ def custom_login(request):
         else:
             return render(request, "login.html", {"error": "Invalid credentials"})
     return render(request, "login.html")
+
+
+def admin_dashboard(request):
+    total_users = User.objects.count()
+    return render(request, 'adminPage.html', {
+        'total_users': total_users,
+    })
+
+def admin_user(request):
+    """Admin user management view with debugging"""
+    print("=== ADMIN USER VIEW CALLED ===")
+    print(f"User: {request.user}")
+    
+    try:
+        # Get all users with detailed information
+        users = User.objects.all().order_by('-date_joined')
+        total_users = users.count()
+        
+        print(f"Found {total_users} users")
+        
+        # Debug: Print first few users
+        for i, user in enumerate(users[:3]):
+            print(f"User {i+1}: {user.username} - {user.email} - Active: {user.is_active}")
+        
+        # Additional filtering options (for future use)
+        search_query = request.GET.get('search', '')
+        if search_query:
+            users = users.filter(
+                Q(username__icontains=search_query) |
+                Q(email__icontains=search_query) |
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
+            )
+            print(f"Filtered users by '{search_query}': {users.count()} results")
+        
+        context = {
+            'users': users,
+            'total_users': total_users,
+            'search_query': search_query,
+        }
+        
+        print(f"Context: users count = {len(list(users))}, total = {total_users}")
+        
+    except Exception as e:
+        print(f"ERROR in admin_user view: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        context = {
+            'users': [],
+            'total_users': 0,
+            'error': str(e),
+        }
+    
+    print("=== END ADMIN USER VIEW ===")
+    return render(request, "AdminUser.html", context)
+
+def admin_content(request):
+    """Admin content management view"""
+    try:
+        # Fetch all content types with error handling
+        recipes = []
+        posts = []
+        comments = []
+        resources = []
+        
+        try:
+            if hasattr(Recipe, 'objects') and Recipe.objects:
+                recipes = Recipe.objects.all().order_by('-created_at')
+        except:
+            pass
+            
+        try:
+            if hasattr(ForumPost, 'objects') and ForumPost.objects:
+                posts = ForumPost.objects.all().order_by('-created_at')
+        except:
+            pass
+            
+        try:
+            if hasattr(Comment, 'objects') and Comment.objects:
+                comments = Comment.objects.all().order_by('-created_at')
+        except:
+            pass
+            
+        try:
+            if hasattr(SharedResource, 'objects') and SharedResource.objects:
+                resources = SharedResource.objects.all().order_by('-uploaded_at')
+        except:
+            pass
+        
+        context = {
+            'recipes': recipes,
+            'posts': posts,
+            'comments': comments,
+            'resources': resources,
+            'recipes_count': len(recipes),
+            'posts_count': len(posts),
+            'comments_count': len(comments),
+            'resources_count': len(resources),
+        }
+        
+    except Exception as e:
+        print(f"ERROR in admin_content view: {e}")
+        context = {
+            'recipes': [],
+            'posts': [],
+            'comments': [],
+            'resources': [],
+            'error': str(e),
+        }
+    
+    return render(request, 'admin_content.html', context)

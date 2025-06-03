@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 
 # Import directly from ai_recipe.views
 from ai_recipe.views import IngredientSearchView, recipe_ai
-from ai_recipe.views import home, custom_login
+from ai_recipe.views import home, custom_login, admin_dashboard, admin_user, admin_content
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -39,8 +39,9 @@ urlpatterns = [
 
     # Login and admin dashboard
     path('login/', custom_login, name='login'),
-    path('admin-dashboard/', TemplateView.as_view(template_name="adminPage.html"), name='admin_dashboard'),
-    path('admin-users/', TemplateView.as_view(template_name="AdminUser.html"), name='admin_user'),
+    path('admin-dashboard/', admin_dashboard, name='admin_dashboard'), 
+    path('admin-users/', admin_user, name='admin_user'),
+    # path('admin-content/', admin_content, name='admin_content'),
 ]
 
 # Serve media files in development
