@@ -41,6 +41,7 @@ urlpatterns = [
     path('login/', custom_login, name='login'),
     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'), 
     path('admin-users/', admin_user, name='admin_user'),
+    path('admin-panel/', include(('adminPanel.urls', 'adminPanel'), namespace='adminPanel')),
     # path('admin-content/', admin_content, name='admin_content'),
 ]
 
