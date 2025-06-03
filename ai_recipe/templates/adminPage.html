@@ -35,7 +35,10 @@
         <div class="icon-bg green"><i class="fa fa-users"></i></div>
         <div class="card-info">
           <div class="card-title">Total Users</div>
-            <div class="card-value">{{ total_users }}</div>
+            <div class="card-value">
+              {{ total_users|default:"N/A" }}
+            </div>
+            <div class="card-change positive">Database Connected</div>
         </div>
       </div>
       <div class="admin-card">
@@ -66,7 +69,7 @@
 
     <!-- Tabs -->
     <div class="admin-tabs mb-4">
-      <button class="tab" type="button" onclick="showTab('activity')">Recent Activity</button>
+      <button class="tab active" type="button" onclick="showTab('activity')">Recent Activity</button>
       <!-- Remove Users tab button -->
       <button class="tab" type="button" onclick="showTab('donations')">Donations</button>
       <button class="tab" type="button" onclick="showTab('issues')">Issues</button>
@@ -81,25 +84,81 @@
           </div>
           <div class="card-body">
             <div class="list-group mb-3">
-              <!-- Example Activity -->
+              <!-- New User Registered -->
               <div class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom">
-                <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center activity-icon">
-                  <i class="fa fa-user text-success"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#dcfce7;width:48px;height:48px;">
+                  <i class="fa fa-user" style="color:#22c55e;font-size:1.5rem;"></i>
                 </div>
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
-                      <div class="fw-medium">User JohnDoe registered</div>
-                      <div class="text-muted small">A new user has joined the platform.</div>
+                      <div class="fw-bold" style="font-size:1.1rem;">New User Registered</div>
+                      <div class="text-muted small">A new user has joined the platform</div>
                     </div>
-                    <span class="badge bg-success">User</span>
+                    <span class="badge" style="background:#18181b;color:#fff;font-weight:600;">User Registration</span>
                   </div>
                   <div class="mt-1 text-muted small">
-                    JohnDoe &bull; 2 hours ago
+                    John Doe &bull; 10 minutes ago
                   </div>
                 </div>
               </div>
-              <!-- Add more activities as needed -->
+
+              <!-- New Food Donation -->
+              <div class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom">
+                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#ede9fe;width:48px;height:48px;">
+                  <i class="fa fa-shopping-bag" style="color:#7c3aed;font-size:1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <div class="fw-bold" style="font-size:1.1rem;">New Food Donation</div>
+                      <div class="text-muted small">Organic Apples (5) added to available donations</div>
+                    </div>
+                    <span class="badge" style="background:#f4f4f5;color:#18181b;font-weight:600;">Donation Added</span>
+                  </div>
+                  <div class="mt-1 text-muted small">
+                    Sarah Johnson &bull; 25 minutes ago
+                  </div>
+                </div>
+              </div>
+
+              <!-- Food Quality Issue -->
+              <div class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom">
+                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#fef9c3;width:48px;height:48px;">
+                  <i class="fa fa-exclamation-triangle" style="color:#eab308;font-size:1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <div class="fw-bold" style="font-size:1.1rem;">Food Quality Issue</div>
+                      <div class="text-muted small">User reported an issue with expired food</div>
+                    </div>
+                    <span class="badge" style="background:#ef4444;color:#fff;font-weight:600;">Issue Reported</span>
+                  </div>
+                  <div class="mt-1 text-muted small">
+                    Michael Brown &bull; 1 hour ago
+                  </div>
+                </div>
+              </div>
+
+              <!-- Donation Claimed -->
+              <div class="list-group-item d-flex align-items-start gap-3 border-0">
+                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#dbeafe;width:48px;height:48px;">
+                  <i class="fa fa-check-circle" style="color:#2563eb;font-size:1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <div class="fw-bold" style="font-size:1.1rem;">Donation Claimed</div>
+                      <div class="text-muted small">Homemade Soup has been claimed by a user</div>
+                    </div>
+                    <span class="badge" style="background:#fff;color:#2563eb;border:1.5px solid #2563eb;font-weight:600;">Donation Claimed</span>
+                  </div>
+                  <div class="mt-1 text-muted small">
+                    Emma Wilson &bull; 2 hours ago
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="text-center">
               <button class="btn btn-outline-secondary">View All Activity</button>
