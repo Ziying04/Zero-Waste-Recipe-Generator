@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'community',  # Add community app
     'ingredient_tracker',  
     'adminPanel',  # Add adminPanel app
+    'notification',  # Our notification app
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notification.context_processors.notification_count',  # Add our context processor
             ],
         },
     },

@@ -43,6 +43,8 @@ urlpatterns = [
     path('admin-users/', admin_user, name='admin_user'),
     path('admin-panel/', include(('adminPanel.urls', 'adminPanel'), namespace='adminPanel')),
     # path('admin-content/', admin_content, name='admin_content'),
+
+    path('notification/', include('notification.urls')),
 ]
 
 # Serve media files in development

@@ -1,6 +1,7 @@
 # ingredient_tracker/utils.py
 from .models import Ingredient
 from datetime import date
+from notification.utils import create_expiry_notification
 
 def get_user_ingredients(user):
     ingredients = Ingredient.objects.filter(user=user)
@@ -14,6 +15,10 @@ def get_user_ingredients(user):
                 else "Expiring Soon" if delta <= 3
                 else "Fresh"
             )
+            
+            # Create notifications for expired or soon-to-expire ingredients
+            if delta <= 3:
+                create_expiry_notification(user, ingredient.id, ingredient.name, delta)
         else:
             ingredient.days_left = None
             ingredient.status = "No expiry info"
