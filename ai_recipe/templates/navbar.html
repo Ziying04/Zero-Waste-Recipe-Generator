@@ -1,107 +1,149 @@
 <nav class="navbar">
   <div class="nav-container">
-    <a class="navbar-brand">
-      <span class="brand-text">ZeroWaste</span
-      ><span class="brand-highlight">Recipe</span>
-    </a>
-    <ul class="navbar-nav">
-      {% if user.is_authenticated %}
-      <li class="nav-item">
-        <a
-          class="nav-link {% if 'ai-generator' in request.path %}active{% endif %}"
-          href="{% url 'recipe_ai' %}"
-        >
-          <i class="nav-icon fas fa-robot"></i>
-          <span>AI Generator</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link {% if 'expiry-date-tracker' in request.path %}active{% endif %}"
-          href="{% url 'ingredient_tracker:expiring_tracker' %}"
-        >
-          <i class="nav-icon fas fa-carrot"></i>
-          <span>Ingredient Inventory</span>
-        </a>
-      </li>
-      {% else %}
-      <li class="nav-item">
-        <a
-          class="nav-link {% if request.path == '/' %}active{% endif %}"
-          href="{% url 'home' %}"
-        >
-          <i class="nav-icon fas fa-home"></i>
-          <span>Home</span>
-        </a>
-      </li>
-      {% endif %}
-      <li class="nav-item">
-        <a
-          class="nav-link {% if 'kitchen' in request.path %}active{% endif %}"
-          href="{% url 'kitchen' %}"
-        >
-          <i class="nav-icon fas fa-utensils"></i>
-          <span>Kitchen</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link {% if 'community' in request.path %}active{% endif %}"
-          href="{% url 'community:community' %}"
-        >
-          <i class="nav-icon fas fa-users"></i>
-          <span>Community</span>
-        </a>
-      </li>
-    </ul>
+    <!-- Logo Section -->
+    <div class="nav-brand">
+      <a href="{% url 'home' %}" class="brand-link">
+        <div class="logo-icon">
+          <i class="fas fa-seedling"></i>
+        </div>
+        <span class="brand-text">ZeroWaste</span>
+      </a>
+    </div>
 
-    <div class="auth-section">
-      {% if user.is_authenticated %}
-
-      <div class="notification-button" onclick="toggleNotificationDropdown()">
-        <i class="fas fa-bell fa-fw"></i>
-        {% if notifications_unread_count > 0 %}
-        <span class="notification-count">{{ notifications_unread_count }}</span>
-        {% endif %}
-        <div class="notification-dropdown" id="notificationDropdown">
-          <div class="notification-dropdown-header">
-            <h4><i class="fas fa-bell mr-2"></i>Notifications</h4>
-          </div>
-          <div class="empty-notifications">
-            <i class="fas fa-spinner fa-spin"></i>
-            <h5>Loading...</h5>
+    <!-- Navigation Menu -->
+    <div class="nav-menu" id="navMenu">
+      <div class="nav-links">
+        <div class="nav-group">
+          <div class="nav-item dropdown" id="discoverDropdown">
+            <a href="#" class="nav-link dropdown-toggle">
+              <i class="fas fa-compass"></i>
+              <span>Discover</span>
+              <i class="fas fa-chevron-down dropdown-arrow"></i>
+            </a>
+            <div class="dropdown-menu">
+              <a href="{% url 'kitchen' %}" class="dropdown-item">
+                <div class="dropdown-icon">
+                  <i class="fas fa-utensils"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Recipes</div>
+                  <div class="dropdown-desc">Find your new favorite dish!</div>
+                </div>
+              </a>
+              <a href="{% url 'recipe_ai' %}" class="dropdown-item">
+                <div class="dropdown-icon">
+                  <i class="fas fa-robot"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">AI Generator</div>
+                  <div class="dropdown-desc">AI-powered recipe creation</div>
+                </div>
+              </a>
+              <a href="{% url 'community:community' %}" class="dropdown-item">
+                <div class="dropdown-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Community</div>
+                  <div class="dropdown-desc">Share and discover together</div>
+                </div>
+              </a>
+              <a
+                href="{% url 'ingredient_tracker:expiring_tracker' %}"
+                class="dropdown-item"
+              >
+                <div class="dropdown-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="dropdown-content">
+                  <div class="dropdown-title">Ingredient Tracker</div>
+                  <div class="dropdown-desc">Track expiring ingredients</div>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div
-        class="profile-button"
-        data-authenticated="true"
-        onclick="toggleProfileDropdown()"
-      >
-        <i class="fas fa-user-circle fa-fw"></i>
+    <!-- Right Side -->
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+      <!-- Search Button -->
+      <button class="nav-btn search-btn" id="searchToggle">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- Theme Toggle -->
+      <button class="nav-btn theme-btn" id="themeToggle">
+        <i class="fas fa-sun"></i>
+      </button>
+
+      <!-- Profile Dropdown -->
+      <div class="profile-section">
+        <button class="profile-trigger" id="profileTrigger">
+          <div class="profile-avatar">
+            <span>{{ user.userprofile.name|first|upper }}</span>
+          </div>
+        </button>
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-info">
-            <span>{{ user.userprofile.name }}</span>
-            <span class="email">{{ user.email }}</span>
+            <div class="profile-name">{{ user.userprofile.name }}</div>
+            <div class="profile-email">{{ user.email }}</div>
           </div>
-          <a href="{% url 'profile' %}"
-            ><i class="fas fa-user me-2"></i>My Profile</a
-          >
-          <a href="{% url 'diary' %}"
-            ><i class="fas fa-book me-2"></i>My Diary</a
-          >
-          <a href="{% url 'logout' %}"
-            ><i class="fas fa-sign-out-alt me-2"></i>Logout</a
-          >
+          <div class="profile-menu">
+            <a href="{% url 'profile' %}" class="profile-item">
+              <i class="fas fa-user"></i>
+              <span>My Profile</span>
+            </a>
+            <a href="{% url 'diary' %}" class="profile-item">
+              <i class="fas fa-book"></i>
+              <span>My Diary</span>
+            </a>
+            <a href="{% url 'sharing' %}" class="profile-item">
+              <i class="fas fa-share-alt"></i>
+              <span>My Recipes</span>
+            </a>
+            <div class="profile-divider"></div>
+            <a href="{% url 'logout' %}" class="profile-item logout">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </div>
         </div>
       </div>
       {% else %}
       <div class="auth-buttons">
-        <a href="{% url 'login' %}" class="nav-link login-btn">Login</a>
-        <a href="{% url 'signup' %}" class="nav-link login-btn">Sign Up</a>
+        <a href="{% url 'login' %}" class="auth-btn login-btn">Login</a>
+        <a href="{% url 'signup' %}" class="auth-btn signup-btn">Sign Up</a>
       </div>
       {% endif %}
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-toggle" id="mobileToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search recipes, ingredients..."
+          class="search-input"
+        />
+        <button class="search-submit">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <button class="search-close" id="searchClose">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
   </div>
 </nav>
