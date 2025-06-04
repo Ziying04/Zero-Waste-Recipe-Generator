@@ -1,26 +1,29 @@
-{% extends 'base_template.html' %} {% load static %} 
-{% block title%}Kitchen{%endblock %} {% block extra_css %}
+{% extends 'base_template.html' %} {% load static %} {% block title%}Kitchen{%endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
 {% endblock %} {% block content %}
 
 <div class="container page-content">
   {% csrf_token %}
   <div class="text-center">
-    <h1 class="mb-3">
+    <h1 class="mb-4">
       <span class="fancy-title">It's Time To Burn The Kitchen</span>
     </h1>
+    <p class="lead text-muted mb-4">
+      Discover amazing recipes from our community and find your next culinary
+      inspiration!
+    </p>
   </div>
 
-  <!-- Add search bar -->
+  <!-- Enhanced search bar -->
   <div class="search-container mb-5">
     <div class="search-wrapper">
-      <i class="fas fa-search search-icon"></i>
       <input
         type="text"
         id="recipe-search"
         class="search-input"
-        placeholder="Search recipes..."
+        placeholder="Search recipes by name, ingredients, or cooking time..."
       />
+      <i class="fas fa-search search-icon"></i>
     </div>
   </div>
 
@@ -46,11 +49,11 @@
             <a href="{% url 'display_recipe' recipe.id %}">{{ recipe.name }}</a>
           </h5>
           <p class="recipe-card-time">
-            <i class="bi bi-clock"></i> {{ recipe.cooking_time }} minutes
+            <i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes
           </p>
           <div class="recipe-actions">
             <button
-              class="btn btn-light save-btn"
+              class="btn save-btn"
               data-recipe-id="{{ recipe.id }}"
               {%
               if
@@ -66,7 +69,7 @@
               <span class="save-count">{{ recipe.saved_by.count }}</span>
             </button>
             <button
-              class="btn btn-light like-btn"
+              class="btn like-btn"
               data-recipe-id="{{ recipe.id }}"
               {%
               if
@@ -86,10 +89,17 @@
       </div>
     </div>
     {% endfor %} {% else %}
-    <div class="col-12">
-      <p class="text-center text-muted">
-        No recipes available in your kitchen yet.
-      </p>
+    <div class="col-12 text-center">
+      <div class="empty-state">
+        <i class="fas fa-utensils fa-3x mb-3 text-muted"></i>
+        <p class="text-center text-muted h5">
+          No recipes available in the kitchen yet.
+        </p>
+        <p class="text-muted">Be the first to share your delicious recipes!</p>
+        <a href="{% url 'create_recipe' %}" class="btn btn-primary mt-3">
+          <i class="fas fa-plus-circle"></i> Add New Recipe
+        </a>
+      </div>
     </div>
     {% endif %}
   </div>
