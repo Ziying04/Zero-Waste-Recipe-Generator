@@ -55,21 +55,24 @@
       </li>
     </ul>
 
-    
-    
     <div class="auth-section">
       {% if user.is_authenticated %}
-      
-        <div class="notification-button" onclick="toggleNotificationDropdown()">
-          <i class="fas fa-bell fa-fw"></i>
-          {% if notifications_unread_count > 0 %}
-            <span class="notification-count">{{ notifications_unread_count }}</span>
-          {% endif %}
-          <div class="notification-dropdown" id="notificationDropdown">
-            <h4>Notifications</h4>
-          
+
+      <div class="notification-button" onclick="toggleNotificationDropdown()">
+        <i class="fas fa-bell fa-fw"></i>
+        {% if notifications_unread_count > 0 %}
+        <span class="notification-count">{{ notifications_unread_count }}</span>
+        {% endif %}
+        <div class="notification-dropdown" id="notificationDropdown">
+          <div class="notification-dropdown-header">
+            <h4><i class="fas fa-bell mr-2"></i>Notifications</h4>
+          </div>
+          <div class="empty-notifications">
+            <i class="fas fa-spinner fa-spin"></i>
+            <h5>Loading...</h5>
           </div>
         </div>
+      </div>
 
       <div
         class="profile-button"
