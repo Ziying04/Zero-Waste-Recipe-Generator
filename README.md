@@ -2,8 +2,6 @@
 
 A Django-based platform that leverages AI to generate recipes from ingredients you already have, helps track expiring food items, and enables community food sharing to reduce food waste.
 
-![Zero Waste Banner](./assets/images/banner.png)
-
 ## 🌟 Features
 
 - **AI Recipe Generator**: Get creative recipes based on ingredients you have on hand
@@ -31,7 +29,7 @@ A Django-based platform that leverages AI to generate recipes from ingredients y
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/Zero-Waste-Recipe-Generator.git
+   git clone <copy code link>
    cd Zero-Waste-Recipe-Generator
    ```
 
@@ -77,8 +75,6 @@ A Django-based platform that leverages AI to generate recipes from ingredients y
 
 ## 💡 How It Works
 
-![How It Works](./assets/images/how_it_works.png)
-
 1. **Input Ingredients**: Enter whatever ingredients you have available
 2. **AI Processing**: Our AI analyzes your ingredients and generates suitable recipes
 3. **Reduce Waste**: Cook with what you have instead of buying more ingredients
@@ -97,10 +93,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-Project Link: [https://github.com/yourusername/Zero-Waste-Recipe-Generator](https://github.com/yourusername/Zero-Waste-Recipe-Generator)
 
 ## 🙏 Acknowledgments
 
