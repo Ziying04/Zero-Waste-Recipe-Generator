@@ -1,0 +1,110 @@
+{% extends 'base_template.html' %} {% load static %} {% block title %}Create New
+Recipe{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+<link rel="stylesheet" href="{% static 'css/create_recipe.css' %}" />
+{% endblock %} {% block content %}
+<div class="container py-4">
+  <div class="card recipe-form-card">
+    <div class="card-header bg-success text-white">
+      <h2 class="mb-0">
+        <i class="fas fa-utensils me-2"></i>Create New Recipe
+      </h2>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" id="recipe-form">
+        {% csrf_token %} {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="recipe-name" class="form-label">Recipe Name*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="recipe-name"
+            name="name"
+            required
+            maxlength="255"
+          />
+          <div class="invalid-feedback">Please enter a recipe name.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="cooking-time" class="form-label"
+            >Cooking Time (minutes)*</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="cooking-time"
+            name="cooking_time"
+            min="1"
+            max="999"
+            required
+          />
+          <div class="invalid-feedback">
+            Please enter a valid cooking time (1-999 minutes).
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="ingredients" class="form-label">Ingredients*</label>
+          <textarea
+            class="form-control"
+            id="ingredients"
+            name="ingredients"
+            rows="6"
+            placeholder="Enter each ingredient on a new line"
+            required
+          ></textarea>
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>
+            Format: quantity + ingredient (e.g., '2 tablespoons olive oil')
+          </div>
+          <div class="invalid-feedback">Please enter the ingredients.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="steps" class="form-label">Cooking Steps*</label>
+          <textarea
+            class="form-control"
+            id="steps"
+            name="steps"
+            rows="8"
+            placeholder="Enter each step on a new line"
+            required
+          ></textarea>
+          <div class="invalid-feedback">Please enter the cooking steps.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="image_url" class="form-label">Image URL (Optional)</label>
+          <input
+            type="url"
+            class="form-control"
+            id="image_url"
+            name="image_url"
+            placeholder="https://example.com/image.jpg"
+          />
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>
+            Provide a URL to an image of your recipe (optional)
+          </div>
+          <div class="image-preview mt-2" id="image-preview"></div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'collection' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Collection
+          </a>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save me-2"></i>Save Recipe
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/create_recipe.js' %}"></script>
+{% endblock %}

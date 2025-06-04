@@ -16,6 +16,7 @@ from .views import (
     toggle_like_recipe,
     update_recipe,
     edit_recipe_view,
+    create_recipe_view,
 )
 
 urlpatterns = [
@@ -35,5 +36,6 @@ urlpatterns = [
     path("profile/", profile_view, name="profile"),
     path("diary/", diary_view, name="diary"),
     path("sharing/", sharing_view, name="sharing"),
+    path("create-recipe/", create_recipe_view, name="create_recipe"),
  
 ]

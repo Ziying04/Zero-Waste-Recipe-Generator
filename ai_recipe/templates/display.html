@@ -1,5 +1,4 @@
-{% extends 'base_template.html' %} {% load static %} 
-{% load recipe_filters %}
+{% extends 'base_template.html' %} {% load static %} {% load recipe_filters %}
 {% block title %}{{ recipe.name }}{% endblock %} {% block extra_css %}
 
 <link rel="stylesheet" href="{% static 'css/display.css' %}" />
@@ -43,7 +42,7 @@
   <div class="recipe-section">
     <h3>Ingredients:</h3>
     <ul class="ingredients-list">
-      {% for ingredient in recipe.ingredients|split_lines %}
+      {% for ingredient in recipe.ingredients|format_ingredients %}
       <li class="ingredient-item">
         <input type="checkbox" id="ingredient-{{ forloop.counter }}" />
         <label for="ingredient-{{ forloop.counter }}">{{ ingredient }}</label>
@@ -55,9 +54,8 @@
   <div class="recipe-section">
     <h3>Cooking Instructions:</h3>
     <div class="step-list">
-      {% for step in recipe.steps|split_lines %}
+      {% for step in recipe.steps|format_steps %}
       <div class="step-item" data-step="{{ forloop.counter }}">
-        <span class="step-number">{{ forloop.counter }}</span>
         <p>{{ step }}</p>
       </div>
       {% endfor %}

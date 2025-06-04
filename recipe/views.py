@@ -16,6 +16,7 @@ from datetime import date
 from community.models import DonationFoodPost, ClaimedFood  # Updated import
 from ingredient_tracker.utils import get_user_ingredients
 from ingredient_tracker.models import Ingredient  # adjust import as needed
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 @ensure_csrf_cookie
@@ -263,4 +264,77 @@ def edit_recipe_view(request, recipe_id):
         return redirect('sharing')
         
     return render(request, "edit_recipe.html", {"recipe": recipe})
+
+@login_required
+@csrf_exempt
+def toggle_share_recipe(request, recipe_id):
+    """Toggle the shared status of a recipe"""
+    try:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        
+        # Only the recipe owner can share/unshare it
+        if recipe.user != request.user:
+            return JsonResponse({'error': 'You cannot share/unshare this recipe'}, status=403)
+            
+        # Toggle the shared status
+        recipe.is_shared = not recipe.is_shared
+        
+        # If sharing, record the timestamp
+        if recipe.is_shared:
+            recipe.shared_at = timezone.now()
+            message = "Recipe shared successfully! It's now visible to the community."
+        else:
+            message = "Recipe is now private and only visible to you."
+            
+        recipe.save()
+        
+        return JsonResponse({
+            'is_shared': recipe.is_shared,
+            'message': message
+        })
+    except Exception as e:
+        logger.error(f"Error in toggle_share_recipe: {e}")
+        return JsonResponse({'error': 'An error occurred'}, status=500)
+
+@login_required
+def create_recipe_view(request):
+    """View for creating a new recipe"""
+    if request.method == "POST":
+        try:
+            name = request.POST.get('name')
+            cooking_time = request.POST.get('cooking_time')
+            ingredients = request.POST.get('ingredients')
+            steps = request.POST.get('steps')
+            image_url = request.POST.get('image_url')
+            
+            # Validate required fields
+            if not name or not cooking_time or not ingredients or not steps:
+                return render(request, 'create_recipe.html', {
+                    'error': 'Please fill in all required fields.'
+                })
+            
+            # Create the recipe
+            recipe = Recipe.objects.create(
+                name=name,
+                cooking_time=int(cooking_time),
+                ingredients=ingredients,
+                steps=steps,
+                image_url=image_url if image_url else None,
+                user=request.user
+            )
+            
+            # Automatically save to the user's collection
+            recipe.saved_by.add(request.user)
+            
+            messages.success(request, f'Recipe "{name}" created successfully!')
+            return redirect('collection')
+            
+        except Exception as e:
+            logger.error(f"Error creating recipe: {e}")
+            return render(request, 'create_recipe.html', {
+                'error': f'An error occurred: {str(e)}'
+            })
+    
+    # GET request - show the form
+    return render(request, 'create_recipe.html')
 

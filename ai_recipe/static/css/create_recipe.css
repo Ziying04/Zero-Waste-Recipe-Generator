@@ -1,0 +1,97 @@
+.recipe-form-card {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-form-card .card-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 15px 20px;
+}
+
+.recipe-form-card .card-body {
+    padding: 25px;
+}
+
+.recipe-form-card label {
+    font-weight: 500;
+    color: #333;
+}
+
+.recipe-form-card textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.recipe-form-card .btn-success {
+    background-color: #16A34A;
+    border-color: #16A34A;
+}
+
+.recipe-form-card .btn-success:hover {
+    background-color: #15803d;
+    border-color: #15803d;
+}
+
+.form-control:focus {
+    border-color: #16A34A;
+    box-shadow: 0 0 0 0.25rem rgba(22, 163, 74, 0.25);
+}
+
+.form-text {
+    margin-top: 5px;
+    color: #6c757d;
+}
+
+.btn {
+    padding: 8px 20px;
+    border-radius: 5px;
+}
+
+/* Image preview */
+.image-preview {
+    margin-top: 10px;
+    display: none;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.image-preview.active {
+    display: block;
+}
+
+.image-preview img {
+    max-height: 200px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Form validation */
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875em;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback,
+.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Highlighting required fields */
+label.form-label::after {
+    content: "*";
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+label[for="image_url"]::after {
+    content: "";
+}

@@ -1,15 +1,37 @@
-{% extends 'base_template.html' %} {% load static %} 
-{% block title %} Recipe Collection{% endblock %} 
-{% block extra_css %}
+{% extends 'base_template.html' %} {% load static %} {% block title %} Recipe
+Collection{% endblock %} {% block extra_css %}
 
 <link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
+<link rel="stylesheet" href="{% static 'css/collection.css' %}" />
 
 {% endblock %} {% block content %}
 
 <div class="page-content">
-  <h1><i class="fas fa-folder"></i> My Collection</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-folder"></i> My Collection</h1>
+    <a
+      href="{% url 'create_recipe' %}"
+      class="btn btn-success btn-lg create-recipe-btn"
+    >
+      <i class="fas fa-plus"></i> Create New Recipe
+    </a>
+  </div>
+
+  <!-- Add empty state message if no recipes -->
+  {% if not saved_recipes %}
+  <div class="empty-collection text-center py-5">
+    <i class="fas fa-utensils fa-4x mb-3 text-muted"></i>
+    <h3 class="text-muted">Your collection is empty</h3>
+    <p class="mb-4">
+      Create your first recipe to start building your collection
+    </p>
+    <a href="{% url 'create_recipe' %}" class="btn btn-lg btn-primary">
+      <i class="fas fa-plus"></i> Create Your First Recipe
+    </a>
+  </div>
+  {% else %}
   <div class="recipes-grid">
-    {% if saved_recipes %} {% for recipe in saved_recipes %}
+    {% for recipe in saved_recipes %}
     <div class="recipe-card">
       {% if recipe.image_url %}
       <img
@@ -34,12 +56,19 @@
           >
             <i class="fas fa-eye"></i> View
           </a>
+          <a
+            href="{% url 'edit_recipe' recipe.id %}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="fas fa-edit"></i> Edit
+          </a>
         </div>
       </div>
     </div>
-    {% endfor %} {% else %}
-    <p class="no-recipes">No recipes in your collection yet.</p>
-    {% endif %}
+    {% endfor %}
   </div>
+  {% endif %}
 </div>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/collection.js' %}"></script>
 {% endblock %}

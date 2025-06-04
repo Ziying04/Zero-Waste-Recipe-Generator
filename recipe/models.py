@@ -11,6 +11,9 @@ class Recipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes', null=True)
     likes = models.ManyToManyField(User, related_name='liked_recipes', blank=True)
     saved_by = models.ManyToManyField(User, related_name='saved_recipes', blank=True)
+    is_shared = models.BooleanField(default=False)  # Track if recipe is shared with community
+    shared_at = models.DateTimeField(null=True, blank=True)  # When the recipe was shared
+    created_at = models.DateTimeField(auto_now_add=True, null=True)  # When the recipe was created
 
     def __str__(self):
         return self.name
