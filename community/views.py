@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import Q
+from django.contrib.auth.models import User
 from .models import DonationFoodPost, ClaimedFood
 from django.views.decorators.http import require_POST
 import json
@@ -13,10 +14,45 @@ from django.utils import timezone
 DEFAULT_USER_LOCATION = (3.1390, 101.6869)  # Example: Kuala Lumpur lat/lon
 
 def community_view(request):
-    context = {
-        'donors_url': '/community/donors/',
-        'seekers_url': '/community/seekers/',
-    }
+    """Community landing page with real statistics"""
+    try:
+        # Get real statistics from database
+        total_users = User.objects.filter(is_active=True).count()
+        
+        # Total food donations ever posted
+        total_donations = DonationFoodPost.objects.count()
+        
+        # Completed food transfers (claimed and completed)
+        completed_transfers = ClaimedFood.objects.filter(
+            status__in=['Completed', 'Received']
+        ).count()
+        
+        # Alternative: Count donations that have been claimed
+        # completed_transfers = DonationFoodPost.objects.filter(
+        #     status__in=['Claimed', 'Completed']
+        # ).count()
+        
+        # Active food posts currently available
+        active_donations = DonationFoodPost.objects.filter(
+            status='Available'
+        ).count()
+        
+        context = {
+            'total_users': total_users,
+            'total_donations': total_donations,
+            'completed_transfers': completed_transfers,
+            'active_donations': active_donations,
+        }
+        
+    except Exception as e:
+        # Fallback values in case of database error
+        context = {
+            'total_users': 0,
+            'total_donations': 0,
+            'completed_transfers': 0,
+            'active_donations': 0,
+        }
+    
     return render(request, 'community.html', context)
 
 def share_food(request):

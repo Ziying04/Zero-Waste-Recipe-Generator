@@ -120,7 +120,8 @@ def logout_view(request):
 
 @login_required
 def collection_view(request):
-    saved_recipes = Recipe.objects.filter(saved_by=request.user)
+    # Get recipes saved by the user (not created by the user)
+    saved_recipes = Recipe.objects.filter(saved_by=request.user).select_related('user')
     return render(request, "collection.html", {"saved_recipes": saved_recipes})
 
 @login_required
@@ -184,7 +185,7 @@ def toggle_save_recipe(request, recipe_id):
         else:
             recipe.saved_by.add(request.user)
             saved = True
-            message = "Recipe saved successfully"
+            message = "Recipe saved to collection"
         
         return JsonResponse({
             'saved': saved,

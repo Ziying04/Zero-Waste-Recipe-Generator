@@ -1,74 +1,184 @@
-{% extends 'base_template.html' %} {% load static %} {% block title %} Recipe
+{% extends 'base_template.html' %} {% load static %} {% block title %}Recipe
 Collection{% endblock %} {% block extra_css %}
-
 <link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
-<link rel="stylesheet" href="{% static 'css/collection.css' %}" />
-
 {% endblock %} {% block content %}
 
-<div class="page-content">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-folder"></i> My Collection</h1>
-    <a
-      href="{% url 'create_recipe' %}"
-      class="btn btn-success btn-lg create-recipe-btn"
-    >
-      <i class="fas fa-plus"></i> Create New Recipe
+<div class="container page-content">
+  {% csrf_token %}
+  <div class="text-center">
+    <h1 class="mb-4">
+      <span class="fancy-title">My Saved Collection</span>
+    </h1>
+    <p class="lead text-muted mb-4">
+      Your personally curated collection of favorite recipes!
+    </p>
+    <a href="{% url 'kitchen' %}" class="btn btn-success mb-5">
+      <i class="fas fa-search"></i> Discover More Recipes
     </a>
   </div>
 
-  <!-- Add empty state message if no recipes -->
-  {% if not saved_recipes %}
-  <div class="empty-collection text-center py-5">
-    <i class="fas fa-utensils fa-4x mb-3 text-muted"></i>
-    <h3 class="text-muted">Your collection is empty</h3>
-    <p class="mb-4">
-      Create your first recipe to start building your collection
-    </p>
-    <a href="{% url 'create_recipe' %}" class="btn btn-lg btn-primary">
-      <i class="fas fa-plus"></i> Create Your First Recipe
-    </a>
+  <!-- Enhanced search bar -->
+  <div class="search-container mb-5">
+    <div class="search-wrapper">
+      <input
+        type="text"
+        id="recipe-search"
+        class="search-input"
+        placeholder="Search your saved recipes..."
+      />
+      <i class="fas fa-search search-icon"></i>
+    </div>
   </div>
-  {% else %}
-  <div class="recipes-grid">
-    {% for recipe in saved_recipes %}
-    <div class="recipe-card">
-      {% if recipe.image_url %}
-      <img
-        src="{{ recipe.image_url }}"
-        class="recipe-card-img"
-        alt="{{ recipe.name }}"
-      />
-      {% else %}
-      <img
-        src="{% static 'images/default-recipe.jpg' %}"
-        class="recipe-card-img"
-        alt="Default recipe image"
-      />
-      {% endif %}
-      <div class="recipe-card-body">
-        <h3>{{ recipe.name }}</h3>
-        <p><i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes</p>
-        <div class="recipe-actions">
-          <a
-            href="{% url 'display_recipe' recipe.id %}"
-            class="btn btn-primary"
-          >
-            <i class="fas fa-eye"></i> View
-          </a>
-          <a
-            href="{% url 'edit_recipe' recipe.id %}"
-            class="btn btn-outline-secondary"
-          >
-            <i class="fas fa-edit"></i> Edit
-          </a>
+
+  <div class="row g-4" id="recipe-grid">
+    {% if saved_recipes %} {% for recipe in saved_recipes %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="recipe-card">
+        <div class="recipe-card-img-container">
+          {% if recipe.image_url %}
+          <img
+            src="{{ recipe.image_url }}"
+            class="recipe-card-img"
+            alt="{{ recipe.name }}"
+            loading="lazy"
+          />
+          {% else %}
+          <img
+            src="{% static 'images/default-recipe.jpg' %}"
+            class="recipe-card-img"
+            alt="Default recipe image"
+            loading="lazy"
+          />
+          {% endif %}
+        </div>
+        <div class="recipe-card-body">
+          <div class="recipe-card-content">
+            <h5 class="recipe-card-title">
+              <a href="{% url 'display_recipe' recipe.id %}"
+                >{{ recipe.name }}</a
+              >
+            </h5>
+            <p class="recipe-card-time">
+              <i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes
+            </p>
+          </div>
+          <div class="recipe-actions">
+            <a
+              href="{% url 'display_recipe' recipe.id %}"
+              class="btn btn-outline-success"
+              style="
+                flex: 1;
+                text-align: center;
+                padding: 10px 12px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+              "
+            >
+              <i class="fas fa-eye"></i> View Recipe
+            </a>
+            <button
+              class="btn save-btn unsave-btn"
+              data-recipe-id="{{ recipe.id }}"
+              data-saved="true"
+              style="
+                flex: 0 0 auto;
+                padding: 10px 14px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+              "
+            >
+              <i class="fas fa-bookmark"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-    {% endfor %}
+    {% endfor %} {% else %}
+    <div class="col-12 text-center">
+      <div class="empty-state">
+        <i class="fas fa-bookmark fa-3x mb-3 text-muted"></i>
+        <h5 class="text-muted mb-4">Your collection is empty</h5>
+        <p class="text-muted mb-4">
+          Start saving recipes you love to build your personal collection!
+        </p>
+        <a href="{% url 'kitchen' %}" class="btn btn-success">
+          <i class="fas fa-search"></i> Explore Recipes
+        </a>
+      </div>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
 </div>
-{% endblock %} {% block extra_js %}
-<script src="{% static 'js/collection.js' %}"></script>
+
+<script src="{% static 'js/kitchen.js' %}"></script>
+<script>
+  // Add specific handling for collection unsave
+  document.addEventListener("DOMContentLoaded", function () {
+    // Handle unsave in collection
+    document.querySelectorAll(".unsave-btn").forEach((button) => {
+      button.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        const recipeId = this.dataset.recipeId;
+        const card = this.closest(".col-12");
+
+        try {
+          const response = await fetch(`/api/recipe/${recipeId}/save/`, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+              ).value,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+
+            // Animate card removal
+            card.style.transition = "all 0.5s ease";
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.8) translateY(-20px)";
+
+            setTimeout(() => {
+              card.remove();
+
+              // Check if collection is now empty
+              const remainingCards = document.querySelectorAll(
+                "#recipe-grid .col-12:not(.text-center)"
+              );
+              if (remainingCards.length === 0) {
+                document.getElementById("recipe-grid").innerHTML = `
+                                <div class="col-12 text-center">
+                                    <div class="empty-state">
+                                        <i class="fas fa-bookmark fa-3x mb-3 text-muted"></i>
+                                        <h5 class="text-muted mb-4">Your collection is empty</h5>
+                                        <p class="text-muted mb-4">
+                                            Start saving recipes you love to build your personal collection!
+                                        </p>
+                                        <a href="{% url 'kitchen' %}" class="btn btn-success">
+                                            <i class="fas fa-search"></i> Explore Recipes
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+              }
+            }, 500);
+
+            // Show success message
+            if (typeof showProfessionalToast === "function") {
+              showProfessionalToast("Recipe removed from collection", "info");
+            }
+          }
+        } catch (error) {
+          console.error("Error removing recipe:", error);
+          if (typeof showProfessionalToast === "function") {
+            showProfessionalToast("Error removing recipe", "error");
+          }
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

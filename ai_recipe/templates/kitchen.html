@@ -1,4 +1,5 @@
-{% extends 'base_template.html' %} {% load static %} {% block title%}Kitchen{%endblock %} {% block extra_css %}
+{% extends 'base_template.html' %} {% load static %} 
+{% block title%}Kitchen{%endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/kitchen.css' %}" />
 {% endblock %} {% block content %}
 
@@ -31,26 +32,34 @@
     {% if recipes %} {% for recipe in recipes %}
     <div class="col-12 col-md-6 col-lg-4">
       <div class="recipe-card">
-        {% if recipe.image_url %}
-        <img
-          src="{{ recipe.image_url }}"
-          class="recipe-card-img"
-          alt="{{ recipe.name }}"
-        />
-        {% else %}
-        <img
-          src="{% static 'images/default-recipe.jpg' %}"
-          class="recipe-card-img"
-          alt="Default recipe image"
-        />
-        {% endif %}
+        <div class="recipe-card-img-container">
+          {% if recipe.image_url %}
+          <img
+            src="{{ recipe.image_url }}"
+            class="recipe-card-img"
+            alt="{{ recipe.name }}"
+            loading="lazy"
+          />
+          {% else %}
+          <img
+            src="{% static 'images/default-recipe.jpg' %}"
+            class="recipe-card-img"
+            alt="Default recipe image"
+            loading="lazy"
+          />
+          {% endif %}
+        </div>
         <div class="recipe-card-body">
-          <h5 class="recipe-card-title">
-            <a href="{% url 'display_recipe' recipe.id %}">{{ recipe.name }}</a>
-          </h5>
-          <p class="recipe-card-time">
-            <i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes
-          </p>
+          <div class="recipe-card-content">
+            <h5 class="recipe-card-title">
+              <a href="{% url 'display_recipe' recipe.id %}"
+                >{{ recipe.name }}</a
+              >
+            </h5>
+            <p class="recipe-card-time">
+              <i class="fas fa-clock"></i> {{ recipe.cooking_time }} minutes
+            </p>
+          </div>
           <div class="recipe-actions">
             <button
               class="btn save-btn"
@@ -65,7 +74,9 @@
               endif
               %}
             >
-              <i class="fas fa-bookmark"></i>
+              <i
+                class="{% if user in recipe.saved_by.all %}fas{% else %}far{% endif %} fa-bookmark"
+              ></i>
               <span class="save-count">{{ recipe.saved_by.count }}</span>
             </button>
             <button
@@ -81,7 +92,9 @@
               endif
               %}
             >
-              <i class="fas fa-heart"></i>
+              <i
+                class="{% if user in recipe.likes.all %}fas{% else %}far{% endif %} fa-heart"
+              ></i>
               <span class="like-count">{{ recipe.likes.count }}</span>
             </button>
           </div>
