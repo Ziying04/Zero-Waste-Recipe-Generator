@@ -2,8 +2,6 @@
 
 A Django-based platform that leverages AI to generate recipes from ingredients you already have, helps track expiring food items, and enables community food sharing to reduce food waste.
 
-![Zero Waste Banner](./assets/images/banner.png)
-
 ## 🌟 Features
 
 - **AI Recipe Generator**: Get creative recipes based on ingredients you have on hand
