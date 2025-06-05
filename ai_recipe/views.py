@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+from adminPanel.models import IssueReport  # Import the admin panel IssueReport model
 
 # Import any utility function you use
 from recipe.utils import generate_recipe
@@ -203,3 +204,20 @@ def admin_content(request):
         }
     
     return render(request, 'admin_content.html', context)
+
+def report_issue(request):
+    if request.method == 'POST':
+        issue_type = request.POST.get('issue_type')
+        description = request.POST.get('description')
+        screenshot = request.FILES.get('screenshot')
+        user = request.user if request.user.is_authenticated else None
+
+        IssueReport.objects.create(
+            user=user,
+            issue_type=issue_type,
+            description=description,
+            screenshot=screenshot
+        )
+        # Redirect or render a success message
+        return render(request, 'reportIssues_user.html', {'success': True})
+    return render(request, 'reportIssues_user.html')  # GET request handling
