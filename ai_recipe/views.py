@@ -1,4 +1,5 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.views import View
@@ -94,11 +95,36 @@ def custom_login(request):
     return render(request, "login.html")
 
 
+def custom_logout(request):
+    """Custom logout view with admin mode detection"""
+    was_admin = request.user.is_staff or request.user.is_superuser if request.user.is_authenticated else False
+    logout(request)
+    
+    if was_admin:
+        messages.success(request, "You have been logged out from admin mode.")
+    else:
+        messages.success(request, "You have been logged out successfully.")
+    
+    return redirect('home')
+
 def admin_dashboard(request):
+    """Enhanced admin dashboard with user mode toggle capability"""
+    # Check if user has admin privileges
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "Access denied. Admin privileges required.")
+        return redirect('home')
+    
     total_users = User.objects.count()
-    return render(request, 'adminPage.html', {
+    
+    # Add admin mode context
+    context = {
         'total_users': total_users,
-    })
+        'is_admin_mode': True,
+        'admin_user': request.user,
+        'can_switch_mode': True,
+    }
+    
+    return render(request, 'adminPage.html', context)
 
 def admin_user(request):
     """Admin user management view with debugging"""

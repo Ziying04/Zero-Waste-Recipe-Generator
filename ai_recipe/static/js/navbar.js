@@ -216,6 +216,50 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateY(0)';
         });
     });
+
+    // Admin Dashboard Button Enhancement
+    const adminBtn = document.querySelector('.admin-btn');
+    if (adminBtn) {
+        adminBtn.addEventListener('click', function(e) {
+            // Add click animation
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    }
+
+    // Enhanced Profile Section for Admin
+    const profileSection = document.querySelector('.profile-section');
+    const adminItems = document.querySelectorAll('.admin-item');
+    
+    // Check if user is admin and add admin class
+    if (adminItems.length > 0 && profileSection) {
+        profileSection.classList.add('admin');
+    }
+
+    // Admin item hover effects
+    adminItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(4px)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    // Admin mode indicator
+    function showAdminModeIndicator() {
+        const adminBtn = document.querySelector('.admin-btn');
+        if (adminBtn && window.location.pathname.includes('/admin')) {
+            adminBtn.classList.add('active-admin');
+            adminBtn.title = 'Currently in Admin Mode - Click to return to User Mode';
+        }
+    }
+
+    // Call admin mode indicator
+    showAdminModeIndicator();
 });
 
 function toggleProfileDropdown() {
@@ -249,5 +293,40 @@ document.addEventListener("click", function (event) {
   if (!event.target.closest(".notification-button")) {
     dropdown.classList.remove("show");
   }
+});
+
+// Admin Mode Toggle Function
+function toggleAdminMode() {
+    const currentPath = window.location.pathname;
+    
+    if (currentPath.includes('/admin')) {
+        // Currently in admin mode, switch to user mode
+        window.location.href = '/';
+    } else {
+        // Currently in user mode, switch to admin mode
+        window.location.href = '/admin-dashboard/';
+    }
+}
+
+// Enhanced Admin Dashboard Access
+function accessAdminDashboard() {
+    // Add loading state to admin button
+    const adminBtn = document.querySelector('.admin-btn');
+    if (adminBtn) {
+        const originalHTML = adminBtn.innerHTML;
+        adminBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        // Restore original content after navigation
+        setTimeout(() => {
+            adminBtn.innerHTML = originalHTML;
+        }, 1000);
+    }
+}
+
+// Add click handler for admin dashboard button
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.admin-btn')) {
+        accessAdminDashboard();
+    }
 });
 

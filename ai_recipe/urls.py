@@ -18,11 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 # Import directly from ai_recipe.views
 from ai_recipe.views import IngredientSearchView, recipe_ai
-from ai_recipe.views import home, custom_login, admin_dashboard, admin_user, admin_content
-from django.views.generic import TemplateView
+from ai_recipe.views import home, custom_login, admin_dashboard, admin_user, admin_content, custom_logout
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -39,6 +39,7 @@ urlpatterns = [
 
     # Login and admin dashboard
     path('login/', custom_login, name='login'),
+    path('logout/', custom_logout, name='logout'),
     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'), 
     path('admin-users/', admin_user, name='admin_user'),
     path('admin-panel/', include(('adminPanel.urls', 'adminPanel'), namespace='adminPanel')),
