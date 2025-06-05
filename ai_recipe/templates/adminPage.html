@@ -1,47 +1,51 @@
-{% extends "base_template.html" %}
-{% load static %}
-{% block title %}ZeroWasteRecipe{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/adminPage.css' %}">
-{% endblock %}
-
-{% block content %}
+{% extends "base_template.html" %} {% load static %} {% block title%}ZeroWasteRecipe{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/adminPage.css' %}" />
+{% endblock %} {% block content %}
 <div class="admin-container">
   <!-- Sidebar -->
   <aside class="admin-sidebar">
-    <a class="sidebar-link active" href="#"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
-    <a class="sidebar-link" href="{% url 'admin_user' %}"><i class="fa fa-users"></i><span>Users</span></a>
-    <a class="sidebar-link" href="#"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
+    <a class="sidebar-link active" href="#"
+      ><i class="fa fa-dashboard"></i><span>Dashboard</span></a
+    >
+    <a class="sidebar-link" href="{% url 'admin_user' %}"
+      ><i class="fa fa-users"></i><span>Users</span></a
+    >
+    <a class="sidebar-link" href="#"
+      ><i class="fa fa-shopping-bag"></i><span>Contents</span></a
+    >
     <!-- <a class="sidebar-link" href="#donations-section"><i class="fa fa-shopping-bag"></i><span>Donations</span></a> -->
     <!-- Change the Issues link to a valid URL name -->
-    <a class="sidebar-link" href="{% url 'adminPanel:admin_issues' %}"><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a>
+    <a class="sidebar-link" href="{% url 'adminPanel:admin_issues' %}"
+      ><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a
+    >
     <div class="sidebar-bottom">
-      <button class="btn"><i class="fa fa-arrow-left"></i>Back to Site</button>
+      <a href="{% url 'home' %}" class="btn"
+        ><i class="fa fa-arrow-left"></i>Back to Site</a
+      >
     </div>
   </aside>
+
   <!-- Main Content -->
   <div class="admin-main">
     <!-- Header -->
     <header class="admin-header">
       <span class="admin-title">Admin Dashboard</span>
       <div class="admin-user">
-        <span class="avatar">A</span>
-        <!-- Add user dropdown or info here if needed -->
+        <span class="avatar">{{ user.username|first|upper|default:"A" }}</span>
       </div>
     </header>
+
     <!-- Dashboard Cards -->
     <div class="admin-cards">
       <div class="admin-card">
         <div class="icon-bg green"><i class="fa fa-users"></i></div>
         <div class="card-info">
           <div class="card-title">Total Users</div>
-            <div class="card-value">
-              {{ total_users|default:"N/A" }}
-            </div>
-            <div class="card-change positive">Database Connected</div>
+          <div class="card-value">{{ total_users|default:"N/A" }}</div>
+          <div class="card-change positive">Database Connected</div>
         </div>
       </div>
+
       <div class="admin-card">
         <div class="icon-bg purple"><i class="fa fa-shopping-bag"></i></div>
         <div class="card-info">
@@ -49,13 +53,26 @@
           <div class="card-value">487</div>
         </div>
       </div>
+
       <div class="admin-card">
-        <div class="icon-bg yellow"><i class="fa fa-exclamation-triangle"></i></div>
+        <div class="icon-bg yellow">
+          <i class="fa fa-exclamation-triangle"></i>
+        </div>
         <div class="card-info">
           <div class="card-title">Total Issues</div>
           <div class="card-value">{{ total_issues|default:"0" }}</div>
+          <div class="card-change">
+            {% if open_issues %}
+            <span class="text-warning">{{ open_issues }} Open</span>
+            {% if resolved_issues %} •
+            <span class="text-success">{{ resolved_issues }} Resolved</span>
+            {% endif %} {% else %}
+            <span class="text-success">All Resolved</span>
+            {% endif %}
+          </div>
         </div>
       </div>
+
       <div class="admin-card">
         <div class="icon-bg blue"><i class="fa fa-chart-bar"></i></div>
         <div class="card-info">
@@ -67,33 +84,58 @@
 
     <!-- Tabs -->
     <div class="admin-tabs mb-4">
-      <button class="tab active" type="button" onclick="showTab('activity')">Recent Activity</button>
-      <!-- Remove Users tab button -->
-      <button class="tab" type="button" onclick="showTab('donations')">Donations</button>
-      <button class="tab" type="button" onclick="showTab('issues')">Issues</button>
+      <button class="tab active" type="button" onclick="showTab('activity')">
+        Recent Activity
+      </button>
+      <button class="tab" type="button" onclick="showTab('donations')">
+        Donations
+      </button>
+      <button class="tab" type="button" onclick="showTab('issues')">
+        Issues
+      </button>
     </div>
+
     <div class="tab-content" id="adminTabContent">
       <!-- Recent Activity Tab -->
       <div class="tab-pane fade show active" id="activity" role="tabpanel">
         <div class="card mb-4">
           <div class="card-header">
             <h5 class="mb-1">Recent Activity</h5>
-            <div class="text-muted small">Overview of the latest activities on the platform</div>
+            <div class="text-muted small">
+              Overview of the latest activities on the platform
+            </div>
           </div>
           <div class="card-body">
             <div class="list-group mb-3">
               <!-- New User Registered -->
-              <div class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom">
-                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#dcfce7;width:48px;height:48px;">
-                  <i class="fa fa-user" style="color:#22c55e;font-size:1.5rem;"></i>
+              <div
+                class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom"
+              >
+                <div
+                  class="rounded-circle d-flex align-items-center justify-content-center activity-icon"
+                  style="background: #dcfce7; width: 48px; height: 48px"
+                >
+                  <i
+                    class="fa fa-user"
+                    style="color: #22c55e; font-size: 1.5rem"
+                  ></i>
                 </div>
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
-                      <div class="fw-bold" style="font-size:1.1rem;">New User Registered</div>
-                      <div class="text-muted small">A new user has joined the platform</div>
+                      <div class="fw-bold" style="font-size: 1.1rem">
+                        New User Registered
+                      </div>
+                      <div class="text-muted small">
+                        A new user has joined the platform
+                      </div>
                     </div>
-                    <span class="badge" style="background:#18181b;color:#fff;font-weight:600;">User Registration</span>
+                    <span
+                      class="badge"
+                      style="background: #18181b; color: #fff; font-weight: 600"
+                    >
+                      User Registration
+                    </span>
                   </div>
                   <div class="mt-1 text-muted small">
                     John Doe &bull; 10 minutes ago
@@ -102,17 +144,38 @@
               </div>
 
               <!-- New Food Donation -->
-              <div class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom">
-                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#ede9fe;width:48px;height:48px;">
-                  <i class="fa fa-shopping-bag" style="color:#7c3aed;font-size:1.5rem;"></i>
+              <div
+                class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom"
+              >
+                <div
+                  class="rounded-circle d-flex align-items-center justify-content-center activity-icon"
+                  style="background: #ede9fe; width: 48px; height: 48px"
+                >
+                  <i
+                    class="fa fa-shopping-bag"
+                    style="color: #7c3aed; font-size: 1.5rem"
+                  ></i>
                 </div>
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
-                      <div class="fw-bold" style="font-size:1.1rem;">New Food Donation</div>
-                      <div class="text-muted small">Organic Apples (5) added to available donations</div>
+                      <div class="fw-bold" style="font-size: 1.1rem">
+                        New Food Donation
+                      </div>
+                      <div class="text-muted small">
+                        Organic Apples (5) added to available donations
+                      </div>
                     </div>
-                    <span class="badge" style="background:#f4f4f5;color:#18181b;font-weight:600;">Donation Added</span>
+                    <span
+                      class="badge"
+                      style="
+                        background: #f4f4f5;
+                        color: #18181b;
+                        font-weight: 600;
+                      "
+                    >
+                      Donation Added
+                    </span>
                   </div>
                   <div class="mt-1 text-muted small">
                     Sarah Johnson &bull; 25 minutes ago
@@ -121,17 +184,34 @@
               </div>
 
               <!-- Food Quality Issue -->
-              <div class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom">
-                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#fef9c3;width:48px;height:48px;">
-                  <i class="fa fa-exclamation-triangle" style="color:#eab308;font-size:1.5rem;"></i>
+              <div
+                class="list-group-item d-flex align-items-start gap-3 border-0 border-bottom"
+              >
+                <div
+                  class="rounded-circle d-flex align-items-center justify-content-center activity-icon"
+                  style="background: #fef9c3; width: 48px; height: 48px"
+                >
+                  <i
+                    class="fa fa-exclamation-triangle"
+                    style="color: #eab308; font-size: 1.5rem"
+                  ></i>
                 </div>
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
-                      <div class="fw-bold" style="font-size:1.1rem;">Food Quality Issue</div>
-                      <div class="text-muted small">User reported an issue with expired food</div>
+                      <div class="fw-bold" style="font-size: 1.1rem">
+                        Food Quality Issue
+                      </div>
+                      <div class="text-muted small">
+                        User reported an issue with expired food
+                      </div>
                     </div>
-                    <span class="badge" style="background:#ef4444;color:#fff;font-weight:600;">Issue Reported</span>
+                    <span
+                      class="badge"
+                      style="background: #ef4444; color: #fff; font-weight: 600"
+                    >
+                      Issue Reported
+                    </span>
                   </div>
                   <div class="mt-1 text-muted small">
                     Michael Brown &bull; 1 hour ago
@@ -140,17 +220,39 @@
               </div>
 
               <!-- Donation Claimed -->
-              <div class="list-group-item d-flex align-items-start gap-3 border-0">
-                <div class="rounded-circle d-flex align-items-center justify-content-center activity-icon" style="background:#dbeafe;width:48px;height:48px;">
-                  <i class="fa fa-check-circle" style="color:#2563eb;font-size:1.5rem;"></i>
+              <div
+                class="list-group-item d-flex align-items-start gap-3 border-0"
+              >
+                <div
+                  class="rounded-circle d-flex align-items-center justify-content-center activity-icon"
+                  style="background: #dbeafe; width: 48px; height: 48px"
+                >
+                  <i
+                    class="fa fa-check-circle"
+                    style="color: #2563eb; font-size: 1.5rem"
+                  ></i>
                 </div>
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
-                      <div class="fw-bold" style="font-size:1.1rem;">Donation Claimed</div>
-                      <div class="text-muted small">Homemade Soup has been claimed by a user</div>
+                      <div class="fw-bold" style="font-size: 1.1rem">
+                        Donation Claimed
+                      </div>
+                      <div class="text-muted small">
+                        Homemade Soup has been claimed by a user
+                      </div>
                     </div>
-                    <span class="badge" style="background:#fff;color:#2563eb;border:1.5px solid #2563eb;font-weight:600;">Donation Claimed</span>
+                    <span
+                      class="badge"
+                      style="
+                        background: #fff;
+                        color: #2563eb;
+                        border: 1.5px solid #2563eb;
+                        font-weight: 600;
+                      "
+                    >
+                      Donation Claimed
+                    </span>
                   </div>
                   <div class="mt-1 text-muted small">
                     Emma Wilson &bull; 2 hours ago
@@ -159,7 +261,9 @@
               </div>
             </div>
             <div class="text-center">
-              <button class="btn btn-outline-secondary">View All Activity</button>
+              <button class="btn btn-outline-secondary">
+                View All Activity
+              </button>
             </div>
           </div>
         </div>
@@ -167,15 +271,25 @@
       <!-- Donations Tab -->
       <div class="tab-pane fade" id="donations-section" role="tabpanel">
         <div class="card mb-4">
-          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+          <div
+            class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3"
+          >
             <div>
               <h5 class="mb-1">Food Donations</h5>
-              <div class="text-muted small">Monitor and manage food donations across the platform</div>
+              <div class="text-muted small">
+                Monitor and manage food donations across the platform
+              </div>
             </div>
             <div class="d-flex gap-2 w-100 w-md-auto">
               <div class="position-relative flex-grow-1 flex-md-grow-0">
-                <i class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" class="form-control ps-5" placeholder="Search donations..." />
+                <i
+                  class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
+                ></i>
+                <input
+                  type="text"
+                  class="form-control ps-5"
+                  placeholder="Search donations..."
+                />
               </div>
               <button class="btn btn-success">Export Data</button>
             </div>
@@ -203,9 +317,24 @@
                     <td>2023-04-10</td>
                     <td class="text-end">
                       <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-secondary" title="View"><i class="fa fa-eye"></i></button>
-                        <button class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa fa-trash"></i></button>
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          title="View"
+                        >
+                          <i class="fa fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          title="Edit"
+                        >
+                          <i class="fa fa-edit"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-outline-danger"
+                          title="Delete"
+                        >
+                          <i class="fa fa-trash"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -215,10 +344,14 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
               <div class="text-muted small">
-                Showing <span class="fw-medium">1</span> to <span class="fw-medium">10</span> of <span class="fw-medium">87</span> donations
+                Showing <span class="fw-medium">1</span> to
+                <span class="fw-medium">10</span> of
+                <span class="fw-medium">87</span> donations
               </div>
               <div class="btn-group">
-                <button class="btn btn-outline-secondary btn-sm" disabled>Previous</button>
+                <button class="btn btn-outline-secondary btn-sm" disabled>
+                  Previous
+                </button>
                 <button class="btn btn-outline-secondary btn-sm">Next</button>
               </div>
             </div>
@@ -228,15 +361,25 @@
       <!-- Issues Tab -->
       <div class="tab-pane fade" id="issues" role="tabpanel">
         <div class="card mb-4">
-          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+          <div
+            class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3"
+          >
             <div>
               <h5 class="mb-1">Issue Management</h5>
-              <div class="text-muted small">Track and resolve reported issues</div>
+              <div class="text-muted small">
+                Track and resolve reported issues
+              </div>
             </div>
             <div class="d-flex gap-2 w-100 w-md-auto">
               <div class="position-relative flex-grow-1 flex-md-grow-0">
-                <i class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" class="form-control ps-5" placeholder="Search issues..." />
+                <i
+                  class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
+                ></i>
+                <input
+                  type="text"
+                  class="form-control ps-5"
+                  placeholder="Search issues..."
+                />
               </div>
               <button class="btn btn-success">Add Issue</button>
             </div>
@@ -259,7 +402,9 @@
                   <tr>
                     <td>
                       <div class="fw-medium">Food expired</div>
-                      <div class="text-muted small">Bread was expired on arrival...</div>
+                      <div class="text-muted small">
+                        Bread was expired on arrival...
+                      </div>
                     </td>
                     <td>John Doe</td>
                     <td><span class="badge bg-danger">Food Quality</span></td>
@@ -267,9 +412,24 @@
                     <td>2023-04-09</td>
                     <td class="text-end">
                       <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-secondary" title="View"><i class="fa fa-eye"></i></button>
-                        <button class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-secondary" title="Assign User"><i class="fa fa-user-plus"></i></button>
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          title="View"
+                        >
+                          <i class="fa fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          title="Edit"
+                        >
+                          <i class="fa fa-edit"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          title="Assign User"
+                        >
+                          <i class="fa fa-user-plus"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -279,10 +439,14 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3">
               <div class="text-muted small">
-                Showing <span class="fw-medium">1</span> to <span class="fw-medium">10</span> of <span class="fw-medium">24</span> issues
+                Showing <span class="fw-medium">1</span> to
+                <span class="fw-medium">10</span> of
+                <span class="fw-medium">24</span> issues
               </div>
               <div class="btn-group">
-                <button class="btn btn-outline-secondary btn-sm" disabled>Previous</button>
+                <button class="btn btn-outline-secondary btn-sm" disabled>
+                  Previous
+                </button>
                 <button class="btn btn-outline-secondary btn-sm">Next</button>
               </div>
             </div>
@@ -292,30 +456,30 @@
     </div>
   </div>
 </div>
+
 <script>
-function showTab(tab) {
-  // Remove active from all tabs and tab-panes
-  document.querySelectorAll('.admin-tabs .tab').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('show', 'active'));
-  // Add active to the selected tab and pane
-  if(tab === 'activity') {
-    document.querySelectorAll('.admin-tabs .tab')[0].classList.add('active');
-    document.getElementById('activity').classList.add('show', 'active');
-  // Remove users tab logic
-  } else if(tab === 'donations') {
-    document.querySelectorAll('.admin-tabs .tab')[1].classList.add('active');
-    document.getElementById('donations-section').classList.add('show', 'active');
-  } else if(tab === 'issues') {
-    document.querySelectorAll('.admin-tabs .tab')[2].classList.add('active');
-    document.getElementById('issues').classList.add('show', 'active');
+  function showTab(tab) {
+    // Remove active from all tabs and tab-panes
+    document
+      .querySelectorAll(".admin-tabs .tab")
+      .forEach((btn) => btn.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-pane")
+      .forEach((pane) => pane.classList.remove("show", "active"));
+
+    // Add active to the selected tab and pane
+    if (tab === "activity") {
+      document.querySelectorAll(".admin-tabs .tab")[0].classList.add("active");
+      document.getElementById("activity").classList.add("show", "active");
+    } else if (tab === "donations") {
+      document.querySelectorAll(".admin-tabs .tab")[1].classList.add("active");
+      document
+        .getElementById("donations-section")
+        .classList.add("show", "active");
+    } else if (tab === "issues") {
+      document.querySelectorAll(".admin-tabs .tab")[2].classList.add("active");
+      document.getElementById("issues").classList.add("show", "active");
+    }
   }
-}
-// Optional: handle sidebar Donations click
-document.querySelector('.admin-sidebar .sidebar-link[href="#donations-section"]')
-  ?.addEventListener('click', function(e) {
-    e.preventDefault();
-    showTab('donations');
-    document.getElementById('donations-section').scrollIntoView({behavior: 'smooth'});
-  });
 </script>
 {% endblock %}

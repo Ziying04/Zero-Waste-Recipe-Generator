@@ -29,18 +29,43 @@ def admin_dashboard(request):
         total_users = 0
 
     try:
+        # Try to use the same model as the main admin dashboard
+        from report_issues_user.models import IssueReport
         total_issues = IssueReport.objects.count()
-        print(f"SUCCESS: Total Issues = {total_issues}")
+        open_issues = IssueReport.objects.filter(status='open').count()
+        resolved_issues = IssueReport.objects.filter(status='resolved').count()
+        print(f"SUCCESS: Using report_issues_user.models - Total Issues = {total_issues} (Open: {open_issues}, Resolved: {resolved_issues})")
+        
+    except ImportError:
+        try:
+            # Fallback to local adminPanel model
+            from .models import IssueReport
+            total_issues = IssueReport.objects.count()
+            open_issues = IssueReport.objects.filter(status='open').count()
+            resolved_issues = IssueReport.objects.filter(status='resolved').count()
+            print(f"SUCCESS: Using adminPanel.models - Total Issues = {total_issues} (Open: {open_issues}, Resolved: {resolved_issues})")
+            
+        except Exception as e:
+            print(f"ERROR: Could not count issues with adminPanel.models - {e}")
+            total_issues = 0
+            open_issues = 0
+            resolved_issues = 0
+            
     except Exception as e:
         print(f"ERROR: Could not count issues - {e}")
         total_issues = 0
+        open_issues = 0
+        resolved_issues = 0
 
     context = {
         'total_users': total_users,
         'total_issues': total_issues,
+        'open_issues': open_issues,
+        'resolved_issues': resolved_issues,
     }
     print(f"Context being sent to template: {context}")
     print("=== END ADMIN DASHBOARD VIEW ===")
+    
     return render(request, "adminPage.html", context)
     
     print(f"Context being sent to template: {context}")
@@ -105,12 +130,35 @@ def admin_issues(request):
     """
     Display all issues for admin management - with debugging
     """
-    from report_issues_user.models import IssueReport
+    try:
+        # Try to use the main IssueReport model first
+        from report_issues_user.models import IssueReport
+        print("SUCCESS: Using report_issues_user.models.IssueReport")
+        
+    except ImportError:
+        try:
+            # Fallback to adminPanel model
+            from .models import IssueReport
+            print("SUCCESS: Using adminPanel.models.IssueReport")
+            
+        except ImportError:
+            print("ERROR: Could not import any IssueReport model")
+            # Return empty context
+            context = {
+                'issues': [],
+                'total_issues': 0,
+                'resolved_issues': 0,
+                'open_issues': 0,
+                'error': 'Could not import IssueReport model'
+            }
+            return render(request, 'adminIssues.html', context)
     
     issues = IssueReport.objects.all().order_by('-created_at')
     total_issues = issues.count()
     resolved_issues = issues.filter(status='resolved').count()
     open_issues = total_issues - resolved_issues
+    
+    print(f"Found {total_issues} issues total ({open_issues} open, {resolved_issues} resolved)")
 
     # Debug: Print field information for the first issue
     if issues.exists():
@@ -120,25 +168,6 @@ def admin_issues(request):
         # Print all field names
         field_names = [field.name for field in first_issue._meta.fields]
         print(f"All fields: {field_names}")
-        
-        # Check for screenshot field variations
-        screenshot_field = None
-        if hasattr(first_issue, 'screenshot'):
-            screenshot_field = 'screenshot'
-        elif hasattr(first_issue, 'image'):
-            screenshot_field = 'image'
-        elif hasattr(first_issue, 'attachment'):
-            screenshot_field = 'attachment'
-        
-        print(f"Screenshot field: {screenshot_field}")
-        
-        if screenshot_field:
-            screenshot_value = getattr(first_issue, screenshot_field)
-            print(f"Screenshot value: {screenshot_value}")
-            if screenshot_value:
-                print(f"Screenshot URL: {screenshot_value.url}")
-                print(f"Screenshot name: {screenshot_value.name}")
-        
         print("=== END DEBUG ===")
 
     context = {

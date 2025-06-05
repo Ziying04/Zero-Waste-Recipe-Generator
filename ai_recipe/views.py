@@ -114,15 +114,54 @@ def admin_dashboard(request):
         messages.error(request, "Access denied. Admin privileges required.")
         return redirect('home')
     
-    total_users = User.objects.count()
+    try:
+        total_users = User.objects.count()
+        print(f"SUCCESS: Total Users = {total_users}")
+    except Exception as e:
+        print(f"ERROR: Could not count users - {e}")
+        total_users = 0
+
+    try:
+        # Try to import from report_issues_user app first (this seems to be the main one)
+        from report_issues_user.models import IssueReport as UserIssueReport
+        total_issues = UserIssueReport.objects.count()
+        open_issues = UserIssueReport.objects.filter(status='open').count()
+        resolved_issues = UserIssueReport.objects.filter(status='resolved').count()
+        print(f"SUCCESS: Using report_issues_user.models - Total Issues = {total_issues} (Open: {open_issues}, Resolved: {resolved_issues})")
+        
+    except ImportError:
+        try:
+            # Fallback to adminPanel.models
+            from adminPanel.models import IssueReport as AdminIssueReport
+            total_issues = AdminIssueReport.objects.count()
+            open_issues = AdminIssueReport.objects.filter(status='open').count()
+            resolved_issues = AdminIssueReport.objects.filter(status='resolved').count()
+            print(f"SUCCESS: Using adminPanel.models - Total Issues = {total_issues} (Open: {open_issues}, Resolved: {resolved_issues})")
+            
+        except ImportError:
+            print("ERROR: Could not import any IssueReport model")
+            total_issues = 0
+            open_issues = 0
+            resolved_issues = 0
+            
+    except Exception as e:
+        print(f"ERROR: Could not count issues - {e}")
+        total_issues = 0
+        open_issues = 0
+        resolved_issues = 0
     
     # Add admin mode context
     context = {
         'total_users': total_users,
+        'total_issues': total_issues,
+        'open_issues': open_issues,
+        'resolved_issues': resolved_issues,
         'is_admin_mode': True,
         'admin_user': request.user,
         'can_switch_mode': True,
     }
+    
+    print(f"Context being sent to template: {context}")
     
     return render(request, 'adminPage.html', context)
 
