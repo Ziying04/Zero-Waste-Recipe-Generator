@@ -1,4 +1,3 @@
-
 {% extends "base_template.html" %}
 {% load static %}
 {% block title %}ZeroWasteRecipe{% endblock %}
@@ -13,7 +12,7 @@
   <aside class="admin-sidebar">
     <a class="sidebar-link active" href="#"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
     <a class="sidebar-link" href="{% url 'admin_user' %}"><i class="fa fa-users"></i><span>Users</span></a>
-    <a class="sidebar-link" href="#"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
+    <a class="sidebar-link" href="{% url 'adminPanel:admin_content' %}"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
     <!-- <a class="sidebar-link" href="#donations-section"><i class="fa fa-shopping-bag"></i><span>Donations</span></a> -->
     <a class="sidebar-link" href="#"><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a>
     <div class="sidebar-bottom">

@@ -4,334 +4,611 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/adminContent.css' %}">
+<style>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a class="sidebar-link active" href="#"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+      <a class="sidebar-link" href="{% url 'admin_user' %}"><i class="fa fa-users"></i><span>Users</span></a>
+      <a class="sidebar-link" href="{% url 'adminPanel:admin_content' %}"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
+      <!-- <a class="sidebar-link" href="#donations-section"><i class="fa fa-shopping-bag"></i><span>Donations</span></a> -->
+      <a class="sidebar-link" href="#"><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a>
+      <div class="sidebar-bottom">
+        <button class="btn"><i class="fa fa-arrow-left"></i>Back to Site</button>
+      </div>
+    </aside>
+.admin-container, .admin-main, .admin-layout {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.card {
+    width: 100%;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px 0 rgba(16,30,54,.08);
+    padding: 0;
+    margin-top: 24px;
+    margin-bottom: 32px;
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 32px 0 32px;
+}
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.card-description {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-top: 2px;
+}
+.add-btn {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px 0 rgba(16,185,129,.15);
+    transition: background 0.2s;
+    cursor: pointer;
+}
+.add-btn:hover {
+    background: #059669;
+}
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 32px 32px 32px;
+}
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    margin-top: 16px;
+}
+.table th, .table td {
+    padding: 18px 12px;
+    text-align: left;
+    background: #fff;
+}
+.table th {
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.table tr:not(:last-child) {
+    border-bottom: 1px solid #f3f4f6;
+}
+.table td {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+.content-title {
+    font-weight: 700;
+    color: #111827;
+}
+.content-preview {
+    color: #6b7280;
+    font-size: 0.97rem;
+    margin-top: 2px;
+}
+.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    background: #f3f4f6;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 400px;
+    margin: 0 auto 24px auto;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.10), 0 2px 8px rgba(0,0,0,0.03);
+}
+.tab-trigger {
+    flex: 1;
+    padding: 20px 0;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    border-bottom: 3px solid transparent;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.04);
+}
+.tab-trigger.active {
+    background: #fff;
+    color: #10b981;
+    border-bottom: 3px solid #10b981;
+    z-index: 2;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.10);
+}
+.tab-trigger:hover {
+    background: #e0f2f1;
+    color: #059669;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.10);
+}
+.action-btn {
+    /* ...existing button styles... */
+}
+.action-btn.edit-btn {
+    background: #2563eb !important;
+    color: #fff !important;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 10px;
+    padding: 8px 22px;
+    margin-right: 8px;
+    box-shadow: 0 2px 8px 0 rgba(99,102,241,0.06);
+    transition: background 0.2s, color 0.2s;
+}
+.action-btn.edit-btn:hover {
+    background: #1d4ed8 !important;
+    color: #fff !important;
+}
+.action-btn.delete-btn {
+    background: #ef4444 !important;
+    color: #fff !important;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 10px;
+    padding: 8px 22px;
+    box-shadow: 0 2px 8px 0 rgba(251,191,36,0.06);
+    transition: background 0.2s, color 0.2s;
+}
+.action-btn.delete-btn:hover {
+    background: #b91c1c !important;
+    color: #fff !important;
+}
+.row-actions {
+    display: none;
+    margin-left: 10px;
+}
+tr.show-actions .row-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.3);
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    min-width: 320px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-header { 
+    font-size: 1.2rem; 
+    font-weight: 600; 
+    margin-bottom: 1rem; 
+}
+.modal-close { 
+    float: right; 
+    cursor: pointer; 
+    font-size: 1.5rem; 
+}
+.form-group {
+    margin-bottom: 1rem;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+.btn-primary {
+    background: #10b981;
+    color: white;
+}
+.btn-primary:hover {
+    background: #059669;
+}
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+.btn-secondary:hover {
+    background: #4b5563;
+}
+@media (max-width: 900px) {
+    .card-header, .table-container { padding: 16px; }
+    .add-btn { padding: 10px 18px; font-size: 1rem; }
+    .action-btn.edit-btn, .action-btn.delete-btn { padding: 10px 18px; font-size: 1rem; }
+}
+</style>
 {% endblock %}
 
 {% block content %}
+
 <div class="admin-container">
-  <aside class="admin-sidebar">
-    <a class="sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
-    <a class="sidebar-link" href="{% url 'admin_user' %}"><i class="fa fa-users"></i><span>Users</span></a>
-    <a class="sidebar-link active" href="{% url 'admin_content' %}"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
-    <a class="sidebar-link" href="#"><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a>
-    <div class="sidebar-bottom">
-      <button class="btn"><i class="fa fa-arrow-left"></i>Back to Site</button>
-    </div>
-  </aside>
   <div class="admin-main">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="admin-title">Content Management</h1>
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary btn-sm"><i class="fa fa-filter me-2"></i>Filter</button>
-        <button class="btn btn-outline-secondary btn-sm"><i class="fa fa-download me-2"></i>Export</button>
+    <div class="admin-layout">
+      <div class="header">
+          <h1 style="font-size:2.2rem;font-weight:800;margin-bottom:24px;">Content Management</h1>
       </div>
-    </div>
-
-    <!-- Overview Cards -->
-    <div class="row mb-4">
-      <div class="col-md-3 mb-3">
-        <div class="admin-card">
-          <div class="card-info">
-            <div class="card-title">Pending Review</div>
-            <div class="card-value">23</div>
-            <div class="card-change text-warning">+5 <span class="text-muted">since yesterday</span></div>
-          </div>
-          <div class="icon-bg yellow"><i class="fa fa-clock"></i></div>
-        </div>
+      <div class="tabs">
+          <button class="tab-trigger active" data-tab="recipes" type="button">Recipes</button>
+          <button class="tab-trigger" data-tab="forum-posts" type="button">Forum Posts</button>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="admin-card">
-          <div class="card-info">
-            <div class="card-title">Published Content</div>
-            <div class="card-value">1,247</div>
-            <div class="card-change text-success">+12% <span class="text-muted">from last month</span></div>
+      <!-- Recipes Tab -->
+      <div class="tab-content active" id="recipes" style="display:block;">
+          <div class="card">
+              <div class="card-header">
+                  <div>
+                      <div class="card-title">Recipes</div>
+                      <div class="card-description">Manage all recipe content</div>
+                  </div>
+                  <button class="add-btn" onclick="openRecipeModal('add')">Add Recipe</button>
+              </div>
+              <div class="table-container">
+                  <table class="table">
+                      <thead>
+                          <tr>
+                              <th style="width:40%;">Title</th>
+                              <th style="width:20%;">Author</th>
+                              <th style="width:20%;">Date</th>
+                              <th style="width:20%;">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody id="recipes-tbody">
+                          {% for recipe in recipes %}
+                          <tr data-id="{{ recipe.id }}">
+                              <td>
+                                  <div class="content-title">{{ recipe.name }}</div>
+                                  <div class="content-preview">{{ recipe.ingredients|truncatechars:60 }}</div>
+                              </td>
+                              <td class="author-cell">{{ recipe.user.username }}</td>
+                              <td class="date-cell">{{ recipe.created_at|date:"Y-m-d" }}</td>
+                              <td>
+                                  <button class="row-actions-btn" onclick="toggleRowActions(this, event)">
+                                      &#8942;
+                                  </button>
+                                  <div class="row-actions">
+                                      <button class="action-btn edit-btn" onclick="openRecipeModal('edit', {{ recipe.id }})">Edit</button>
+                                      <button class="action-btn delete-btn" onclick="deleteContent('recipe', {{ recipe.id }}, this)">Delete</button>
+                                  </div>
+                              </td>
+                          </tr>
+                          {% empty %}
+                          <tr><td colspan="4">No recipes found.</td></tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
           </div>
-          <div class="icon-bg green"><i class="fa fa-file-text"></i></div>
-        </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="admin-card">
-          <div class="card-info">
-            <div class="card-title">Reported Content</div>
-            <div class="card-value">8</div>
-            <div class="card-change text-danger">+2 <span class="text-muted">since yesterday</span></div>
+      <!-- Forum Posts Tab -->
+      <div class="tab-content" id="forum-posts" style="display:none;">
+          <div class="card">
+              <div class="card-header">
+                  <div>
+                      <div class="card-title">Forum Posts</div>
+                      <div class="card-description">Manage all forum post content</div>
+                  </div>
+                  <button class="add-btn" onclick="openDonationModal('add')">Add Donation Post</button>
+              </div>
+              <div class="table-container">
+                  <table class="table">
+                      <thead>
+                          <tr>
+                              <th style="width:40%;">Title</th>
+                              <th style="width:20%;">Author</th>
+                              <th style="width:20%;">Date</th>
+                              <th style="width:20%;">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody id="posts-tbody">
+                          {% for post in donation_posts %}
+                          <tr data-id="{{ post.id }}">
+                              <td>
+                                  <div class="content-title">{{ post.food_name }}</div>
+                                  <div class="content-preview">{{ post.description|truncatechars:60 }}</div>
+                              </td>
+                              <td class="author-cell">{{ post.donor.username }}</td>
+                              <td class="date-cell">{{ post.created_at|date:"Y-m-d" }}</td>
+                              <td>
+                                  <button class="row-actions-btn" onclick="toggleRowActions(this, event)">
+                                      &#8942;
+                                  </button>
+                                  <div class="row-actions">
+                                      <button class="action-btn edit-btn" onclick="openDonationModal('edit', {{ post.id }})">Edit</button>
+                                      <button class="action-btn delete-btn" onclick="deleteContent('donation', {{ post.id }}, this)">Delete</button>
+                                  </div>
+                              </td>
+                          </tr>
+                          {% empty %}
+                          <tr><td colspan="4">No forum posts found.</td></tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
           </div>
-          <div class="icon-bg red"><i class="fa fa-flag"></i></div>
-        </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="admin-card">
-          <div class="card-info">
-            <div class="card-title">Total Comments</div>
-            <div class="card-value">3,456</div>
-            <div class="card-change text-success">+8% <span class="text-muted">from last week</span></div>
-          </div>
-          <div class="icon-bg blue"><i class="fa fa-comments"></i></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-4" id="contentTabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Pending Review</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="published-tab" data-bs-toggle="tab" data-bs-target="#published" type="button" role="tab">Published Content</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="reported-tab" data-bs-toggle="tab" data-bs-target="#reported" type="button" role="tab">Reported Content</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All Content</button>
-      </li>
-    </ul>
-    <div class="tab-content" id="contentTabsContent">
-      <!-- Pending Review Tab -->
-      <div class="tab-pane fade show active" id="pending" role="tabpanel">
-        <div class="card mb-4">
-          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-            <div>
-              <h5 class="mb-1">Pending Review</h5>
-              <div class="text-muted small">Content awaiting moderation approval</div>
-            </div>
-            <div class="d-flex gap-2 w-100 w-md-auto">
-              <input type="text" class="form-control" placeholder="Search content..." style="max-width:200px;">
-              <select class="form-select" style="max-width:140px;">
-                <option>All Types</option>
-                <option>Recipes</option>
-                <option>Forum Posts</option>
-                <option>Comments</option>
-              </select>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive rounded border">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Content</th>
-                    <th>Author</th>
-                    <th>Type</th>
-                    <th>Submitted</th>
-                    <th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div>
-                        <strong>Zero-Waste Banana Bread Recipe</strong>
-                        <div class="text-muted small">A delicious recipe using overripe bananas and leftover ingredients...</div>
-                      </div>
-                    </td>
-                    <td>Sarah Johnson</td>
-                    <td><span class="badge bg-success">Recipe</span></td>
-                    <td>2 hours ago</td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-success btn-sm" title="Approve"><i class="fa fa-check"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Reject"><i class="fa fa-times"></i></button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Tips for Reducing Food Waste at Home</strong>
-                      <div class="text-muted small">Sharing my experience with meal planning and storage techniques...</div>
-                    </td>
-                    <td>Michael Brown</td>
-                    <td><span class="badge bg-primary">Post</span></td>
-                    <td>4 hours ago</td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-success btn-sm" title="Approve"><i class="fa fa-check"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Reject"><i class="fa fa-times"></i></button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Great recipe! I modified it slightly...</strong>
-                      <div class="text-muted small">I tried this recipe and made some adjustments that worked well...</div>
-                    </td>
-                    <td>Emma Wilson</td>
-                    <td><span class="badge bg-purple">Comment</span></td>
-                    <td>6 hours ago</td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-success btn-sm" title="Approve"><i class="fa fa-check"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Reject"><i class="fa fa-times"></i></button>
-                    </td>
-                  </tr>
-                  <!-- Add more rows as needed -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Published Content Tab -->
-      <div class="tab-pane fade" id="published" role="tabpanel">
-        <div class="card mb-4">
-          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-            <div>
-              <h5 class="mb-1">Published Content</h5>
-              <div class="text-muted small">All approved and published content</div>
-            </div>
-            <div class="d-flex gap-2 w-100 w-md-auto">
-              <input type="text" class="form-control" placeholder="Search content..." style="max-width:200px;">
-              <select class="form-select" style="max-width:140px;">
-                <option>All Types</option>
-                <option>Recipes</option>
-                <option>Forum Posts</option>
-                <option>Comments</option>
-              </select>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive rounded border">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Content</th>
-                    <th>Author</th>
-                    <th>Type</th>
-                    <th>Published</th>
-                    <th>Engagement</th>
-                    <th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <strong>Ultimate Guide to Meal Planning</strong>
-                      <div class="text-muted small">Comprehensive guide to planning meals and reducing waste...</div>
-                    </td>
-                    <td>Alex Taylor</td>
-                    <td><span class="badge bg-primary">Post</span></td>
-                    <td>May 10, 2023</td>
-                    <td>
-                      <span>👍 45</span> <span class="ms-2">💬 12</span>
-                    </td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-primary btn-sm" title="Edit"><i class="fa fa-edit"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Carrot Top Pesto Recipe</strong>
-                      <div class="text-muted small">Don't throw away those carrot tops! Make this delicious pesto...</div>
-                    </td>
-                    <td>Olivia Smith</td>
-                    <td><span class="badge bg-success">Recipe</span></td>
-                    <td>May 9, 2023</td>
-                    <td>
-                      <span>👍 78</span> <span class="ms-2">💬 23</span>
-                    </td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-primary btn-sm" title="Edit"><i class="fa fa-edit"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
-                    </td>
-                  </tr>
-                  <!-- Add more rows as needed -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Reported Content Tab -->
-      <div class="tab-pane fade" id="reported" role="tabpanel">
-        <div class="card mb-4">
-          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-            <div>
-              <h5 class="mb-1">Reported Content</h5>
-              <div class="text-muted small">Content flagged by users for review</div>
-            </div>
-            <div class="d-flex gap-2 w-100 w-md-auto">
-              <input type="text" class="form-control" placeholder="Search reports..." style="max-width:200px;">
-              <select class="form-select" style="max-width:140px;">
-                <option>All Reports</option>
-                <option>Spam</option>
-                <option>Inappropriate</option>
-                <option>Misinformation</option>
-              </select>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive rounded border">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Content</th>
-                    <th>Report Reason</th>
-                    <th>Reported By</th>
-                    <th>Date</th>
-                    <th class="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <strong>Questionable Food Safety Advice</strong>
-                      <div class="text-muted small">Recipe suggests unsafe food handling practices...</div>
-                    </td>
-                    <td><span class="badge bg-warning">Misinformation</span></td>
-                    <td>FoodSafetyExpert</td>
-                    <td>May 10, 2023</td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Spam promotional content</strong>
-                      <div class="text-muted small">This post is clearly advertising a commercial product...</div>
-                    </td>
-                    <td><span class="badge bg-danger">Spam</span></td>
-                    <td>CommunityModerator</td>
-                    <td>May 9, 2023</td>
-                    <td class="text-end">
-                      <button class="btn btn-outline-secondary btn-sm" title="View"><i class="fa fa-eye"></i></button>
-                      <button class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa fa-trash"></i></button>
-                    </td>
-                  </tr>
-                  <!-- Add more rows as needed -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- All Content Tab -->
-      <div class="tab-pane fade" id="all" role="tabpanel">
-        <div class="card mb-4">
-          <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-            <div>
-              <h5 class="mb-1">All Content</h5>
-              <div class="text-muted small">Complete overview of all platform content</div>
-            </div>
-            <div class="d-flex gap-2 w-100 w-md-auto">
-              <input type="text" class="form-control" placeholder="Search all content..." style="max-width:200px;">
-              <select class="form-select" style="max-width:140px;">
-                <option>All Status</option>
-                <option>Published</option>
-                <option>Pending</option>
-                <option>Rejected</option>
-              </select>
-              <button class="btn btn-success">Export All</button>
-            </div>
-          </div>
-          <div class="card-body text-center text-muted py-5">
-            <i class="fa fa-file-text fa-3x mb-3 opacity-50"></i>
-            <p>All content overview will be displayed here</p>
-            <p class="small">Use the filters above to view specific content types and statuses</p>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
+
+<!-- Recipe Modal -->
+<div class="modal" id="recipe-modal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="closeModal('recipe-modal')">&times;</span>
+    <div class="modal-header" id="recipe-modal-title">Add/Edit Recipe</div>
+    <form id="recipe-form">
+      {% csrf_token %}
+      <input type="hidden" name="recipe_id" id="recipe_id">
+      
+      <div class="form-group">
+        <label for="recipe_name">Name:</label>
+        <input type="text" name="name" id="recipe_name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="recipe_cooking_time">Cooking Time (minutes):</label>
+        <input type="number" name="cooking_time" id="recipe_cooking_time" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="recipe_steps">Steps:</label>
+        <textarea name="steps" id="recipe_steps" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="recipe_image_url">Image URL:</label>
+        <input type="url" name="image_url" id="recipe_image_url">
+      </div>
+      
+      <div class="form-group">
+        <label for="recipe_ingredients">Ingredients:</label>
+        <textarea name="ingredients" id="recipe_ingredients" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="is_shared" id="recipe_is_shared">
+          Is Shared
+        </label>
+      </div>
+      
+      <div style="margin-top:1rem;">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('recipe-modal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Donation Modal -->
+<div class="modal" id="donation-modal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="closeModal('donation-modal')">&times;</span>
+    <div class="modal-header" id="donation-modal-title">Add/Edit Donation Post</div>
+    <form id="donation-form">
+      {% csrf_token %}
+      <input type="hidden" name="donation_id" id="donation_id">
+      
+      <div class="form-group">
+        <label for="donation_food_name">Food Name:</label>
+        <input type="text" name="food_name" id="donation_food_name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="donation_description">Description:</label>
+        <textarea name="description" id="donation_description" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="donation_quantity">Quantity:</label>
+        <input type="text" name="quantity" id="donation_quantity" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="donation_location">Location:</label>
+        <input type="text" name="location" id="donation_location" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="donation_category">Category:</label>
+        <select name="category" id="donation_category" required>
+          <option value="">Select Category</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Vegetables">Vegetables</option>
+          <option value="Dairy">Dairy</option>
+          <option value="Grains & Bread">Grains & Bread</option>
+          <option value="Protein">Protein & Meat</option>
+          <option value="Prepared Meals">Prepared Meals</option>
+          <option value="Canned Goods">Canned Goods</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="donation_expiry_date">Expiry Date:</label>
+        <input type="date" name="expiry_date" id="donation_expiry_date" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="donation_status">Status:</label>
+        <select name="status" id="donation_status" required>
+          <option value="">Select Status</option>
+          <option value="Available">Available</option>
+          <option value="Claimed">Claimed</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+      
+      <div style="margin-top:1rem;">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('donation-modal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Get CSRF token
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+// Delete AJAX
+function deleteContent(type, id, btn) {
+    if (!confirm('Are you sure you want to delete this content?')) return;
+    let url = '';
+    if (type === 'recipe') {
+        url = "{% url 'adminPanel:delete_recipe' 0 %}".replace('0', id);
+    } else if (type === 'donation') {
+        url = "{% url 'adminPanel:delete_donation' 0 %}".replace('0', id);
+    }
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Accept': 'application/json'
+        }
+    }).then(resp => resp.json()).then(data => {
+        if (data.success) {
+            btn.closest('tr').remove();
+            alert('Content deleted successfully!');
+        } else {
+            alert(data.error || 'Failed to delete.');
+        }
+    }).catch(() => alert('Failed to delete.'));
+}
+
+// Tab switching
+document.querySelectorAll('.tab-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabId = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-content').forEach(tc => {
+            tc.classList.remove('active');
+            tc.style.display = 'none';
+        });
+        document.querySelector(`#${tabId}`).classList.add('active');
+        document.querySelector(`#${tabId}`).style.display = 'block';
+        
+        document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
+
+// Open Recipe Modal
+function openRecipeModal(action, id = null) {
+    document.getElementById('recipe-form').reset();
+    document.getElementById('recipe_id').value = id ? id : '';
+    document.getElementById('recipe-modal-title').innerText = action === 'add' ? 'Add Recipe' : 'Edit Recipe';
+    if (action === 'edit' && id) {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        const title = row.querySelector('.content-title').innerText;
+        const ingredients = row.querySelector('.content-preview').innerText;
+        const user = row.querySelector('.author-cell').innerText;
+        const date = row.querySelector('.date-cell').innerText;
+        
+        document.getElementById('recipe_name').value = title;
+        document.getElementById('recipe_ingredients').value = ingredients;
+    }
+    openModal('recipe-modal');
+}
+
+// Open Donation Modal
+function openDonationModal(action, id = null) {
+    document.getElementById('donation-form').reset();
+    document.getElementById('donation_id').value = id ? id : '';
+    document.getElementById('donation-modal-title').innerText = action === 'add' ? 'Add Donation Post' : 'Edit Donation Post';
+    if (action === 'edit' && id) {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        const title = row.querySelector('.content-title').innerText;
+        const description = row.querySelector('.content-preview').innerText;
+        const user = row.querySelector('.author-cell').innerText;
+        const date = row.querySelector('.date-cell').innerText;
+        
+        document.getElementById('donation_food_name').value = title;
+        document.getElementById('donation_description').value = description;
+    }
+    openModal('donation-modal');
+}
+
+// Open Modal
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+// Close Modal
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Toggle Row Actions
+function toggleRowActions(btn, event) {
+    event.stopPropagation();
+    const row = btn.closest('tr');
+    const actions = row.querySelector('.row-actions');
+    const isVisible = actions.style.display === 'flex';
+    
+    document.querySelectorAll('.row-actions').forEach(a => {
+        a.style.display = 'none';
+    });
+    
+    actions.style.display = isVisible ? 'none' : 'flex';
+}
+
+// CSRF token for AJAX
+document.addEventListener('DOMContentLoaded', () => {
+    const csrfToken = getCSRFToken();
+    fetch('/path/to/your/endpoint/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ key: 'value' })
+    }).then(response => response.json())
+      .then(data => console.log(data))
+      .catch(error => console.error('Error:', error));
+});
+</script>
 {% endblock %}
