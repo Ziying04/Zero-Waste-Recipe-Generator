@@ -45,6 +45,7 @@ urlpatterns = [
     # path('admin-content/', admin_content, name='admin_content'),
 
     path('notification/', include('notification.urls')),
+    path('issues/', include('report_issues_user.urls')),
 ]
 
 # Serve media files in development
