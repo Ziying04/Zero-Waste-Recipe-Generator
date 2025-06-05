@@ -1,0 +1,198 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Report Issue{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reportIssues_user.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-bug"></i> Report an Issue</h1>
+        <p>Help us improve by reporting bugs, inappropriate content, or providing feedback</p>
+    </div>
+
+    <div class="form-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        {% if success %}
+        <div class="confirmation-message" id="confirmationMessage" style="display:block;">
+            <h3><i class="fas fa-check-circle"></i> Thank you for reporting!</h3>
+            <p>We will review your issue shortly and get back to you if needed.</p>
+        </div>
+        {% else %}
+        <form id="issueForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="issueType">Issue Type <span class="required">*</span></label>
+                <select id="issueType" name="issue_type" required>
+                    <option value="">Select an issue type...</option>
+                    <option value="bug"><i class="fas fa-bug"></i> Bug Report</option>
+                    <option value="inappropriate"><i class="fas fa-exclamation-triangle"></i> Inappropriate Content</option>
+                    <option value="feature"><i class="fas fa-lightbulb"></i> Feature Request</option>
+                    <option value="performance"><i class="fas fa-bolt"></i> Performance Issue</option>
+                    <option value="accessibility"><i class="fas fa-universal-access"></i> Accessibility Issue</option>
+                    <option value="other"><i class="fas fa-tools"></i> Other</option>
+                </select>
+                <div class="error-message" id="issueTypeError">Please select an issue type.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description <span class="required">*</span></label>
+                <textarea id="description" name="description" placeholder="Please provide a detailed description of the issue..." required maxlength="1000"></textarea>
+                <div class="char-counter" id="charCounter">0 / 1000 characters</div>
+                <div class="error-message" id="descriptionError">Please provide a description of the issue.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="screenshot">Screenshot (Optional)</label>
+                <div class="file-upload-wrapper" onclick="document.getElementById('screenshot').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Click to upload a screenshot</strong><br>
+                        <small>Supported formats: JPG, PNG, GIF (Max 5MB)</small>
+                    </div>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+                <input type="file" id="screenshot" name="screenshot" accept="image/*">
+                <div class="error-message" id="fileError"></div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Report
+                </button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Form validation and submission
+    const form = document.getElementById('issueForm');
+    const issueType = document.getElementById('issueType');
+    const description = document.getElementById('description');
+    const screenshot = document.getElementById('screenshot');
+    const charCounter = document.getElementById('charCounter');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    const progressFill = document.getElementById('progressFill');
+    const fileInfo = document.getElementById('fileInfo');
+
+    // Character counter for description
+    description.addEventListener('input', function() {
+        const count = this.value.length;
+        charCounter.textContent = `${count} / 1000 characters`;
+        charCounter.style.color = count > 800 ? '#e74c3c' : '#666';
+    });
+
+    // File upload handling
+    screenshot.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                showError('fileError', 'File size must be less than 5MB');
+                this.value = '';
+                fileInfo.style.display = 'none';
+                return;
+            }
+
+            // Show file info
+            fileInfo.innerHTML = `
+                <strong>Selected:</strong> ${file.name}<br>
+                <small>Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+            `;
+            fileInfo.style.display = 'block';
+            hideError('fileError');
+        } else {
+            fileInfo.style.display = 'none';
+        }
+    });
+
+    // Progress bar update
+    function updateProgress() {
+        let progress = 0;
+        if (issueType.value) progress += 33;
+        if (description.value.trim()) progress += 34;
+        if (screenshot.files[0]) progress += 33;
+        
+        progressFill.style.width = progress + '%';
+    }
+
+    issueType.addEventListener('change', updateProgress);
+    description.addEventListener('input', updateProgress);
+    screenshot.addEventListener('change', updateProgress);
+
+    // For Django - remove the preventDefault and let form submit normally
+    if (typeof form !== "undefined" && form) {
+        form.addEventListener('submit', function(e) {
+            // Reset previous errors
+            hideAllErrors();
+            
+            let isValid = true;
+
+            // Validate issue type
+            if (!issueType.value) {
+                showError('issueTypeError', 'Please select an issue type.');
+                isValid = false;
+            }
+
+            // Validate description
+            if (!description.value.trim()) {
+                showError('descriptionError', 'Please provide a description of the issue.');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault(); // Only prevent submission if validation fails
+                return false;
+            }
+
+            // Show loading state
+            const submitBtn = form.querySelector('.submit-btn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            submitBtn.disabled = true;
+            // Allow normal Django form submission
+        });
+    }
+
+    function showError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    function hideError(elementId) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.style.display = 'none';
+    }
+
+    function hideAllErrors() {
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(element => {
+            element.style.display = 'none';
+        });
+    }
+
+    // Add smooth animations on input focus
+    const inputs = document.querySelectorAll('select, textarea, input[type="file"]');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateY(-2px)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+{% endblock %}

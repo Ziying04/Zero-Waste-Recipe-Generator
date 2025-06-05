@@ -1,9 +1,11 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+from adminPanel.models import IssueReport  # Import the admin panel IssueReport model
 
 # Import any utility function you use
 from recipe.utils import generate_recipe
@@ -93,11 +95,75 @@ def custom_login(request):
     return render(request, "login.html")
 
 
+def custom_logout(request):
+    """Custom logout view with admin mode detection"""
+    was_admin = request.user.is_staff or request.user.is_superuser if request.user.is_authenticated else False
+    logout(request)
+    
+    if was_admin:
+        messages.success(request, "You have been logged out from admin mode.")
+    else:
+        messages.success(request, "You have been logged out successfully.")
+    
+    return redirect('home')
+
 def admin_dashboard(request):
-    total_users = User.objects.count()
-    return render(request, 'adminPage.html', {
+    """Enhanced admin dashboard with user mode toggle capability"""
+    # Check if user has admin privileges
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "Access denied. Admin privileges required.")
+        return redirect('home')
+    
+    try:
+        total_users = User.objects.count()
+        print(f"SUCCESS: Total Users = {total_users}")
+    except Exception as e:
+        print(f"ERROR: Could not count users - {e}")
+        total_users = 0
+
+    try:
+        # Try to import from report_issues_user app first (this seems to be the main one)
+        from report_issues_user.models import IssueReport as UserIssueReport
+        total_issues = UserIssueReport.objects.count()
+        open_issues = UserIssueReport.objects.filter(status='open').count()
+        resolved_issues = UserIssueReport.objects.filter(status='resolved').count()
+        print(f"SUCCESS: Using report_issues_user.models - Total Issues = {total_issues} (Open: {open_issues}, Resolved: {resolved_issues})")
+        
+    except ImportError:
+        try:
+            # Fallback to adminPanel.models
+            from adminPanel.models import IssueReport as AdminIssueReport
+            total_issues = AdminIssueReport.objects.count()
+            open_issues = AdminIssueReport.objects.filter(status='open').count()
+            resolved_issues = AdminIssueReport.objects.filter(status='resolved').count()
+            print(f"SUCCESS: Using adminPanel.models - Total Issues = {total_issues} (Open: {open_issues}, Resolved: {resolved_issues})")
+            
+        except ImportError:
+            print("ERROR: Could not import any IssueReport model")
+            total_issues = 0
+            open_issues = 0
+            resolved_issues = 0
+            
+    except Exception as e:
+        print(f"ERROR: Could not count issues - {e}")
+        total_issues = 0
+        open_issues = 0
+        resolved_issues = 0
+    
+    # Add admin mode context
+    context = {
         'total_users': total_users,
-    })
+        'total_issues': total_issues,
+        'open_issues': open_issues,
+        'resolved_issues': resolved_issues,
+        'is_admin_mode': True,
+        'admin_user': request.user,
+        'can_switch_mode': True,
+    }
+    
+    print(f"Context being sent to template: {context}")
+    
+    return render(request, 'adminPage.html', context)
 
 def admin_user(request):
     """Admin user management view with debugging"""
@@ -203,3 +269,20 @@ def admin_content(request):
         }
     
     return render(request, 'admin_content.html', context)
+
+def report_issue(request):
+    if request.method == 'POST':
+        issue_type = request.POST.get('issue_type')
+        description = request.POST.get('description')
+        screenshot = request.FILES.get('screenshot')
+        user = request.user if request.user.is_authenticated else None
+
+        IssueReport.objects.create(
+            user=user,
+            issue_type=issue_type,
+            description=description,
+            screenshot=screenshot
+        )
+        # Redirect or render a success message
+        return render(request, 'reportIssues_user.html', {'success': True})
+    return render(request, 'reportIssues_user.html')  # GET request handling

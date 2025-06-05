@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'ingredient_tracker',  
     'adminPanel',  # Add adminPanel app
     'notification',  # Our notification app
+    'report_issues_user',
 ]
 
 MIDDLEWARE = [

@@ -522,7 +522,119 @@
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
-/* Responsive Design */
+/* Admin Dashboard Button */
+.admin-dashboard-btn {
+  margin-right: 0.5rem;
+}
+
+.admin-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white !important;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.admin-btn:hover::before {
+  left: 100%;
+}
+
+.admin-btn:hover {
+  background: linear-gradient(135deg, #5b5ff1, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Admin Badge in Profile */
+.profile-role {
+  margin-top: 0.5rem;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Admin Section in Profile Dropdown */
+.admin-section {
+  padding: 0.5rem 0;
+}
+
+.admin-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.admin-item {
+  background: rgba(99, 102, 241, 0.05);
+  border-left: 3px solid var(--primary-green);
+  margin: 0.25rem 0;
+}
+
+.admin-item:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.admin-item i {
+  color: #6366f1;
+}
+
+/* Enhanced Profile Dropdown for Admin */
+.profile-section.admin .profile-dropdown {
+  min-width: 320px;
+}
+
+/* Mobile Responsive for Admin Elements */
+@media (max-width: 768px) {
+  .admin-dashboard-btn {
+    margin-right: 0.25rem;
+  }
+  
+  .admin-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .admin-section-title {
+    font-size: 0.8rem;
+    padding: 0.375rem 0.5rem;
+  }
+  
+  .admin-item {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .nav-menu {
     margin: 0 1rem;

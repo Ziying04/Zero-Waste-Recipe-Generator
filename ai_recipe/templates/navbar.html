@@ -60,7 +60,6 @@
                   <div class="dropdown-desc">Track expiring ingredients</div>
                 </div>
               </a>
-              
             </div>
           </div>
         </div>
@@ -70,6 +69,20 @@
     <!-- Right Side -->
     <div class="nav-actions">
       {% if user.is_authenticated %}
+
+      <!-- Admin Dashboard Button (only show for admin users) -->
+      {% if user.is_staff or user.is_superuser %}
+      <div class="admin-dashboard-btn">
+        <a
+          href="{% url 'admin_dashboard' %}"
+          class="nav-btn admin-btn"
+          title="Admin Dashboard"
+        >
+          <i class="fas fa-cog"></i>
+        </a>
+      </div>
+      {% endif %}
+
       <!-- Search Button -->
       <button class="nav-btn search-btn" id="searchToggle">
         <i class="fas fa-search"></i>
@@ -91,8 +104,17 @@
           <div class="profile-info">
             <div class="profile-name">{{ user.userprofile.name }}</div>
             <div class="profile-email">{{ user.email }}</div>
+            {% if user.is_staff or user.is_superuser %}
+            <div class="profile-role">
+              <span class="admin-badge">
+                <i class="fas fa-crown"></i>
+                {% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}
+              </span>
+            </div>
+            {% endif %}
           </div>
           <div class="profile-menu">
+
             <a href="{% url 'profile' %}" class="profile-item">
               <i class="fas fa-user"></i>
               <span>My Profile</span>
@@ -104,6 +126,11 @@
             <a href="{% url 'sharing' %}" class="profile-item">
               <i class="fas fa-share-alt"></i>
               <span>My Recipes</span>
+            </a>
+            <!-- Report Issue inside profile dropdown -->
+            <a href="{% url 'report_issue'%}" class="profile-item">
+              <i class="fas fa-bug"></i>
+              <span>Report Issue</span>
             </a>
             <div class="profile-divider"></div>
             <a href="{% url 'logout' %}" class="profile-item logout">
