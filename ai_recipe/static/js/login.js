@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is already authenticated
+    if (document.body.dataset.authenticated === 'true') {
+        window.location.href = '/';
+        return;
+    }
+});
+
 document.getElementById('login-form').addEventListener('submit', function (e) {
     e.preventDefault();
   
@@ -22,23 +30,41 @@ document.getElementById('login-form').addEventListener('submit', function (e) {
       document.getElementById('password-error').textContent = errors.password || '';
       document.getElementById('form-error').textContent = '';
     } else {
-      // Simulate login
-      document.getElementById('submit-btn').disabled = true;
-      document.getElementById('submit-btn').textContent = 'Logging in...';
+      // Perform actual login
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in...';
   
-      // Simulate an API call (replace with your own login logic)
-      setTimeout(() => {
-        // Simulate a failed login
-        const loginSuccessful = false; // Change this to `true` to simulate success
-  
-        if (!loginSuccessful) {
-          document.getElementById('form-error').textContent = 'Invalid email or password. Please try again.';
-          document.getElementById('submit-btn').disabled = false;
-          document.getElementById('submit-btn').textContent = 'Log In';
+      // Submit the form to Django backend
+      fetch('/login/', {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        if (response.ok) {
+          // Check if it's a redirect response
+          if (response.redirected) {
+            window.location.href = response.url;
+          } else {
+            // For successful login, redirect to home
+            window.location.href = '/';
+          }
         } else {
-          window.location.href = '/dashboard'; // Redirect to the dashboard
+          return response.text().then(text => {
+            // Parse the response to extract error message
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const errorElement = doc.querySelector('.error-message');
+            const errorMessage = errorElement ? errorElement.textContent : 'Login failed. Please try again.';
+            throw new Error(errorMessage);
+          });
         }
-      }, 1500);
+      })
+      .catch(error => {
+        document.getElementById('form-error').textContent = error.message;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+      });
     }
   });
-  

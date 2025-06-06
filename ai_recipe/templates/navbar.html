@@ -10,7 +10,8 @@
       </a>
     </div>
 
-    <!-- Navigation Menu -->
+    <!-- Navigation Menu - Only show for authenticated users -->
+    {% if user.is_authenticated %}
     <div class="nav-menu" id="navMenu">
       <div class="nav-links">
         <div class="nav-group">
@@ -65,6 +66,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
     <!-- Right Side -->
     <div class="nav-actions">
@@ -97,12 +99,16 @@
       <div class="profile-section">
         <button class="profile-trigger" id="profileTrigger">
           <div class="profile-avatar">
-            <span>{{ user.userprofile.name|first|upper }}</span>
+            <span
+              >{{ user.first_name|first|upper|default:user.username|first|upper}}
+              </span>
           </div>
         </button>
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-info">
-            <div class="profile-name">{{ user.userprofile.name }}</div>
+            <div class="profile-name">
+              {{ user.first_name|default:user.username }}
+            </div>
             <div class="profile-email">{{ user.email }}</div>
             {% if user.is_staff or user.is_superuser %}
             <div class="profile-role">
@@ -114,7 +120,6 @@
             {% endif %}
           </div>
           <div class="profile-menu">
-
             <a href="{% url 'profile' %}" class="profile-item">
               <i class="fas fa-user"></i>
               <span>My Profile</span>
@@ -127,7 +132,6 @@
               <i class="fas fa-share-alt"></i>
               <span>My Recipes</span>
             </a>
-            <!-- Report Issue inside profile dropdown -->
             <a href="{% url 'report_issue'%}" class="profile-item">
               <i class="fas fa-bug"></i>
               <span>Report Issue</span>
@@ -156,7 +160,8 @@
     </div>
   </div>
 
-  <!-- Search Overlay -->
+  <!-- Search Overlay - Only show for authenticated users -->
+  {% if user.is_authenticated %}
   <div class="search-overlay" id="searchOverlay">
     <div class="search-container">
       <div class="search-box">
@@ -174,4 +179,12 @@
       </button>
     </div>
   </div>
+  {% endif %}
 </nav>
+
+<!-- Add authentication status to page data -->
+<script>
+  document.body.dataset.authenticated =
+    '{{ user.is_authenticated|yesno:"true,false" }}';
+  document.body.dataset.isAdmin = '{{ user.is_staff|yesno:"true,false" }}';
+</script>
