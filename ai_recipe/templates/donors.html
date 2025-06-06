@@ -5,16 +5,6 @@
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
 />
-<style>
-  /* Hide all tab-content unless active */
-  .tab-content {
-    display: none;
-  }
-  .tab-content.active {
-    display: block;
-  }
-</style>
-
 {% endblock %} {% block content %}
 
 <div class="container">
@@ -47,7 +37,11 @@
         onclick="showTab('donations')"
         type="button"
       >
-        <i class="fas fa-list"></i> My Donations {{ total_donations|default:0}}
+        <i class="fas fa-list"></i> My Donations
+        <span
+          class="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold"
+          >{{ total_donations|default:0 }}</span
+        >
       </button>
       <button
         class="tab-btn"
@@ -201,7 +195,70 @@
         data-post-id="{{ post.id }}"
         data-post-title="{{ post.food_name }}"
       >
-        <!-- ...existing post card content... -->
+        <div class="post-header">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="avatar">
+                {{ post.donor.username|make_list|first|upper }}
+              </div>
+              <div>
+                <h3 class="font-semibold">{{ post.donor.username }}</h3>
+                <span class="text-sm text-gray-500">
+                  {{ post.created_at|timesince }} ago
+                </span>
+              </div>
+            </div>
+            <span
+              class="status-badge {% if post.status == 'Available' %}available{% elif post.status == 'Claimed' %}claimed{% else %}completed{% endif %}"
+            >
+              {{ post.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="post-content">
+          {% if post.image %}
+          <img
+            src="{{ post.image.url }}"
+            alt="{{ post.food_name }}"
+            class="post-image"
+          />
+          {% endif %}
+
+          <h2 class="post-title">{{ post.food_name }}</h2>
+          <p class="post-description">{{ post.description }}</p>
+
+          <div class="post-details">
+            <div class="post-details-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ post.location }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-box"></i>
+              <span>{{ post.quantity }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-calendar"></i>
+              <span>Expires: {{ post.expiry_date }}</span>
+            </div>
+            <div class="post-details-item">
+              <i class="fas fa-tag"></i>
+              <span>{{ post.category }}</span>
+            </div>
+          </div>
+
+          <div class="post-actions">
+            {% if post.status == 'Available' %}
+            <button
+              class="button danger delete-post-btn"
+              data-post-id="{{ post.id }}"
+              data-post-title="{{ post.food_name }}"
+            >
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+            {% endif %}
+          </div>
+        </div>
       </div>
       {% empty %}
       <div class="empty-state">
@@ -223,26 +280,28 @@
 
   <!-- Statistics Display -->
   {% if total_donations > 0 %}
-  <div class="stats-container mt-8 p-6 bg-white rounded-lg shadow-md">
-    <h3 class="text-lg font-semibold mb-4">Your Impact</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="stat-item text-center">
-        <div class="text-2xl font-bold text-green-600">
-          {{ total_donations }}
+  <div class="stats-container mt-8">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-bread-slice"></i>
         </div>
-        <div class="text-sm text-gray-600">Total Donations</div>
+        <div class="stat-number">{{ total_donations }}</div>
+        <div class="stat-label">Available Food Items</div>
       </div>
-      <div class="stat-item text-center">
-        <div class="text-2xl font-bold text-blue-600">
-          {{ active_donations }}
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
         </div>
-        <div class="text-sm text-gray-600">Active Donations</div>
+        <div class="stat-number">{{ active_donations }}</div>
+        <div class="stat-label">Active Donors</div>
       </div>
-      <div class="stat-item text-center">
-        <div class="text-2xl font-bold text-purple-600">
-          {{ completed_donations }}
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-hands-helping"></i>
         </div>
-        <div class="text-sm text-gray-600">Completed Donations</div>
+        <div class="stat-number">{{ completed_donations }}</div>
+        <div class="stat-label">Your Claimed Items</div>
       </div>
     </div>
   </div>
@@ -251,111 +310,4 @@
 
 {% endblock %} {% block extra_js %}
 <script src="{% static 'js/donors.js' %}"></script>
-<script>
-  // Global function for tab switching
-  function showTab(tabName) {
-    const tabs = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    // Remove active class from all tabs and contents
-    tabs.forEach(t => t.classList.remove('active'));
-    tabContents.forEach(c => c.classList.remove('active'));
-
-    // Add active class to selected tab and content
-    if (tabName === 'donations') {
-      document.getElementById('tab-donations').classList.add('active');
-      document.getElementById('tab-content-donations').classList.add('active');
-    } else if (tabName === 'add') {
-      document.getElementById('tab-add').classList.add('active');
-      document.getElementById('tab-content-add').classList.add('active');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM loaded, initializing donor page");
-
-    // Initialize default tab based on donations count
-    {% if total_donations|default:0 == 0 %}
-      showTab('add');
-    {% else %}
-      showTab('donations');
-    {% endif %}
-
-    // Initialize form validation
-    const form = document.getElementById('donation-form');
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        console.log("Form submission attempted");
-        let isValid = true;
-        const requiredFields = form.querySelectorAll('[required]');
-
-        requiredFields.forEach(field => {
-          if (field.type === 'file') {
-            if (!field.files || field.files.length === 0) {
-              isValid = false;
-              field.parentElement.style.borderColor = '#dc2626';
-              console.log(`File field ${field.name} is empty`);
-            }
-          } else if (!field.value.trim()) {
-            isValid = false;
-            field.style.borderColor = '#dc2626';
-            console.log(`Field ${field.name} is empty`);
-          }
-        });
-
-        if (!isValid) {
-          e.preventDefault();
-          alert('Please fill in all required fields');
-        } else {
-          console.log('Form validation passed');
-        }
-      });
-    }
-
-    // Initialize delete confirmation
-    document.querySelectorAll('.delete-post-btn').forEach(button => {
-      button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const postId = this.getAttribute('data-post-id');
-        const postTitle = this.getAttribute('data-post-title');
-
-        if (confirm(`Are you sure you want to delete "${postTitle}"? This action cannot be undone.`)) {
-          deletePost(postId);
-        }
-      });
-    });
-  });
-
-  function deletePost(postId) {
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-    fetch(`/community/delete_donation/${postId}/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken,
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to delete donation');
-      }
-      return response.json();
-    })
-    .then(data => {
-      const postCard = document.querySelector(`[data-post-id="${postId}"]`);
-      if (postCard) {
-        postCard.remove();
-      }
-      alert(data.message || 'Donation deleted successfully!');
-
-      // Reload page to update donation counts
-      window.location.reload();
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert(error.message || 'An error occurred. Please try again.');
-    });
-  }
-</script>
 {% endblock %}
