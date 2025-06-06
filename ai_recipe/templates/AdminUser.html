@@ -1,453 +1,435 @@
-{% extends "base_template.html" %} {% load static %} {% block title%}ZeroWasteRecipe - User Management{% endblock %} {% block extra_css %}
+{% extends "base_template.html" %}
+{% load static %}
+
+{% block title %}User Management | Admin Dashboard{% endblock %}
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/AdminUser.css' %}" />
-{% endblock %} {% block content %}
-<!-- Your existing HTML content stays the same -->
+<style>
+  .status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .status-active {
+    background-color: rgba(22, 163, 74, 0.15);
+    color: #16a34a;
+  }
+  .status-inactive {
+    background-color: rgba(156, 163, 175, 0.15);
+    color: #6b7280;
+  }
+  
+  .role-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .role-admin {
+    background-color: rgba(168, 85, 247, 0.15);
+    color: #8b5cf6;
+  }
+  .role-staff {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+  }
+  .role-user {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+  }
+  
+  .user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .search-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #6b7280;
+  }
+  
+  .search-input {
+    padding-left: 40px;
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    font-size: 1rem;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+  
+  .filter-dropdown {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    padding: 0 15px;
+    font-size: 0.95rem;
+    color: #374151;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+    padding-right: 40px;
+  }
+  
+  .stats-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #f3f4f6;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .stats-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .stats-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stats-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stats-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .action-button {
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .action-button:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+  }
+  
+  .action-button.view:hover {
+    color: #3b82f6;
+  }
+  
+  .action-button.edit:hover {
+    color: #f59e0b;
+  }
+  
+  .action-button.delete:hover {
+    color: #ef4444;
+  }
+  
+  .user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .user-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+  }
+  
+  .user-email {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="admin-container">
   <!-- Sidebar -->
   <aside class="admin-sidebar">
-    <a class="sidebar-link" href="{% url 'admin_dashboard' %}">
-      <i class="fa fa-dashboard"></i><span>Dashboard</span>
-    </a>
-    <a class="sidebar-link active" href="{% url 'admin_user' %}">
-      <i class="fa fa-users"></i><span>Users</span>
-    </a>
-    <a class="sidebar-link" href="{% url 'adminPanel:admin_content' %}">
-      <i class="fa fa-shopping-bag"></i><span>Contents</span>
-    </a>
-    <a class="sidebar-link" href="{% url 'adminPanel:admin_issues' %}">
-      <i class="fa fa-exclamation-triangle"></i><span>Issues</span>
-    </a>
+    <a class="sidebar-link" href="{% url 'admin_dashboard' %}"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+    <a class="sidebar-link active" href="{% url 'admin_user' %}"><i class="fa fa-users"></i><span>Users</span></a>
+    <a class="sidebar-link" href="{% url 'adminPanel:admin_content' %}"><i class="fa fa-shopping-bag"></i><span>Contents</span></a>
+    <a class="sidebar-link" href="{% url 'adminPanel:admin_issues' %}"><i class="fa fa-exclamation-triangle"></i><span>Issues</span></a>
+    <div class="sidebar-bottom">
+      <a href="/" class="btn"><i class="fa fa-arrow-left"></i>Back to Site</a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="{% url 'home' %}" class="back-to-site">
+        <i class="fas fa-arrow-left"></i> Back to Site
+      </a>
+    </div>
   </aside>
+  
 
   <div class="admin-main">
     <header class="admin-header">
-      <h1
-        class="display-4 fw-bold text-dark mb-0"
-        style="
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #2d3748;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-            Oxygen, Ubuntu, Cantarell, sans-serif;
-        "
-      >
-        User Management
-      </h1>
-      <div class="admin-user">
-        <span
-          class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
-          style="width: 45px; height: 45px"
-          >{{ user.username|slice:":1"|upper|default:"A" }}</span>
+      <div>
+        <h1 class="header-title">User Management</h1>
+        <p class="header-subtitle">
+          Manage all user accounts and permissions
+        </p>
+      </div>
+      <div class="admin-profile">
+        <div class="profile-dropdown">
+          <button class="profile-button">
+            <div class="avatar">{{ user.username|first|upper }}</div>
+            <span class="profile-name">{{ user.username }}</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
       </div>
     </header>
 
-    <!-- Enhanced User Management Section -->
-    <div class="card mb-4 border-0 shadow-sm" style="border-radius: 15px">
-      <div
-        class="card-header bg-white border-bottom d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 p-4"
-        style="border-radius: 15px 15px 0 0"
-      >
-        <div>
-          <h4 class="mb-2 fw-semibold text-dark">Manage Users</h4>
-          <p class="text-muted mb-0 small">
-            <i class="fa fa-users me-2"></i>Control user accounts and
-            permissions
-            <span class="badge bg-light text-dark ms-2">
-              <span id="total-users-count">{{ total_users|default:0 }}</span>
-              total users
-            </span>
-          </p>
+
+    <!-- User Management Section -->
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title-section">
+          <h2 class="card-title">User Accounts</h2>
+          <p class="card-subtitle">View and manage all system users</p>
         </div>
-        <div class="d-flex gap-2 w-100 w-md-auto">
-          <div class="position-relative flex-grow-1 flex-md-grow-0">
-            <i
-              class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
-            ></i>
-            <input
-              type="text"
-              class="form-control ps-5 border-0 bg-light"
-              style="border-radius: 25px; padding: 12px 20px 12px 45px"
-              placeholder="Search users..."
-              value="{{ search_query|default:'' }}"
-            />
-          </div>
-          <a href="{% url 'adminPanel:add_user_view' %}" class="btn btn-success d-flex align-items-center gap-2 px-4" style="border-radius: 25px; font-weight: 500;">
-            <i class="fa fa-plus"></i>Add User
+        
+        <div class="card-actions">
+          <a href="{% url 'adminPanel:add_user_view' %}" class="primary-button">
+            <i class="fas fa-plus"></i> Add User
           </a>
         </div>
       </div>
-
-      <div class="card-body p-0">
-        <!-- Success/Error messages for delete operations -->
-        <div id="delete-messages" style="display: none">
-          <div
-            id="delete-success"
-            class="alert alert-success mx-4 mt-3"
-            style="display: none"
-          >
-            <i class="fa fa-check-circle me-2"></i
-            ><strong>Success!</strong> User has been deleted successfully.
-          </div>
-          <div
-            id="delete-error"
-            class="alert alert-danger mx-4 mt-3"
-            style="display: none"
-          >
-            <i class="fa fa-exclamation-triangle me-2"></i
-            ><strong>Error!</strong> <span id="delete-error-message"></span>
-          </div>
+      
+      <div class="card-toolbar">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="userSearchInput" class="search-input" placeholder="Search by name, email or username...">
         </div>
-
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
-              <tr>
-                <th
-                  class="border-0 py-3 px-4 fw-semibold text-secondary"
-                  style="
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                  "
-                >
-                  <i class="fa fa-user me-2"></i>User
-                </th>
-                <th
-                  class="border-0 py-3 px-4 fw-semibold text-secondary"
-                  style="
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                  "
-                >
-                  <i class="fa fa-envelope me-2"></i>Email
-                </th>
-                <th
-                  class="border-0 py-3 px-4 fw-semibold text-secondary"
-                  style="
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                  "
-                >
-                  <i class="fa fa-shield me-2"></i>Role
-                </th>
-                <th
-                  class="border-0 py-3 px-4 fw-semibold text-secondary"
-                  style="
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                  "
-                >
-                  <i class="fa fa-circle me-2"></i>Status
-                </th>
-                <th
-                  class="border-0 py-3 px-4 fw-semibold text-secondary"
-                  style="
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                  "
-                >
-                  <i class="fa fa-calendar me-2"></i>Joined
-                </th>
-                <th
-                  class="border-0 py-3 px-4 fw-semibold text-secondary text-end"
-                  style="
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                  "
-                >
-                  <i class="fa fa-cogs me-2"></i>Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody id="users-table-body">
-              {% for user in users %}
-              <tr
-                id="user-row-{{ user.id }}"
-                class="border-bottom"
-                style="border-color: #f1f3f4 !important"
-              >
-                <td class="py-4 px-4">
-                  <div class="d-flex align-items-center">
-                    <div
-                      class="rounded-circle bg-gradient d-flex align-items-center justify-content-center me-3"
-                      style="
-                        width: 48px;
-                        height: 48px;
-                        background: linear-gradient(
-                          135deg,
-                          #667eea 0%,
-                          #764ba2 100%
-                        );
-                      "
-                    >
-                      <span class="text-white fw-bold" style="font-size: 1.1rem"
-                        >{{ user.username|slice:":1"|upper|default:"?" }}</span>
-                    </div>
-                    <div>
-                      <div
-                        class="fw-bold text-dark mb-1"
-                        style="font-size: 0.95rem"
-                      >
-                        {% if user.get_full_name %} {{ user.get_full_name }} 
-                        {% elif user.first_name or user.last_name %} 
-                        {{ user.first_name }} {{ user.last_name }} {% else %} 
-                        {{ user.username }} {% endif %}
-                      </div>
-                      <div class="text-muted small d-flex align-items-center">
-                        <i class="fa fa-at me-1" style="font-size: 0.7rem"></i
-                        >{{ user.username }}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="py-4 px-4">
-                  <span class="text-dark"
-                    >{{ user.email|default:"No email" }}</span
-                  >
-                  {% if not user.email %}
-                  <i
-                    class="fa fa-exclamation-triangle text-warning ms-2"
-                    title="No email provided"
-                  ></i>
-                  {% endif %}
-                </td>
-                <td class="py-4 px-4">
-                  {% if user.is_superuser %}
-                  <span
-                    class="badge bg-purple text-white px-3 py-2 rounded-pill fw-semibold"
-                    style="background-color: #6f42c1 !important"
-                  >
-                    <i class="fa fa-crown me-1"></i>Admin
-                  </span>
-                  {% elif user.is_staff %}
-                  <span
-                    class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-semibold"
-                  >
-                    <i class="fa fa-user-tie me-1"></i>Staff
-                  </span>
-                  {% else %}
-                  <span
-                    class="badge bg-success px-3 py-2 rounded-pill fw-semibold"
-                  >
-                    <i class="fa fa-user me-1"></i>User
-                  </span>
-                  {% endif %}
-                </td>
-                <td class="py-4 px-4">
-                  <span
-                    class="badge px-3 py-2 rounded-pill fw-semibold {% if user.is_active %}bg-success{% else %}bg-secondary{% endif %}"
-                  >
-                    <i class="fa fa-circle me-1" style="font-size: 0.6rem"></i>
-                    {% if user.is_active %}Active{% else %}Inactive{% endif %}
-                  </span>
-                </td>
-                <td class="py-4 px-4">
-                  <span class="text-dark"
-                    >{{ user.date_joined|date:"M d, Y"|default:"Unknown"}}</span
-                  >
-                  <div class="text-muted small">
-                    {{ user.date_joined|timesince }} ago
-                  </div>
-                </td>
-                <td class="py-4 px-4 text-end">
-                  <div class="btn-group shadow-sm" role="group">
-                    <button
-                      class="btn btn-sm btn-outline-primary border-0 bg-light"
-                      title="View Details"
-                      onclick="viewUser('{{ user.id }}')"
-                      style="border-radius: 8px 0 0 8px"
-                    >
-                      <i class="fa fa-eye"></i>
-                    </button>
-                    <button
-                      class="btn btn-sm btn-outline-secondary border-0 bg-light"
-                      title="Edit User"
-                      onclick="editUser('{{ user.id }}')"
-                    >
-                      <i class="fa fa-edit"></i>
-                    </button>
-                    <button
-                      class="btn btn-sm btn-outline-danger border-0 bg-light delete-user-btn"
-                      title="Delete User"
-                      data-user-id="{{ user.id }}"
-                      data-username="{{ user.username|escapejs }}"
-                      data-delete-url="{% url 'adminPanel:admin_delete_user' user_id=user.id %}"
-                      {% if user.is_superuser%}disabled{%endif%}
-                      style="border-radius: 0 8px 8px 0"
-                    >
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr id="no-users-row">
-                <td colspan="6" class="text-center py-5">
-                  <div class="text-muted">
-                    <div class="mb-4">
-                      <i
-                        class="fa fa-users"
-                        style="font-size: 4rem; opacity: 0.3"
-                      ></i>
-                    </div>
-                    <h5 class="text-secondary mb-2">No users found</h5>
-                    <p class="mb-0">
-                      This might indicate a database connectivity issue.
-                    </p>
-                    <button
-                      class="btn btn-outline-primary mt-3"
-                      onclick="location.reload()"
-                    >
-                      <i class="fa fa-refresh me-2"></i>Refresh Page
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        
+        <div class="toolbar-actions">
+          <select class="filter-dropdown" id="roleFilter">
+            <option value="all">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="user">Regular User</option>
+          </select>
+          
+          <select class="filter-dropdown" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
       </div>
+      
+      <!-- Success/Error messages for operations -->
+      <div id="message-container" class="message-container" style="display: none;">
+      </div>
+      
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined Date</th>
+              <th>Last Login</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+            {% for user in users %}
+            <tr id="user-row-{{ user.id }}">
+              <td>
+                <div class="user-info-cell">
+                  <div class="user-avatar">
+                    {{ user.username|first|upper|default:"?" }}
+                  </div>
+                  <div class="user-details">
+                    <div class="user-name">
+                      {% if user.get_full_name %}
+                        {{ user.get_full_name }}
+                      {% elif user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                      {% else %}
+                        {{ user.username }}
+                      {% endif %}
+                    </div>
+                    <div class="user-email">
+                      {{ user.email|default:"No email" }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if user.is_superuser %}
+                  <span class="role-badge role-admin">
+                    <i class="fas fa-crown"></i> Admin
+                  </span>
+                {% else %}
+                  <span class="role-badge role-user">
+                    <i class="fas fa-user"></i> User
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="status-badge {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
+                  <i class="fas fa-circle" style="font-size: 0.6rem;"></i>
+                  {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+              </td>
+              <td>
+                <div>{{ user.date_joined|date:"M d, Y" }}</div>
+                <small class="text-muted">{{ user.date_joined|timesince }} ago</small>
+              </td>
+              <td>
+                {% if user.last_login %}
+                <div>{{ user.last_login|date:"M d, Y" }}</div>
+                <small class="text-muted">{{ user.last_login|timesince }} ago</small>
+                {% else %}
+                <span class="text-muted">Never</span>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                <div class="action-buttons">
+                  <button class="action-button view" title="View Details" onclick="viewUser('{{ user.id }}')">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-button edit" title="Edit User" onclick="editUser('{{ user.id }}')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-button delete" title="Delete User" 
+                    {% if user.is_superuser or user == request.user %}disabled{% endif %}
+                    onclick="confirmDeleteUser('{{ user.id }}', '{{ user.username|escapejs }}')">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-container">
+                  <div class="empty-state-icon">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <h4 class="empty-state-title">No Users Found</h4>
+                  <p class="empty-state-message">There are no users in the database yet.</p>
+                  <a href="{% url 'adminPanel:add_user_view' %}" class="empty-state-action">
+                    Create your first user
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      {% if is_paginated %}
+      <div class="pagination-container">
+        <div class="pagination">
+          {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-item">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-item">&lsaquo; prev</a>
+          {% endif %}
+          
+          <span class="page-item current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          </span>
+          
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-item">next &rsaquo;</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="page-item">last &raquo;</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
 
-<!-- Enhanced Add User Popup with Signup Page Styling -->
-<div class="card-popup-overlay" id="add-user-popup" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1000; align-items: center; justify-content: center;">
-  <div class="auth-card" style="background: #fff; border-radius: 20px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);">
-    <div class="auth-header">
-      <div class="logo-section">
-        <div class="logo-icon" style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
-          <i class="fas fa-user-plus" style="color: white; font-size: 24px;"></i>
-        </div>
-        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0; color: #1f2937;">Add New User</h1>
-      </div>
-      <p class="auth-subtitle" style="color: #6b7280; font-size: 0.9rem; margin: 8px 0 24px 0;">Create a new user account with specific permissions</p>
-      <button class="popup-close-btn" id="close-popup" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; opacity: 0.7; color: #4b5563;">&times;</button>
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirm Deletion</h3>
+      <button class="close-modal">&times;</button>
     </div>
-    
-    <!-- Messages for user feedback -->
-    <div id="add-user-messages" style="display: none; margin-bottom: 16px;">
-      <div id="add-user-success" class="success-message" style="display: none; background-color: #d1fae5; border-radius: 8px; padding: 12px; margin-bottom: 16px; border-left: 4px solid #10b981;">
-        <i class="fa fa-check-circle" style="color: #059669; margin-right: 8px;"></i>
-        <span id="add-user-success-message" style="color: #065f46;"></span>
-      </div>
-      <div id="add-user-error" class="error-message" style="display: none; background-color: #fee2e2; border-radius: 8px; padding: 12px; margin-bottom: 16px; border-left: 4px solid #ef4444;">
-        <i class="fa fa-exclamation-triangle" style="color: #dc2626; margin-right: 8px;"></i>
-        <span id="add-user-error-message" style="color: #b91c1c;"></span>
-      </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete user "<span id="deleteUsername"></span>"?</p>
+      <p class="warning-text">This action cannot be undone. All data associated with this user will be permanently removed.</p>
     </div>
-    
-    <div class="auth-form">
-      <form id="add-user-form">
-        <div class="form-group" style="margin-bottom: 20px;">
-          <label class="form-label" style="font-weight: 600; display: block; margin-bottom: 6px; color: #374151;" for="user-email">
-            <i class="fa fa-envelope" style="color: #10b981; margin-right: 8px;"></i>Email Address
-          </label>
-          <div class="input-wrapper" style="position: relative;">
-            <input type="email" id="user-email" name="email" class="form-input" style="width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Enter email address" required/>
-            <i class="fa fa-envelope input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
-          </div>
-          <div class="error-text" id="email-error" style="color: #ef4444; font-size: 14px; margin-top: 4px;"></div>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 20px;">
-          <label class="form-label" style="font-weight: 600; display: block; margin-bottom: 6px; color: #374151;" for="user-username">
-            <i class="fa fa-user" style="color: #10b981; margin-right: 8px;"></i>Username
-          </label>
-          <div class="input-wrapper" style="position: relative;">
-            <input type="text" id="user-username" name="username" class="form-input" style="width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Enter username" required/>
-            <i class="fa fa-user input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
-          </div>
-          <div class="error-text" id="username-error" style="color: #ef4444; font-size: 14px; margin-top: 4px;"></div>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 20px;">
-          <label class="form-label" style="font-weight: 600; display: block; margin-bottom: 6px; color: #374151;" for="user-role">
-            <i class="fa fa-shield-alt" style="color: #10b981; margin-right: 8px;"></i>User Role
-          </label>
-          <div class="input-wrapper" style="position: relative;">
-            <select id="user-role" name="role" class="form-select" style="width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width=\"20\" height=\"20\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5H7z\" fill=\"%23555\"/></svg>'); background-repeat: no-repeat; background-position: right 12px center;" required>
-              <option value="">Select user role</option>
-              <option value="user">👤 Regular User</option>
-              <option value="staff">👔 Staff Member</option>
-              <option value="admin">👑 Administrator</option>
-            </select>
-            <i class="fa fa-shield-alt input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
-          </div>
-          <div class="error-text" id="role-error" style="color: #ef4444; font-size: 14px; margin-top: 4px;"></div>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 20px;">
-          <label class="form-label" style="font-weight: 600; display: block; margin-bottom: 6px; color: #374151;" for="user-password">
-            <i class="fa fa-lock" style="color: #10b981; margin-right: 8px;"></i>Password
-          </label>
-          <div class="input-wrapper" style="position: relative;">
-            <input type="password" id="user-password" name="password" class="form-input" style="width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Set secure password" required/>
-            <i class="fa fa-lock input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
-          </div>
-          <div class="error-text" id="password-error" style="color: #ef4444; font-size: 14px; margin-top: 4px;"></div>
-          
-          <!-- Password Strength Indicator -->
-          <div class="password-strength" id="password-strength" style="display: none; margin-top: 8px;">
-            <div class="strength-bar-container" style="width: 100%; height: 4px; background-color: #e0e0e0; border-radius: 2px; overflow: hidden; margin-bottom: 4px;">
-              <div class="strength-bar" id="strength-bar" style="height: 100%; transition: all 0.3s ease; border-radius: 2px;"></div>
-            </div>
-            <div class="strength-text" id="strength-text" style="font-size: 12px; font-weight: 500;"></div>
-          </div>
-        </div>
-
-        <button type="button" class="auth-button" id="create-user-btn" style="background: linear-gradient(135deg, #10b981, #059669); width: 100%; border: none; color: white; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <i class="fa fa-user-plus"></i>Create User
-        </button>
-      </form>
-    </div>
-    
-    <div class="auth-footer" style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 14px; color: #6b7280;">
-      <p id="cancel-btn" style="cursor: pointer;">
-        <i class="fa fa-arrow-left" style="margin-right: 4px;"></i>
-        <span>Cancel and go back</span>
-      </p>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="cancelDelete">Cancel</button>
+      <button class="btn-danger" id="confirmDelete">Delete User</button>
     </div>
   </div>
 </div>
 
 <script>
-  // Check authentication status before allowing any actions
-  document.addEventListener("DOMContentLoaded", function () {
-    // Check if user is authenticated
-    if (
-      !document.body.dataset.authenticated ||
-      document.body.dataset.authenticated !== "true"
-    ) {
-      window.location.href = "/login/";
-      return;
-    }
-
-    // Check if user has admin privileges
-    if (
-      !document.body.dataset.isAdmin ||
-      document.body.dataset.isAdmin !== "true"
-    ) {
-      alert("Access denied. Admin privileges required.");
-      window.location.href = "/";
-      return;
-    }
-  });
-
-  // Get CSRF token for Django
+  // Get CSRF token
   function getCookie(name) {
     let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           break;
         }
@@ -455,410 +437,157 @@
     }
     return cookieValue;
   }
-
-  const csrftoken = getCookie("csrftoken");
-
-  // Card popup functionality
-  const popup = document.getElementById("add-user-popup");
-  const addUserBtn = document.getElementById("add-user-btn");
-  const closePopupBtn = document.getElementById("close-popup");
-  const cancelBtn = document.getElementById("cancel-btn");
-  const createUserBtn = document.getElementById("create-user-btn");
-  const addUserForm = document.getElementById("add-user-form");
-
-  // Open popup
-  addUserBtn.addEventListener("click", function () {
-    if (!isAuthenticated()) return;
-    popup.style.display = "flex";
-    document.body.style.overflow = "hidden"; // Prevent background scrolling
-  });
-
-  // Close popup functions
-  function closePopup() {
-    popup.style.display = "none";
-    document.body.style.overflow = ""; // Restore scrolling
-    resetForm();
-  }
-
-  closePopupBtn.addEventListener("click", closePopup);
-  cancelBtn.addEventListener("click", closePopup);
-
-  // Close popup when clicking outside
-  popup.addEventListener("click", function (e) {
-    if (e.target === popup) {
-      closePopup();
-    }
-  });
-
-  // Close popup with Escape key
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && popup.style.display === "flex") {
-      closePopup();
-    }
-  });
-
-  // Enhanced Create User function with password strength checking
-  const createUserBtn = document.getElementById('create-user-btn');
-  const passwordField = document.getElementById('user-password');
-  const strengthBar = document.getElementById('strength-bar');
-  const strengthText = document.getElementById('strength-text');
-  const strengthIndicator = document.getElementById('password-strength');
+  const csrftoken = getCookie('csrftoken');
   
-  // Show password strength when typing
-  passwordField.addEventListener('input', function() {
-    const password = this.value;
-    if (password) {
-      strengthIndicator.style.display = 'block';
-      const strength = checkPasswordStrength(password);
-      updateStrengthIndicator(strength);
-    } else {
-      strengthIndicator.style.display = 'none';
-    }
+  // Search and filter functionality
+  document.getElementById('userSearchInput').addEventListener('input', function() {
+    filterTable();
   });
   
-  function checkPasswordStrength(password) {
-    // Default strength is 0 (weak)
-    let strength = 0;
+  document.getElementById('roleFilter').addEventListener('change', function() {
+    filterTable();
+  });
+  
+  document.getElementById('statusFilter').addEventListener('change', function() {
+    filterTable();
+  });
+  
+  function filterTable() {
+    const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
     
-    // Check password length
-    if (password.length >= 8) strength += 1;
+    const rows = document.querySelectorAll('#users-table-body tr');
     
-    // Check for mixed case characters
-    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
-    
-    // Check for numbers
-    if (password.match(/\d/)) strength += 1;
-    
-    // Check for special characters
-    if (password.match(/[^a-zA-Z\d]/)) strength += 1;
-    
-    return strength;
+    rows.forEach(row => {
+      if (row.id === '') return; // Skip header or template rows
+      
+      const userName = row.querySelector('.user-name').textContent.toLowerCase();
+      const userEmail = row.querySelector('.user-email').textContent.toLowerCase();
+      const roleElement = row.querySelector('.role-badge');
+      const statusElement = row.querySelector('.status-badge');
+      
+      const role = roleElement ? roleElement.textContent.trim().toLowerCase() : '';
+      const status = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
+      
+      const matchesSearch = userName.includes(searchTerm) || userEmail.includes(searchTerm);
+      const matchesRole = roleFilter === 'all' || role.includes(roleFilter.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || status.includes(statusFilter.toLowerCase());
+      
+      row.style.display = matchesSearch && matchesRole && matchesStatus ? '' : 'none';
+    });
   }
   
-  function updateStrengthIndicator(strength) {
-    // Update strength bar width and color
-    let width = (strength + 1) * 25; // 25%, 50%, 75%, 100%
-    strengthBar.style.width = `${width}%`;
-    
-    // Update strength bar color and text
-    switch (strength) {
-      case 0:
-        strengthBar.className = 'strength-bar weak';
-        strengthBar.style.backgroundColor = '#ef4444';
-        strengthText.textContent = 'Weak password';
-        strengthText.style.color = '#ef4444';
-        break;
-      case 1:
-        strengthBar.className = 'strength-bar fair';
-        strengthBar.style.backgroundColor = '#f59e0b';
-        strengthText.textContent = 'Fair password';
-        strengthText.style.color = '#f59e0b';
-        break;
-      case 2:
-        strengthBar.className = 'strength-bar good';
-        strengthBar.style.backgroundColor = '#10b981';
-        strengthText.textContent = 'Good password';
-        strengthText.style.color = '#10b981';
-        break;
-      case 3:
-        strengthBar.className = 'strength-bar strong';
-        strengthBar.style.backgroundColor = '#059669';
-        strengthText.textContent = 'Strong password';
-        strengthText.style.color = '#059669';
-        break;
-    }
+  // User Actions
+  function viewUser(userId) {
+    // Implement view user functionality or redirect to user detail page
+    console.log(`View user ${userId}`);
+    showMessage('info', 'View user functionality will be implemented soon.');
   }
-
-  // Form validation & submission
-  createUserBtn.addEventListener('click', function(e) {
-    e.preventDefault();
+  
+  function editUser(userId) {
+    // Redirect to edit user page or show edit modal
+    window.location.href = `/admin-panel/admin/users/${userId}/edit/`;
+  }
+  
+  // Delete user confirmation
+  function confirmDeleteUser(userId, username) {
+    const modal = document.getElementById('deleteModal');
+    const usernameSpan = document.getElementById('deleteUsername');
+    const confirmButton = document.getElementById('confirmDelete');
     
-    if (!isAuthenticated()) return;
+    usernameSpan.textContent = username;
+    modal.style.display = 'flex';
     
-    // Clear previous errors
-    clearErrors();
-    
-    // Get form data
-    const email = document.getElementById('user-email').value.trim();
-    const username = document.getElementById('user-username').value.trim();
-    const role = document.getElementById('user-role').value;
-    const password = document.getElementById('user-password').value;
-    
-    // Validate form
-    let isValid = true;
-    
-    if (!email) {
-      showError('email', 'Email is required');
-      isValid = false;
-    } else if (!isValidEmail(email)) {
-      showError('email', 'Please enter a valid email address');
-      isValid = false;
-    }
-    
-    if (!username) {
-      showError('username', 'Username is required');
-      isValid = false;
-    }
-    
-    if (!role) {
-      showError('role', 'Please select a user role');
-      isValid = false;
-    }
-    
-    if (!password) {
-      showError('password', 'Password is required');
-      isValid = false;
-    } else if (password.length < 8) {
-      showError('password', 'Password must be at least 8 characters long');
-      isValid = false;
-    }
-    
-    if (!isValid) return;
-    
-    // Prepare data for submission
-    const userData = {
-      email: email,
-      username: username,
-      role: role,
-      password: password
+    // Set up delete confirmation button
+    confirmButton.onclick = function() {
+      deleteUser(userId, username);
+      modal.style.display = 'none';
     };
     
-    // Disable button and show loading state
-    createUserBtn.disabled = true;
-    createUserBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating...';
+    // Close modal on cancel
+    document.getElementById('cancelDelete').onclick = function() {
+      modal.style.display = 'none';
+    };
     
-    // Send request to server
-    fetch('/admin-panel/admin/users/create/', {
+    // Close modal on X button click
+    document.querySelector('.close-modal').onclick = function() {
+      modal.style.display = 'none';
+    };
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+  }
+  
+  function deleteUser(userId, username) {
+    fetch(`/admin-panel/admin/users/${userId}/delete/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'X-CSRFToken': csrftoken,
-        'X-Requested-With': 'XMLHttpRequest'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(userData)
+      credentials: 'same-origin'
     })
     .then(response => {
       if (!response.ok) {
         return response.json().then(data => {
-          throw new Error(data.error || 'An error occurred');
+          throw new Error(data.error || 'An error occurred while deleting the user');
         });
       }
       return response.json();
     })
     .then(data => {
       if (data.success) {
-        // Show success message
-        showUserMessage('success', data.message || 'User created successfully');
+        // Remove user row from the table
+        const userRow = document.getElementById(`user-row-${userId}`);
+        if (userRow) {
+          userRow.remove();
+        }
         
-        // Add user to table
-        addUserToTable(data.user);
+        // Update user count in the stats card
+        const userCountElement = document.querySelector('.stats-value');
+        if (userCountElement) {
+          const currentCount = parseInt(userCountElement.textContent);
+          userCountElement.textContent = currentCount - 1;
+        }
         
-        // Reset form and close popup after 1.5 seconds
-        setTimeout(() => {
-          resetForm();
-          closePopup();
-          
-          // Reload the page to ensure everything is up-to-date
-          // window.location.reload();
-        }, 1500);
+        showMessage('success', `User "${username}" has been deleted successfully.`);
       } else {
-        throw new Error(data.error || 'Unknown error');
+        throw new Error(data.error || 'Failed to delete user');
       }
     })
     .catch(error => {
-      console.error('Error creating user:', error);
-      showUserMessage('error', error.message || 'Failed to create user');
-    })
-    .finally(() => {
-      // Re-enable button
-      createUserBtn.disabled = false;
-      createUserBtn.innerHTML = '<i class="fa fa-user-plus"></i> Create User';
-    });
-  });
-  
-  // Helper functions
-  function clearErrors() {
-    document.querySelectorAll('.error-text').forEach(el => {
-      el.textContent = '';
+      console.error('Error:', error);
+      showMessage('error', error.message);
     });
   }
   
-  function showError(field, message) {
-    const errorElement = document.getElementById(`${field}-error`);
-    if (errorElement) {
-      errorElement.textContent = message;
-    }
-  }
-  
-  function isValidEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  }
-  
-  function showUserMessage(type, message) {
-    const messagesContainer = document.getElementById('add-user-messages');
-    const successMessage = document.getElementById('add-user-success');
-    const errorMessage = document.getElementById('add-user-error');
+  // Message display function
+  function showMessage(type, message) {
+    const container = document.getElementById('message-container');
+    container.innerHTML = '';
     
-    // Hide all messages first
-    successMessage.style.display = 'none';
-    errorMessage.style.display = 'none';
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `alert alert-${type}`;
     
-    // Show appropriate message
-    if (type === 'success') {
-      document.getElementById('add-user-success-message').textContent = message;
-      successMessage.style.display = 'block';
-    } else {
-      document.getElementById('add-user-error-message').textContent = message;
-      errorMessage.style.display = 'block';
-    }
+    let icon = 'info-circle';
+    if (type === 'success') icon = 'check-circle';
+    if (type === 'error' || type === 'danger') icon = 'exclamation-triangle';
     
-    messagesContainer.style.display = 'block';
+    messageDiv.innerHTML = `<i class="fas fa-${icon} me-2"></i>${message}`;
+    container.appendChild(messageDiv);
+    container.style.display = 'block';
     
-    // Auto-hide success message after 5 seconds
-    if (type === 'success') {
+    // Auto-hide success and info messages after 5 seconds
+    if (type === 'success' || type === 'info') {
       setTimeout(() => {
-        successMessage.style.display = 'none';
-        messagesContainer.style.display = 'none';
+        container.style.display = 'none';
       }, 5000);
     }
   }
-  
-  function resetForm() {
-    // Reset the form
-    document.getElementById('add-user-form').reset();
-    
-    // Reset password strength indicator
-    strengthIndicator.style.display = 'none';
-    
-    // Clear any errors
-    clearErrors();
-    
-    // Hide any messages
-    document.getElementById('add-user-messages').style.display = 'none';
-    document.getElementById('add-user-success').style.display = 'none';
-    document.getElementById('add-user-error').style.display = 'none';
-  }
-      
-  function addUserToTable(user) {
-    const tbody = document.getElementById("users-table-body");
-    const noUsersRow = document.querySelector(
-      "#users-table-body tr:first-child"
-    );
-
-    // If there's a "no users found" message, remove it
-    if (noUsersRow && noUsersRow.querySelector('td[colspan="6"]')) {
-      noUsersRow.remove();
-    }
-
-    // Create a new row for the user
-    const row = document.createElement("tr");
-    row.id = `user-row-${user.id}`;
-    row.className = "border-bottom";
-    row.style.borderColor = "#f1f3f4 !important";
-
-    // Format the role badge
-    let roleBadge = "";
-    if (user.is_superuser) {
-      roleBadge =
-        '<span class="badge bg-purple text-white px-3 py-2 rounded-pill fw-semibold" style="background-color: #6f42c1 !important;"><i class="fa fa-crown me-1"></i>Admin</span>';
-    } else if (user.is_staff) {
-      roleBadge =
-        '<span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-semibold"><i class="fa fa-user-tie me-1"></i>Staff</span>';
-    } else {
-      roleBadge =
-        '<span class="badge bg-success px-3 py-2 rounded-pill fw-semibold"><i class="fa fa-user me-1"></i>User</span>';
-    }
-
-    // Add the HTML content
-    row.innerHTML = `
-        <td class="py-4 px-4">
-          <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-              <span class="text-white fw-bold" style="font-size: 1.1rem;">${user.username
-                .charAt(0)
-                .toUpperCase()}</span>
-            </div>
-            <div>
-              <div class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">
-                ${user.username}
-              </div>
-              <div class="text-muted small d-flex align-items-center">
-                <i class="fa fa-at me-1" style="font-size: 0.7rem;"></i>${
-                  user.username
-                }
-              </div>
-            </div>
-          </div>
-        </td>
-        <td class="py-4 px-4">
-          <span class="text-dark">${user.email || "No email"}</span>
-          ${
-            !user.email
-              ? '<i class="fa fa-exclamation-triangle text-warning ms-2" title="No email provided"></i>'
-              : ""
-          }
-        </td>
-        <td class="py-4 px-4">
-          ${roleBadge}
-        </td>
-        <td class="py-4 px-4">
-          <span class="badge px-3 py-2 rounded-pill fw-semibold bg-success">
-            <i class="fa fa-circle me-1" style="font-size: 0.6rem;"></i>Active
-          </span>
-        </td>
-        <td class="py-4 px-4">
-          <span class="text-dark">${user.date_joined || "Just now"}</span>
-          <div class="text-muted small">Just created</div>
-        </td>
-        <td class="py-4 px-4 text-end">
-          <div class="btn-group shadow-sm" role="group">
-            <button class="btn btn-sm btn-outline-primary border-0 bg-light" title="View Details" onclick="viewUser('${
-              user.id
-            }')" style="border-radius: 8px 0 0 8px;">
-              <i class="fa fa-eye"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary border-0 bg-light" title="Edit User" onclick="editUser('${
-              user.id
-            }')">
-              <i class="fa fa-edit"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger border-0 bg-light delete-user-btn" title="Delete User" data-user-id="${
-              user.id
-            }" data-username="${
-      user.username
-    }" data-delete-url="{% url 'adminPanel:admin_delete_user' user_id=0 %}".replace('0', user.id) ${
-      user.is_superuser ? "disabled" : ""
-    } style="border-radius: 0 8px 8px 0;">
-              <i class="fa fa-trash"></i>
-            </button>
-          </div>
-        </td>
-      `;
-
-    // Add the row to the table
-    tbody.appendChild(row);
-
-    // Update user count
-    const countElement = document.getElementById("total-users-count");
-    if (countElement) {
-      const currentCount = parseInt(countElement.textContent);
-      countElement.textContent = currentCount + 1;
-    }
-  }
-
-  // Other existing functions...
-  function isAuthenticated() {
-    if (
-      !document.body.dataset.authenticated ||
-      document.body.dataset.authenticated !== "true"
-    ) {
-      alert("Please log in to perform this action.");
-      window.location.href = "/login/";
-      return false;
-    }
-    return true;
-  }
 </script>
-
 {% endblock %}
