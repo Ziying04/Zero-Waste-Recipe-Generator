@@ -135,9 +135,18 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Media files configuration
+# Media files (Uploaded images)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Add this if not already present to properly serve media files in development
+import os
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... your url patterns here ...
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

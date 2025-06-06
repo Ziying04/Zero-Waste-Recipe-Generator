@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 import json
 from django.contrib import messages
 from django.utils import timezone
+from datetime import datetime
 
 # Replace with actual user's coordinates or extract from request/user profile
 DEFAULT_USER_LOCATION = (3.1390, 101.6869)  # Example: Kuala Lumpur lat/lon
@@ -129,30 +130,107 @@ class DonorDashboardView(TemplateView):
 
 @login_required
 def donors_view(request):
+    """
+    Handle donation creation and display of user's donations.
+    """
+    print("\n=== DONORS VIEW CALLED ===")
+    print(f"User: {request.user}")
+    print(f"Method: {request.method}")
+    
+    context = {
+        'today': datetime.now().strftime('%Y-%m-%d'),  # For date input min value
+    }
+    
     if request.method == 'POST':
-        food_name = request.POST.get('title')
-        description = request.POST.get('description')
-        quantity = request.POST.get('quantity')
-        location = request.POST.get('location')
-        category = request.POST.get('category')
-        image = request.FILES.get('image')
-        expiry_date = request.POST.get('expiration_date')
+        print("Processing POST request...")
+        try:
+            # Extract form data
+            food_name = request.POST.get('title')
+            description = request.POST.get('description')
+            quantity = request.POST.get('quantity')
+            location = request.POST.get('location')
+            category = request.POST.get('category')
+            expiry_date = request.POST.get('expiration_date')
+            
+            print(f"Form data: food_name={food_name}, category={category}, expiry_date={expiry_date}")
+            
+            # Check for image file
+            if 'image' in request.FILES:
+                image = request.FILES['image']
+                print(f"Image uploaded: {image.name}, size: {image.size} bytes")
+            else:
+                print("No image file uploaded!")
+                messages.error(request, "Please upload an image of the food item.")
+                return redirect('community:donors')
+                
+            # Validate required fields
+            required_fields = {
+                'food_name': food_name,
+                'description': description,
+                'quantity': quantity,
+                'location': location,
+                'category': category,
+                'expiry_date': expiry_date,
+            }
+            
+            missing_fields = [field for field, value in required_fields.items() if not value]
+            
+            if missing_fields:
+                error_msg = f"Please fill in all required fields. Missing: {', '.join(missing_fields)}"
+                print(f"Validation error: {error_msg}")
+                messages.error(request, error_msg)
+                return redirect('community:donors')
 
-        DonationFoodPost.objects.create(
-            donor=request.user,
-            food_name=food_name,
-            description=description,
-            quantity=quantity,
-            location=location,
-            category=category,
-            image=image,
-            expiry_date=expiry_date
-        )
-        return redirect('community:donors')
+            # Create the donation post
+            donation = DonationFoodPost.objects.create(
+                donor=request.user,
+                food_name=food_name,
+                description=description,
+                quantity=quantity,
+                location=location,
+                category=category,
+                image=request.FILES['image'],
+                expiry_date=expiry_date
+            )
+            
+            print(f"Donation created successfully! ID: {donation.id}")
+            messages.success(request, f"Your donation '{food_name}' has been posted successfully!")
+            return redirect('community:donors')
+            
+        except Exception as e:
+            print(f"ERROR creating donation: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            messages.error(request, f"Error creating donation: {str(e)}")
+            return redirect('community:donors')
 
-    # Only get the user's own donation posts
-    donation_posts = DonationFoodPost.objects.filter(donor=request.user).order_by('-created_at')
-    return render(request, 'donors.html', {'DonationFoodPost': donation_posts})
+    # GET request - display donations
+    try:
+        # Get the user's own donation posts
+        donation_posts = DonationFoodPost.objects.filter(donor=request.user).order_by('-created_at')
+        print(f"Retrieved {donation_posts.count()} donation posts")
+        
+        # Add statistics for the user
+        active_count = donation_posts.filter(status='Available').count()
+        completed_count = donation_posts.filter(status='Completed').count()
+        
+        print(f"Stats: Active={active_count}, Completed={completed_count}, Total={donation_posts.count()}")
+        
+        context.update({
+            'DonationFoodPost': donation_posts,
+            'active_donations': active_count,
+            'completed_donations': completed_count,
+            'total_donations': donation_posts.count(),
+        })
+        
+        return render(request, 'donors.html', context)
+        
+    except Exception as e:
+        print(f"ERROR retrieving donations: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        messages.error(request, f"Error retrieving your donations: {str(e)}")
+        return render(request, 'donors.html', context)
 
 @login_required
 def claim_donation(request, post_id):
