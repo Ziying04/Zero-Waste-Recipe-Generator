@@ -595,3 +595,76 @@ def donation_detail_json(request, donation_id):
     }
 
     return JsonResponse(data)
+
+@user_passes_test(lambda u: u.is_staff)
+def create_user(request):
+    """
+    Create a new user with specified role
+    """
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
+    
+    # Check if request is AJAX
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+    
+    try:
+        # Parse JSON data from request
+        data = json.loads(request.body)
+        
+        # Extract user data
+        email = data.get('email', '').strip()
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        role = data.get('role', 'user')
+        
+        # Validate required fields
+        if not email or not username or not password:
+            return JsonResponse({"success": False, "error": "Email, username and password are required"}, status=400)
+            
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({"success": False, "error": "Username already exists"}, status=400)
+            
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({"success": False, "error": "Email already exists"}, status=400)
+        
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        
+        # Set role based on selection
+        if role == 'staff':
+            user.is_staff = True
+            user.save()
+        elif role == 'admin':
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+        
+        return JsonResponse({
+            "success": True,
+            "message": f"User '{username}' created successfully with {role} role",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser,
+                "date_joined": user.date_joined.strftime('%Y-%m-%d')
+            }
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
+    except Exception as e:
+        print(f"Error creating user: {str(e)}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+@user_passes_test(lambda u: u.is_staff)
+def add_user_view(request):
+    """Render the add user form page"""
+    return render(request, 'AddUser.html')

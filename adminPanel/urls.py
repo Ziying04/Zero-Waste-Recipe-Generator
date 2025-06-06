@@ -4,7 +4,7 @@ from .views import (
     admin_dashboard, admin_user, delete_user, admin_content, admin_issues,
     delete_recipe, delete_donation, edit_recipe, edit_donation,
     recipe_detail_json, donation_detail_json, issue_detail, delete_issue, resolve_issue,
-    create_recipe, create_donation, debug_donation_model,
+    create_recipe, create_donation, debug_donation_model, create_user, add_user_view,  # Added add_user_view
 )
 
 app_name = "adminPanel"
@@ -14,6 +14,8 @@ urlpatterns = [
     path('admin/', admin_dashboard, name='admin_dashboard'),
     path('admin-users/', admin_user, name='admin_user'),
     path('admin/users/<int:user_id>/delete/', delete_user, name='admin_delete_user'),
+    path('admin/users/create/', create_user, name='admin_create_user'),
+    path('admin/users/add/', add_user_view, name='add_user_view'),  # Add this line
     
     # Issues Management
     path('admin-issues/', admin_issues, name='admin_issues'),

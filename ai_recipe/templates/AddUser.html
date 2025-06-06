@@ -1,0 +1,456 @@
+{% extends "base_template.html" %} {% load static %} {% block title %}Add User{%endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/AdminUser.css' %}" />
+<style>
+  .container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .form-header h1 {
+    color: #16a34a;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .form-header p {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    outline: none;
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5H7z' fill='%23555'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+  }
+
+  .btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: #16a34a;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+  }
+
+  .btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  .btn-secondary:hover {
+    background: #d1d5db;
+  }
+
+  .alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .alert-success {
+    background-color: #d1fae5;
+    border-left: 4px solid #16a34a;
+    color: #065f46;
+  }
+
+  .alert-danger {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #b91c1c;
+  }
+
+  .btn-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .error-text {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
+  .password-strength {
+    margin-top: 10px;
+  }
+
+  .strength-bar-container {
+    width: 100%;
+    height: 5px;
+    background-color: #e5e7eb;
+    border-radius: 3px;
+    margin-bottom: 5px;
+  }
+
+  .strength-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container">
+  <div class="form-header">
+    <h1><i class="fas fa-user-plus"></i> Add New User</h1>
+    <p>Create a new user or admin account</p>
+  </div>
+
+  <div id="alerts-container">
+    <!-- Alerts will appear here -->
+  </div>
+
+  <form id="addUserForm">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="email"> <i class="fas fa-envelope"></i> Email Address </label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        required
+        placeholder="Enter user's email"
+      />
+      <div class="error-text" id="email-error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="username"> <i class="fas fa-user"></i> Username </label>
+      <input
+        type="text"
+        class="form-control"
+        id="username"
+        name="username"
+        required
+        placeholder="Create a username"
+      />
+      <div class="error-text" id="username-error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="role"> <i class="fas fa-user-tag"></i> User Role </label>
+      <select class="form-control form-select" id="role" name="role" required>
+        <option value="">Select a role</option>
+        <option value="user">Regular User</option>
+        <option value="staff">Staff Member</option>
+        <option value="admin">Administrator</option>
+      </select>
+      <div class="error-text" id="role-error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="password"> <i class="fas fa-lock"></i> Password </label>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        required
+        placeholder="Create a secure password"
+      />
+
+      <div
+        class="password-strength"
+        id="password-strength"
+        style="display: none"
+      >
+        <div class="strength-bar-container">
+          <div class="strength-bar" id="strength-bar"></div>
+        </div>
+        <small id="strength-text"></small>
+      </div>
+
+      <div class="error-text" id="password-error"></div>
+    </div>
+
+    <div class="btn-container">
+      <a href="{% url 'admin_user' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary" id="submit-btn">
+        <i class="fas fa-user-plus"></i> Create User
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("addUserForm");
+    const passwordField = document.getElementById("password");
+    const strengthBar = document.getElementById("strength-bar");
+    const strengthText = document.getElementById("strength-text");
+    const strengthIndicator = document.getElementById("password-strength");
+
+    // Get CSRF token
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie("csrftoken");
+
+    // Show password strength
+    passwordField.addEventListener("input", function () {
+      const password = this.value;
+      if (password) {
+        strengthIndicator.style.display = "block";
+        const strength = checkPasswordStrength(password);
+        updateStrengthIndicator(strength);
+      } else {
+        strengthIndicator.style.display = "none";
+      }
+    });
+
+    function checkPasswordStrength(password) {
+      // Default strength is 0 (weak)
+      let strength = 0;
+
+      // Check password length
+      if (password.length >= 8) strength += 1;
+
+      // Check for mixed case characters
+      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+
+      // Check for numbers
+      if (password.match(/\d/)) strength += 1;
+
+      // Check for special characters
+      if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+
+      return strength;
+    }
+
+    function updateStrengthIndicator(strength) {
+      // Update strength bar width and color
+      let width = (strength + 1) * 25; // 25%, 50%, 75%, 100%
+      strengthBar.style.width = `${width}%`;
+
+      // Update strength bar color and text
+      switch (strength) {
+        case 0:
+          strengthBar.style.backgroundColor = "#ef4444";
+          strengthText.textContent = "Weak password";
+          strengthText.style.color = "#ef4444";
+          break;
+        case 1:
+          strengthBar.style.backgroundColor = "#f59e0b";
+          strengthText.textContent = "Fair password";
+          strengthText.style.color = "#f59e0b";
+          break;
+        case 2:
+          strengthBar.style.backgroundColor = "#16a34a";
+          strengthText.textContent = "Good password";
+          strengthText.style.color = "#16a34a";
+          break;
+        case 3:
+          strengthBar.style.backgroundColor = "#15803d";
+          strengthText.textContent = "Strong password";
+          strengthText.style.color = "#15803d";
+          break;
+      }
+    }
+
+    // Form submission
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      clearErrors();
+
+      // Get form data
+      const email = document.getElementById("email").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const role = document.getElementById("role").value;
+      const password = document.getElementById("password").value;
+
+      // Validate form
+      let isValid = true;
+
+      if (!email) {
+        showError("email", "Email is required");
+        isValid = false;
+      } else if (!isValidEmail(email)) {
+        showError("email", "Please enter a valid email address");
+        isValid = false;
+      }
+
+      if (!username) {
+        showError("username", "Username is required");
+        isValid = false;
+      }
+
+      if (!role) {
+        showError("role", "Please select a user role");
+        isValid = false;
+      }
+
+      if (!password) {
+        showError("password", "Password is required");
+        isValid = false;
+      } else if (password.length < 8) {
+        showError("password", "Password must be at least 8 characters long");
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      // Prepare data for submission
+      const userData = {
+        email: email,
+        username: username,
+        role: role,
+        password: password,
+      };
+
+      // Show loading state
+      const submitBtn = document.getElementById("submit-btn");
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> Creating...';
+      submitBtn.disabled = true;
+
+      // Send request to server
+      fetch("/admin-panel/admin/users/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: JSON.stringify(userData),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.error || "An error occurred");
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.success) {
+            showAlert("success", data.message || "User created successfully");
+            form.reset();
+            strengthIndicator.style.display = "none";
+
+            // Redirect to user management page after 2 seconds
+            setTimeout(() => {
+              window.location.href = "{% url 'admin_user' %}";
+            }, 2000);
+          } else {
+            throw new Error(data.error || "Unknown error");
+          }
+        })
+        .catch((error) => {
+          console.error("Error creating user:", error);
+          showAlert("danger", error.message || "Failed to create user");
+        })
+        .finally(() => {
+          // Restore button state
+          submitBtn.innerHTML = originalBtnText;
+          submitBtn.disabled = false;
+        });
+    });
+
+    // Helper functions
+    function clearErrors() {
+      document.querySelectorAll(".error-text").forEach((el) => {
+        el.textContent = "";
+      });
+    }
+
+    function showError(field, message) {
+      const errorElement = document.getElementById(`${field}-error`);
+      if (errorElement) {
+        errorElement.textContent = message;
+      }
+    }
+
+    function isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function showAlert(type, message) {
+      const alertsContainer = document.getElementById("alerts-container");
+      const alert = document.createElement("div");
+      alert.className = `alert alert-${type}`;
+
+      if (type === "success") {
+        alert.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      } else {
+        alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+      }
+
+      alertsContainer.appendChild(alert);
+
+      // Auto-hide success alerts after 5 seconds
+      if (type === "success") {
+        setTimeout(() => {
+          alert.remove();
+        }, 5000);
+      }
+    }
+  });
+</script>
+{% endblock %}
