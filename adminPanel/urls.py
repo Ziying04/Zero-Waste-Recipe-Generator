@@ -15,7 +15,7 @@ urlpatterns = [
     path('admin-users/', admin_user, name='admin_user'),
     path('admin/users/<int:user_id>/delete/', delete_user, name='admin_delete_user'),
     path('admin/users/create/', create_user, name='admin_create_user'),
-    path('admin/users/add/', add_user_view, name='add_user_view'),  # Add this line
+    path('add-user/', add_user_view, name='add_user_view'),  # Simplified URL
     
     # Issues Management
     path('admin-issues/', admin_issues, name='admin_issues'),

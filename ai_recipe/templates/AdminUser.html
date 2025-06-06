@@ -71,10 +71,9 @@
               value="{{ search_query|default:'' }}"
             />
           </div>
-          <button class="btn btn-success d-flex align-items-center gap-2 px-4" id="add-user-btn" style="border-radius: 25px; font-weight: 500;">
-            <i class="fa fa-plus"></i>
-            <a href="{% url 'adminPanel:add_user_view' %}" style="color: white; text-decoration: none;">Add User</a>
-          </button>
+          <a href="{% url 'adminPanel:add_user_view' %}" class="btn btn-success d-flex align-items-center gap-2 px-4" style="border-radius: 25px; font-weight: 500;">
+            <i class="fa fa-plus"></i>Add User
+          </a>
         </div>
       </div>
 
