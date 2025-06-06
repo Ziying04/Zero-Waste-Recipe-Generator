@@ -55,7 +55,7 @@
               value="{{ search_query|default:'' }}"
             />
           </div>
-          <button class="btn btn-success">Add User</button>
+          <button class="btn btn-success" id="add-user-btn">Add User</button>
         </div>
       </div>
 
@@ -186,267 +186,510 @@
     </div>
   </div>
 </div>
+<!-- Add User Card Popup -->
+<div class="card-popup-overlay" id="add-user-popup">
+  <div class="popup-card">
+    <div class="popup-card-header">
+      <h2 class="popup-card-title">Add New User</h2>
+      <p class="popup-card-subtitle">Create a new user account with specific permissions.</p>
+      <button class="popup-close-btn" id="close-popup">&times;</button>
+    </div>
+    <div class="popup-card-body">
+      <form id="add-user-form">
+        <div class="form-group">
+          <label class="form-label" for="user-name">Name</label>
+          <input
+            type="text"
+            id="user-name"
+            name="name"
+            class="form-input"
+            placeholder="Full name"
+            required
+          />
+          <div class="error-message" id="name-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-email">Email</label>
+          <input
+            type="email"
+            id="user-email"
+            name="email"
+            class="form-input"
+            placeholder="Email address"
+            required
+          />
+          <div class="error-message" id="email-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-username">Username</label>
+          <input
+            type="text"
+            id="user-username"
+            name="username"
+            class="form-input"
+            placeholder="Username"
+            required
+          />
+          <div class="error-message" id="username-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-role">Role</label>
+          <select id="user-role" name="role" class="form-select" required>
+            <option value="">Select role</option>
+            <option value="user">User</option>
+            <option value="staff">Staff</option>
+            <option value="admin">Admin</option>
+          </select>
+          <div class="error-message" id="role-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-status">Status</label>
+          <select id="user-status" name="status" class="form-select" required>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <div class="error-message" id="status-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-password">Password</label>
+          <input
+            type="password"
+            id="user-password"
+            name="password"
+            class="form-input"
+            placeholder="Set password"
+            required
+          />
+          <div class="error-message" id="password-error"></div>
+        </div>
+      </form>
+    </div>
+    <div class="popup-card-footer">
+      <button type="button" class="btn-cancel" id="cancel-btn">Cancel</button>
+      <button type="submit" class="btn-create" id="create-user-btn">Create User</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // Check authentication status before allowing any actions
-  document.addEventListener("DOMContentLoaded", function () {
-    // Check if user is authenticated
-    if (
-      !document.body.dataset.authenticated ||
-      document.body.dataset.authenticated !== "true"
-    ) {
-      window.location.href = "/login/";
-      return;
-    }
-
-    // Check if user has admin privileges
-    if (
-      !document.body.dataset.isAdmin ||
-      document.body.dataset.isAdmin !== "true"
-    ) {
-      alert("Access denied. Admin privileges required.");
-      window.location.href = "/";
-      return;
-    }
-  });
-
-  // Get CSRF token for Django
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-
-  const csrftoken = getCookie("csrftoken");
-
-  function viewUser(userId) {
-    if (!isAuthenticated()) return;
-    console.log("View user:", userId);
-  }
-
-  function editUser(userId) {
-    if (!isAuthenticated()) return;
-    console.log("Edit user:", userId);
-  }
-
-  function isAuthenticated() {
-    if (
-      !document.body.dataset.authenticated ||
-      document.body.dataset.authenticated !== "true"
-    ) {
-      alert("Please log in to perform this action.");
-      window.location.href = "/login/";
-      return false;
-    }
-    return true;
-  }
-
-  // UPDATED DELETE FUNCTION WITH AUTHENTICATION CHECK
-  function deleteUser(userId, username) {
-    if (!isAuthenticated()) return;
-
-    console.log("=== DELETE USER DEBUG ===");
-    console.log("User ID:", userId);
-    console.log("Username:", username);
-    console.log("Current URL:", window.location.href);
-    console.log("CSRF Token:", csrftoken);
-
-    if (
-      confirm(
-        `Are you sure you want to delete user "${username}"?\n\n(Check browser console for debug info)`
-      )
-    ) {
-      const deleteBtn = document.querySelector(
-        `button[data-user-id="${userId}"]`
-      );
-
-      if (!deleteBtn) {
-        console.error("Delete button not found for user:", userId);
+  <script>
+    // Check authentication status before allowing any actions
+    document.addEventListener("DOMContentLoaded", function () {
+      // Check if user is authenticated
+      if (
+        !document.body.dataset.authenticated ||
+        document.body.dataset.authenticated !== "true"
+      ) {
+        window.location.href = "/login/";
         return;
       }
-
-      // Get the URL from the data attribute (recommended approach)
-      const deleteUrl = deleteBtn.getAttribute("data-delete-url");
-      console.log("Delete URL from data attribute:", deleteUrl);
-
-      // Fallback to constructed URL if data attribute is empty
-      const fallbackUrl = `/admin/users/${userId}/delete/`;
-      const finalUrl = deleteUrl || fallbackUrl;
-
-      console.log("Final URL being used:", finalUrl);
-
-      const originalHTML = deleteBtn.innerHTML;
-      deleteBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-      deleteBtn.disabled = true;
-
-      fetch(finalUrl, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": csrftoken,
-          "Content-Type": "application/json",
-        },
-        credentials: "same-origin",
-      })
-        .then((response) => {
-          if (response.status === 401 || response.status === 403) {
-            throw new Error("Authentication required. Please log in.");
-          }
-
-          console.log("Response Status:", response.status);
-          console.log("Response URL:", response.url);
-
-          if (!response.ok) {
-            return response.text().then((text) => {
-              console.log("Error Response Body:", text);
-              throw new Error(
-                `HTTP ${response.status}: ${response.statusText}`
-              );
-            });
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Success Response:", data);
-
-          if (data.success) {
-            const userRow = document.getElementById(`user-row-${userId}`);
-            if (userRow) {
-              userRow.remove();
-            }
-            updateUserCounts();
-            showMessage(
-              "delete-success",
-              data.message || "User deleted successfully."
-            );
-          } else {
-            throw new Error(data.error || "Failed to delete user");
-          }
-        })
-        .catch((error) => {
-          console.error("=== ERROR DETAILS ===");
-          console.error("Error message:", error.message);
-          console.error("Full error:", error);
-
-          if (error.message.includes("Authentication required")) {
-            window.location.href = "/login/";
-            return;
-          }
-
-          showMessage(
-            "delete-error",
-            error.message || "An error occurred while deleting the user."
-          );
-
-          // Restore button state
-          deleteBtn.innerHTML = originalHTML;
-          deleteBtn.disabled = false;
-        })
-        .finally(() => {
-          console.log("=== END DELETE DEBUG ===");
-        });
-    }
-  }
-
-  function showMessage(messageId, text) {
-    const messagesContainer = document.getElementById("delete-messages");
-    const messageElement = document.getElementById(messageId);
-
-    // Hide all messages first
-    document.getElementById("delete-success").style.display = "none";
-    document.getElementById("delete-error").style.display = "none";
-
-    // Show the specific message
-    if (messageId === "delete-error") {
-      document.getElementById("delete-error-message").textContent = text;
-    }
-
-    messageElement.style.display = "block";
-    messagesContainer.style.display = "block";
-
-    // Auto-hide success messages after 5 seconds
-    if (messageId === "delete-success") {
-      setTimeout(() => {
-        messageElement.style.display = "none";
-        messagesContainer.style.display = "none";
-      }, 5000);
-    }
-  }
-
-  function updateUserCounts() {
-    const visibleRows = document.querySelectorAll(
-      "#users-table-body tr:not(#no-users-row)"
-    );
-    const currentCount = visibleRows.length;
-
-    // Only update elements that actually exist
-    const totalUsersCountElement = document.getElementById("total-users-count");
-    if (totalUsersCountElement) {
-      totalUsersCountElement.textContent = currentCount;
-    }
-
-    // Optional: Add these elements to your HTML if you want to show more detailed counts
-    const showingCountElement = document.getElementById("showing-count");
-    if (showingCountElement) {
-      showingCountElement.textContent = currentCount;
-    }
-
-    const totalCountElement = document.getElementById("total-count");
-    if (totalCountElement) {
-      totalCountElement.textContent = currentCount;
-    }
-
-    // Show "No users found" message if no users are visible
-    const noUsersRow = document.getElementById("no-users-row");
-    if (currentCount === 0 && noUsersRow) {
-      noUsersRow.style.display = "";
-    } else if (noUsersRow) {
-      noUsersRow.style.display = "none";
-    }
-  }
-
-  // Event delegation for delete buttons
-  document.addEventListener("DOMContentLoaded", function () {
-    document.addEventListener("click", function (e) {
-      if (e.target.closest(".delete-user-btn")) {
-        const btn = e.target.closest(".delete-user-btn");
-        const userId = btn.getAttribute("data-user-id");
-        const username = btn.getAttribute("data-username");
-
-        if (userId && username) {
-          deleteUser(userId, username);
-        }
+  
+      // Check if user has admin privileges
+      if (
+        !document.body.dataset.isAdmin ||
+        document.body.dataset.isAdmin !== "true"
+      ) {
+        alert("Access denied. Admin privileges required.");
+        window.location.href = "/";
+        return;
       }
     });
-  });
-
-  // Search functionality
-  document
-    .querySelector('input[placeholder="Search users..."]')
-    .addEventListener("input", function (e) {
-      const searchTerm = e.target.value.toLowerCase();
-      const rows = document.querySelectorAll(
-        "#users-table-body tr:not(#no-users-row)"
-      );
-
-      rows.forEach((row) => {
-        const username = row.cells[0].textContent.toLowerCase();
-        const email = row.cells[1].textContent.toLowerCase();
-
-        if (username.includes(searchTerm) || email.includes(searchTerm)) {
-          row.style.display = "";
-        } else {
-          row.style.display = "none";
+  
+    // Get CSRF token for Django
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  
+    const csrftoken = getCookie("csrftoken");
+  
+    // Card popup functionality
+    const popup = document.getElementById('add-user-popup');
+    const addUserBtn = document.getElementById('add-user-btn');
+    const closePopupBtn = document.getElementById('close-popup');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const createUserBtn = document.getElementById('create-user-btn');
+    const addUserForm = document.getElementById('add-user-form');
+  
+    // Open popup
+    addUserBtn.addEventListener('click', function() {
+      if (!isAuthenticated()) return;
+      popup.classList.add('show');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    });
+  
+    // Close popup functions
+    function closePopup() {
+      popup.classList.remove('show');
+      document.body.style.overflow = ''; // Restore scrolling
+      resetForm();
+    }
+  
+    closePopupBtn.addEventListener('click', closePopup);
+    cancelBtn.addEventListener('click', closePopup);
+  
+    // Close popup when clicking outside
+    popup.addEventListener('click', function(e) {
+      if (e.target === popup) {
+        closePopup();
+      }
+    });
+  
+    // Close popup with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && popup.classList.contains('show')) {
+        closePopup();
+      }
+    });
+  
+    // Form validation
+    function validateForm() {
+      let isValid = true;
+      const formData = new FormData(addUserForm);
+      
+      // Clear previous errors
+      document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+      document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+  
+      // Validate required fields
+      const requiredFields = ['name', 'email', 'username', 'role', 'password'];
+      requiredFields.forEach(field => {
+        const value = formData.get(field);
+        if (!value || value.trim() === '') {
+          showFieldError(field, 'This field is required');
+          isValid = false;
         }
       });
+  
+      // Validate email format
+      const email = formData.get('email');
+      if (email && !isValidEmail(email)) {
+        showFieldError('email', 'Please enter a valid email address');
+        isValid = false;
+      }
+  
+      // Validate password length
+      const password = formData.get('password');
+      if (password && password.length < 6) {
+        showFieldError('password', 'Password must be at least 6 characters long');
+        isValid = false;
+      }
+  
+      return isValid;
+    }
+  
+    function showFieldError(fieldName, message) {
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      const inputElement = document.getElementById(`user-${fieldName}`);
+      
+      if (errorElement) errorElement.textContent = message;
+      if (inputElement) inputElement.classList.add('error');
+    }
+  
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+  
+    // Create user function
+    createUserBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      if (!isAuthenticated()) return;
+      
+      if (!validateForm()) return;
+  
+      const formData = new FormData(addUserForm);
+      const userData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        username: formData.get('username'),
+        role: formData.get('role'),
+        status: formData.get('status'),
+        password: formData.get('password')
+      };
+  
+      // Show loading state
+      createUserBtn.disabled = true;
+      createUserBtn.textContent = 'Creating...';
+  
+      // Make API call to create user
+      fetch('/admin/users/create/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify(userData)
+      })
+      .then(response => {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error('Authentication required. Please log in.');
+        }
+        
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          closePopup();
+          showAddUserMessage('add-user-success', data.message || 'User created successfully.');
+          
+          // Add new user to table (you might want to refresh the page instead)
+          addUserToTable(data.user);
+          updateUserCounts();
+        } else {
+          throw new Error(data.error || 'Failed to create user');
+        }
+      })
+      .catch(error => {
+        console.error('Error creating user:', error);
+        
+        if (error.message.includes('Authentication required')) {
+          window.location.href = '/login/';
+          return;
+        }
+        
+        showAddUserMessage('add-user-error', error.message || 'An error occurred while creating the user.');
+      })
+      .finally(() => {
+        // Restore button state
+        createUserBtn.disabled = false;
+        createUserBtn.textContent = 'Create User';
+      });
     });
+  
+    // Helper functions
+    function resetForm() {
+      addUserForm.reset();
+      document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+      document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    }
+  
+    function showAddUserMessage(messageId, text) {
+      const messagesContainer = document.getElementById('add-user-messages');
+      const messageElement = document.getElementById(messageId);
+  
+      // Hide all messages first
+      document.getElementById('add-user-success').style.display = 'none';
+      document.getElementById('add-user-error').style.display = 'none';
+  
+      // Show the specific message
+      if (messageId === 'add-user-error') {
+        document.getElementById('add-user-error-message').textContent = text;
+      } else if (messageId === 'add-user-success') {
+        document.getElementById('add-user-success-message').textContent = text;
+      }
+  
+      messageElement.style.display = 'block';
+      messagesContainer.style.display = 'block';
+  
+      // Auto-hide success messages after 5 seconds
+      if (messageId === 'add-user-success') {
+        setTimeout(() => {
+          messageElement.style.display = 'none';
+          messagesContainer.style.display = 'none';
+        }, 5000);
+      }
+    }
+  
+    function addUserToTable(user) {
+      // This is a simplified version - you might want to refresh the page instead
+      // to ensure all data is properly loaded from the server
+      const tbody = document.getElementById('users-table-body');
+      const noUsersRow = document.getElementById('no-users-row');
+      
+      if (noUsersRow && noUsersRow.style.display !== 'none') {
+        noUsersRow.style.display = 'none';
+      }
+      
+      // You would need to create the full row HTML here based on your template structure
+      // For now, just refresh the page to show the new user
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  
+    function viewUser(userId) {
+      if (!isAuthenticated()) return;
+      console.log("View user:", userId);
+    }
+  
+    function editUser(userId) {
+      if (!isAuthenticated()) return;
+      console.log("Edit user:", userId);
+    }
+  
+    function isAuthenticated() {
+      if (
+        !document.body.dataset.authenticated ||
+        document.body.dataset.authenticated !== "true"
+      ) {
+        alert("Please log in to perform this action.");
+        window.location.href = "/login/";
+        return false;
+      }
+      return true;
+    }
+  
+    // UPDATED DELETE FUNCTION WITH AUTHENTICATION CHECK
+    function deleteUser(userId, username) {
+      if (!isAuthenticated()) return;
+  
+      console.log("=== DELETE USER DEBUG ===");
+      console.log("User ID:", userId);
+      console.log("Username:", username);
+      console.log("Current URL:", window.location.href);
+      console.log("CSRF Token:", csrftoken);
+  
+      if (
+        confirm(
+          `Are you sure you want to delete user "${username}"?\n\n(Check browser console for debug info)`
+        )
+      ) {
+        const deleteBtn = document.querySelector(
+          `button[data-user-id="${userId}"]`
+        );
+  
+        if (!deleteBtn) {
+          console.error("Delete button not found for user:", userId);
+          return;
+        }
+  
+        // Get the URL from the data attribute (recommended approach)
+        const deleteUrl = deleteBtn.getAttribute("data-delete-url");
+        console.log("Delete URL from data attribute:", deleteUrl);
+  
+        // Fallback to constructed URL if data attribute is empty
+        const fallbackUrl = `/admin/users/${userId}/delete/`;
+        const finalUrl = deleteUrl || fallbackUrl;
+  
+        console.log("Final URL being used:", finalUrl);
+  
+        const originalHTML = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+        deleteBtn.disabled = true;
+  
+        fetch(finalUrl, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken,
+            "Content-Type": "application/json",
+          },
+          credentials: "same-origin",
+        })
+          .then((response) => {
+            if (response.status === 401 || response.status === 403) {
+              throw new Error("Authentication required. Please log in.");
+            }
+  
+            console.log("Response Status:", response.status);
+            console.log("Response URL:", response.url);
+  
+            if (!response.ok) {
+              return response.text().then((text) => {
+                console.log("Error Response Body:", text);
+                throw new Error(
+                  `HTTP ${response.status}: ${response.statusText}`
+                );
+              });
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Success Response:", data);
+  
+            if (data.success) {
+              const userRow = document.getElementById(`user-row-${userId}`);
+              if (userRow) {
+                userRow.remove();
+              }
+              updateUserCounts();
+              showMessage(
+                "delete-success",
+                data.message || "User deleted successfully."
+              );
+            } else {
+              throw new Error(data.error || "Failed to delete user");
+            }
+          })
+          .catch((error) => {
+            console.error("=== ERROR DETAILS ===");
+            console.error("Error message:", error.message);
+            console.error("Full error:", error);
+  
+            if (error.message.includes("Authentication required")) {
+              window.location.href = "/login/";
+              return;
+            }
+  
+            showMessage(
+              "delete-error",
+              error.message || "An error occurred while deleting the user."
+            );
+  
+            // Restore button state
+            deleteBtn.innerHTML = originalHTML;
+            deleteBtn.disabled = false;
+          })
+          .finally(() => {
+            console.log("=== END DELETE DEBUG ===");
+          });
+      }
+    }
+  
+    function showMessage(messageId, text) {
+      const messagesContainer = document.getElementById("delete-messages");
+      const messageElement = document.getElementById(messageId);
+  
+      // Hide all messages first
+      document.getElementById("delete-success").style.display = "none";
+      document.getElementById("delete-error").style.display = "none";
+  
+      // Show the specific message
+      if (messageId === "delete-error") {
+        document.getElementById("delete-error-message").textContent = text;
+      }
+  
+      messageElement.style.display = "block";
+      messagesContainer.style.display = "block";
+  
+      // Auto-hide success messages after 5 seconds
+      if (messageId === "delete-success") {
+        setTimeout(() => {
+          messageElement.style.display = "none";
+          messagesContainer.style.display = "none";
+        }, 5000);
+      }
+    }
+  
+    function updateUserCounts() {
+      // Update user count display
+      const totalUsersElement = document.getElementById('total-users-count');
+      if (totalUsersElement) {
+        const currentCount = parseInt(totalUsersElement.textContent) || 0;
+        totalUsersElement.textContent = Math.max(0, currentCount);
+      }
+    }
 </script>
 {% endblock %}
