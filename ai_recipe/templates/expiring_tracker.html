@@ -1,13 +1,7 @@
-{% extends 'base_template.html' %} 
-{% load static %} 
-
-{% block title %}Inventory{% endblock %}
-
-{% block extra_css %}
+{% extends 'base_template.html' %} {% load static %} {% block title %}Inventory{% endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/expiring_tracker.css' %}" />
-{% endblock %} 
+{% endblock %} {% block content %}
 
-{% block content %}
 <div class="container">
   <h1 class="title"><i class="nav-icon fas fa-carrot"></i>Ingredient Inventory</h1>
 

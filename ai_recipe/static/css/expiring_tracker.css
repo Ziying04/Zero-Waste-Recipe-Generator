@@ -246,14 +246,6 @@ select {
   animation: floatPulse 2s ease-in-out infinite;
 }
 
-.notification-container {
-  position: fixed;
-  top: 80px;
-  right: 20px;
-  z-index: 9999;
-  max-width: 350px;
-}
-
 .notification-message {
   padding: 15px 20px;
   margin-bottom: 10px;
