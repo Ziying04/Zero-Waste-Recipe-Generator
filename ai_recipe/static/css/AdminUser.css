@@ -20,20 +20,7 @@
             min-height: 100vh;
             background-color: #f9fafb;
         }
-
-        /* Sidebar */
-        .admin-sidebar {
-            background: #ffffff;
-            border-right: 1px solid #f3f4f6;
-            padding: 1.5rem 1rem;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: sticky;
-            top: 0;
-            box-shadow: 1px 0 5px rgba(0, 0, 0, 0.05);
-        }
-
+ 
         .sidebar-header {
             display: flex;
             align-items: center;
