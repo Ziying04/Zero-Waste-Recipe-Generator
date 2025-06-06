@@ -162,11 +162,11 @@ h3.yourRecipe {
 }
 
 
-.hidden{
+.hidden {
   display: none;
 }
 
-.display{
+.display {
   display: block;
 }
 
@@ -178,7 +178,7 @@ h3.yourRecipe {
 }
 
 
-.add-ingredient{
+.add-ingredient {
   padding: 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -231,7 +231,7 @@ h3.yourRecipe {
   font-weight: bold;
 }
 
-.badge.expiring-soon{
+.badge.expiring-soon {
   background-color: #fff3cd;
   color: #856404;
 }
@@ -245,5 +245,3 @@ h3.yourRecipe {
   background-color: #f8d7da;
   color: #721c24;
 }
-
-

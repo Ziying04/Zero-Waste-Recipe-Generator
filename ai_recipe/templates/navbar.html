@@ -31,7 +31,11 @@
                   <div class="dropdown-desc">Find your new favorite dish!</div>
                 </div>
               </a>
-              <a href="{% url 'recipe_ai' %}" class="dropdown-item">
+              <a
+                class="nav-link {% if 'recipe_ai' in request.path %}active{% endif %}"
+                href="{% url 'generate_recipe' %}"
+                class="dropdown-item"
+              >
                 <div class="dropdown-icon">
                   <i class="fas fa-robot"></i>
                 </div>
@@ -100,8 +104,7 @@
         <button class="profile-trigger" id="profileTrigger">
           <div class="profile-avatar">
             <span
-              >{{ user.first_name|first|upper|default:user.username|first|upper}}
-              </span>
+              >{{ user.first_name|first|upper|default:user.username|first|upper}}</span>
           </div>
         </button>
         <div class="profile-dropdown" id="profileDropdown">

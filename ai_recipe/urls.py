@@ -35,8 +35,9 @@ urlpatterns = [
     # Main routes
     path("", home, name="home"),
     path("ingredient-search/", IngredientSearchView.as_view(), name="ingredient_search"),
-    path("recipe-generator/", recipe_ai, name="recipe_ai"),
-
+    # Remove or rename this to avoid conflict
+    # path("recipe-generator/", recipe_ai, name="recipe_ai"),
+    
     # Authentication routes
     path('login/', custom_login, name='login'),
     path('signup/', custom_signup, name='signup'),
