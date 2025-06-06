@@ -94,6 +94,18 @@
         <i class="fas fa-search"></i>
       </button>
 
+      <!-- Notification Button -->
+      <a
+        href="{% url 'notification-home' %}"
+        class="nav-btn notification-btn"
+        title="Notifications"
+      >
+        <i class="fas fa-bell"></i>
+        {% if notifications_unread_count > 0 %}
+        <span class="notification-badge">{{ notifications_unread_count }}</span>
+        {% endif %}
+      </a>
+
       <!-- Theme Toggle -->
       <button class="nav-btn theme-btn" id="themeToggle">
         <i class="fas fa-sun"></i>
@@ -104,7 +116,8 @@
         <button class="profile-trigger" id="profileTrigger">
           <div class="profile-avatar">
             <span
-              >{{ user.first_name|first|upper|default:user.username|first|upper}}</span>
+              >{{user.first_name|first|upper|default:user.username|first|upper}}</span
+            >
           </div>
         </button>
         <div class="profile-dropdown" id="profileDropdown">
