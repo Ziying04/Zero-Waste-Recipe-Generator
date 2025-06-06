@@ -22,7 +22,7 @@ from django.contrib.auth import views as auth_views
 
 # Import directly from ai_recipe.views
 from ai_recipe.views import IngredientSearchView, recipe_ai
-from ai_recipe.views import home, custom_login, admin_dashboard, admin_user, admin_content, custom_logout
+from ai_recipe.views import home, custom_login, admin_dashboard, admin_user, admin_content, custom_logout, custom_signup
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -35,15 +35,17 @@ urlpatterns = [
     # Main routes
     path("", home, name="home"),
     path("ingredient-search/", IngredientSearchView.as_view(), name="ingredient_search"),
-    path("recipe-generator/", recipe_ai, name="recipe_generator"),
+    path("recipe-generator/", recipe_ai, name="recipe_ai"),
 
-    # Login and admin dashboard
+    # Authentication routes
     path('login/', custom_login, name='login'),
+    path('signup/', custom_signup, name='signup'),
     path('logout/', custom_logout, name='logout'),
+    
+    # Admin routes
     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'), 
     path('admin-users/', admin_user, name='admin_user'),
     path('admin-panel/', include(('adminPanel.urls', 'adminPanel'), namespace='adminPanel')),
-    # path('admin-content/', admin_content, name='admin_content'),
 
     path('notification/', include('notification.urls')),
     path('issues/', include('report_issues_user.urls')),

@@ -77,4 +77,11 @@
     <div class="floating-element element-3"></div>
   </div>
 </div>
+
+<script>
+  // Check if user is already authenticated
+  if (document.body.dataset.authenticated === "true") {
+    window.location.href = "/";
+  }
+</script>
 {% endblock %}

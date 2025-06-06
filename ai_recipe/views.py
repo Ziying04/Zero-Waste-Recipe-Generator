@@ -5,6 +5,9 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.http import JsonResponse
 from adminPanel.models import IssueReport  # Import the admin panel IssueReport model
 
 # Import any utility function you use
@@ -17,12 +20,90 @@ from recipe.models import Recipe  # Import Recipe model
 # from recipe.models import Comment  # Remove or comment out this line
 
 
+def custom_login(request):
+    # Redirect authenticated users
+    if request.user.is_authenticated:
+        return redirect('home')
+        
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        # Check for admin credentials
+        if email == "admin123@gmail.com" and password == "admin123":
+            # Try to get or create the admin user
+            user, created = User.objects.get_or_create(username="admin123", defaults={
+                "email": email,
+                "is_staff": True,
+                "is_superuser": True,
+            })
+            if created:
+                user.set_password(password)
+                user.save()
+            # Authenticate and login
+            user = authenticate(request, username="admin123", password=password)
+            if user:
+                login(request, user)
+                return redirect("admin_dashboard")
+                
+        # Normal authentication for other users
+        user = authenticate(request, username=email, password=password)
+        if user:
+            login(request, user)
+            return redirect("home")
+        else:
+            return render(request, "login.html", {"error": "Invalid credentials"})
+    return render(request, "login.html")
+
+def custom_signup(request):
+    # Redirect authenticated users
+    if request.user.is_authenticated:
+        return redirect('home')
+        
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        # Check if user already exists
+        if User.objects.filter(email=email).exists():
+            if request.content_type == 'application/json':
+                return JsonResponse({"error": "User with this email already exists"}, status=400)
+            return render(request, "signup.html", {"error": "User with this email already exists"})
+
+        try:
+            # Create new user
+            user = User.objects.create_user(
+                username=email,  # Use email as username
+                email=email,
+                password=password,
+                first_name=name
+            )
+            
+            # Authenticate and login
+            user = authenticate(request, username=email, password=password)
+            if user:
+                login(request, user)
+                if request.content_type == 'application/json':
+                    return JsonResponse({"success": True, "redirect": "/"})
+                return redirect("home")
+                
+        except Exception as e:
+            if request.content_type == 'application/json':
+                return JsonResponse({"error": "Failed to create account"}, status=400)
+            return render(request, "signup.html", {"error": "Failed to create account"})
+    
+    return render(request, "signup.html")
+
+
 # Home view (redirects to recipe_ai if authenticated)
 def home(request):
-    if request.user.is_authenticated:
-        return redirect('recipe_ai')  # must match the name in urls.py
-
     if request.method == "POST":
+        # Require authentication for POST actions
+        if not request.user.is_authenticated:
+            messages.error(request, "Please log in to access this feature.")
+            return redirect('login')
+            
         if "find_recipes" in request.POST:
             return redirect('ingredient_search')  # update with your recipe page url name
         elif "use_ai_recipe" in request.POST:
@@ -32,16 +113,18 @@ def home(request):
 
 
 # View to render the AI recipe page
+@login_required
 def recipe_ai(request):
     return render(request, "recipe_ai.html")
 
 
 # Ingredient Search View
 @method_decorator(ensure_csrf_cookie, name='dispatch')
+@method_decorator(login_required, name='dispatch')
 class IngredientSearchView(View):
     def get(self, request):
         ingredients = request.session.get("ingredients", [])
-        return render(request, ".html", {"ingredients": ingredients})
+        return render(request, "ingredient_search.html", {"ingredients": ingredients})
 
     def post(self, request):
         ingredients = request.session.get("ingredients", [])
@@ -64,37 +147,6 @@ class IngredientSearchView(View):
         return redirect("ingredient_search")
 
 
-def custom_login(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
-        # Check for admin credentials
-        if email == "admin123@gmail.com" and password == "admin123":
-            # Try to get or create the admin user
-            user, created = User.objects.get_or_create(username="admin123", defaults={
-                "email": email,
-                "is_staff": True,
-                "is_superuser": True,
-            })
-            if created:
-                user.set_password(password)
-                user.save()
-            # Authenticate and login
-            user = authenticate(request, username="admin123", password=password)
-            if user:
-                login(request, user)
-                return redirect("admin_dashboard")  # url name for adminPage.html
-        # Normal authentication for other users
-        user = authenticate(request, username=email, password=password)
-        if user:
-            login(request, user)
-            return redirect("home")
-        else:
-            return render(request, "login.html", {"error": "Invalid credentials"})
-    return render(request, "login.html")
-
-
 def custom_logout(request):
     """Custom logout view with admin mode detection"""
     was_admin = request.user.is_staff or request.user.is_superuser if request.user.is_authenticated else False
@@ -107,6 +159,7 @@ def custom_logout(request):
     
     return redirect('home')
 
+@login_required
 def admin_dashboard(request):
     """Enhanced admin dashboard with user mode toggle capability"""
     # Check if user has admin privileges
@@ -165,8 +218,14 @@ def admin_dashboard(request):
     
     return render(request, 'adminPage.html', context)
 
+@login_required
 def admin_user(request):
     """Admin user management view with debugging"""
+    # Check if user has admin privileges
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "Access denied. Admin privileges required.")
+        return redirect('home')
+    
     print("=== ADMIN USER VIEW CALLED ===")
     print(f"User: {request.user}")
     
@@ -214,8 +273,14 @@ def admin_user(request):
     print("=== END ADMIN USER VIEW ===")
     return render(request, "AdminUser.html", context)
 
+@login_required
 def admin_content(request):
     """Admin content management view"""
+    # Check if user has admin privileges
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "Access denied. Admin privileges required.")
+        return redirect('home')
+    
     try:
         # Fetch all content types with error handling
         recipes = []
@@ -270,12 +335,13 @@ def admin_content(request):
     
     return render(request, 'admin_content.html', context)
 
+@login_required
 def report_issue(request):
     if request.method == 'POST':
         issue_type = request.POST.get('issue_type')
         description = request.POST.get('description')
         screenshot = request.FILES.get('screenshot')
-        user = request.user if request.user.is_authenticated else None
+        user = request.user
 
         IssueReport.objects.create(
             user=user,
@@ -283,6 +349,5 @@ def report_issue(request):
             description=description,
             screenshot=screenshot
         )
-        # Redirect or render a success message
         return render(request, 'reportIssues_user.html', {'success': True})
     return render(request, 'reportIssues_user.html')  # GET request handling

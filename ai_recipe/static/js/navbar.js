@@ -262,41 +262,20 @@ document.addEventListener('DOMContentLoaded', function() {
     showAdminModeIndicator();
 });
 
-function toggleProfileDropdown() {
-    const isAuthenticated = document.querySelector('.profile-button')?.dataset.authenticated === 'true';
-    
-    if (!isAuthenticated) {
-        window.location.href = '/api/login/';
+// Admin Mode Toggle Function
+function toggleAdminMode() {
+    // Check authentication first
+    if (!isUserAuthenticated()) {
+        redirectToLogin();
         return;
     }
     
-    const dropdown = document.getElementById('profileDropdown');
-    dropdown.classList.toggle('show');
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('profileDropdown');
-    const profileButton = document.querySelector('.profile-button');
-    
-    if (!profileButton?.contains(event.target) && dropdown?.classList.contains('show')) {
-        dropdown.classList.remove('show');
+    // Check admin privileges
+    if (!isUserAdmin()) {
+        alert('Access denied. Admin privileges required.');
+        return;
     }
-});
-
-function toggleNotificationDropdown() {
-  document.getElementById("notificationDropdown").classList.toggle("show");
-}
-
-document.addEventListener("click", function (event) {
-  const dropdown = document.getElementById("notificationDropdown");
-  if (!event.target.closest(".notification-button")) {
-    dropdown.classList.remove("show");
-  }
-});
-
-// Admin Mode Toggle Function
-function toggleAdminMode() {
+    
     const currentPath = window.location.pathname;
     
     if (currentPath.includes('/admin')) {
@@ -310,6 +289,18 @@ function toggleAdminMode() {
 
 // Enhanced Admin Dashboard Access
 function accessAdminDashboard() {
+    // Check authentication first
+    if (!isUserAuthenticated()) {
+        redirectToLogin();
+        return;
+    }
+    
+    // Check admin privileges
+    if (!isUserAdmin()) {
+        alert('Access denied. Admin privileges required.');
+        return;
+    }
+    
     // Add loading state to admin button
     const adminBtn = document.querySelector('.admin-btn');
     if (adminBtn) {
@@ -323,10 +314,40 @@ function accessAdminDashboard() {
     }
 }
 
-// Add click handler for admin dashboard button
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.admin-btn')) {
-        accessAdminDashboard();
+// Utility functions for authentication checks
+function isUserAuthenticated() {
+    return document.body.dataset.authenticated === 'true' || 
+           document.querySelector('meta[name="user-authenticated"]')?.content === 'true';
+}
+
+function isUserAdmin() {
+    return document.body.dataset.isAdmin === 'true' || 
+           document.querySelector('meta[name="user-admin"]')?.content === 'true';
+}
+
+function redirectToLogin() {
+    alert('Please log in to access this feature.');
+    window.location.href = '/login/';
+}
+
+// Update toggleProfileDropdown function
+function toggleProfileDropdown() {
+    if (!isUserAuthenticated()) {
+        redirectToLogin();
+        return;
     }
-});
+    
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Update notification dropdown
+function toggleNotificationDropdown() {
+    if (!isUserAuthenticated()) {
+        redirectToLogin();
+        return;
+    }
+    
+    document.getElementById("notificationDropdown").classList.toggle("show");
+}
 

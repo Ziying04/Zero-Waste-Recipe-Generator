@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is already authenticated
+    if (document.body.dataset.authenticated === 'true') {
+        window.location.href = '/';
+        return;
+    }
+});
+
 document.getElementById("signupForm").addEventListener("submit", async function (e) {
     e.preventDefault();
   
@@ -29,23 +37,20 @@ document.getElementById("signupForm").addEventListener("submit", async function 
   
     if (hasError) return;
   
-    // Simulate async API call
+    // Make the actual signup request
     try {
       document.getElementById("submitBtn").innerText = "Creating Account...";
-      await new Promise((res) => setTimeout(res, 1000)); // fake delay
+      
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('csrfmiddlewaretoken', document.querySelector("[name=csrfmiddlewaretoken]").value);
 
-      // Make an AJAX POST request to the Django backend
-      const response = await fetch("{% url 'signup' %}", {
+      const response = await fetch("/signup/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value, // Include CSRF token
-        },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          password: password,
-        })
+        body: formData,
+        credentials: 'same-origin'
       });
 
       if (response.ok) {
@@ -58,14 +63,15 @@ document.getElementById("signupForm").addEventListener("submit", async function 
         if (response.status === 400) {
           const errorData = await response.json();
           document.getElementById("error-form").innerText = errorData.error;
+        } else {
+          document.getElementById("error-form").innerText = "An error occurred during sign up.";
         }
-        
       }
       
     } catch (err) {
+      console.error('Signup error:', err);
       document.getElementById("error-form").innerText = "An error occurred during sign up.";
     } finally {
       document.getElementById("submitBtn").innerText = "Sign Up";
     }
   });
-  

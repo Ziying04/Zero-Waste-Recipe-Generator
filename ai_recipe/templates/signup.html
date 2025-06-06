@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
 {% endblock %} {% block content %}
 <div class="auth-container">
-  <div class="auth-card">
+  <div class="auth-card" id="signupCard">
     <div class="auth-header">
       <div class="logo-section">
         <div class="logo-icon">
@@ -10,12 +10,10 @@
         </div>
         <h1>Join ZeroWaste</h1>
       </div>
-      <p class="auth-subtitle">
-        Create your account and start reducing food waste
-      </p>
+      <p class="auth-subtitle">Create your account to start your journey</p>
     </div>
 
-    <form method="POST" id="signupForm" class="auth-form">
+    <form method="POST" class="auth-form" id="signupForm">
       {% csrf_token %} {% if error %}
       <div class="error-message">
         <i class="fas fa-exclamation-circle"></i>
@@ -29,14 +27,13 @@
           <i class="fas fa-user input-icon"></i>
           <input
             type="text"
-            id="name"
             name="name"
+            id="name"
             placeholder="Enter your full name"
             required
-            autocomplete="name"
           />
         </div>
-        <span id="error-name" class="field-error"></span>
+        <div class="error-text" id="error-name"></div>
       </div>
 
       <div class="form-group">
@@ -45,14 +42,13 @@
           <i class="fas fa-envelope input-icon"></i>
           <input
             type="email"
-            id="email"
             name="email"
-            placeholder="Enter your email address"
+            id="email"
+            placeholder="Enter your email"
             required
-            autocomplete="email"
           />
         </div>
-        <span id="error-email" class="field-error"></span>
+        <div class="error-text" id="error-email"></div>
       </div>
 
       <div class="form-group">
@@ -61,14 +57,13 @@
           <i class="fas fa-lock input-icon"></i>
           <input
             type="password"
-            id="password"
             name="password"
-            placeholder="Create a strong password"
+            id="password"
+            placeholder="Create a password"
             required
-            autocomplete="new-password"
           />
         </div>
-        <span id="error-password" class="field-error"></span>
+        <div class="error-text" id="error-password"></div>
       </div>
 
       <div class="form-group">
@@ -77,17 +72,16 @@
           <i class="fas fa-lock input-icon"></i>
           <input
             type="password"
-            id="confirmPassword"
             name="confirmPassword"
+            id="confirmPassword"
             placeholder="Confirm your password"
             required
-            autocomplete="new-password"
           />
         </div>
-        <span id="error-confirmPassword" class="field-error"></span>
+        <div class="error-text" id="error-confirmPassword"></div>
       </div>
 
-      <span id="error-form" class="field-error"></span>
+      <div class="error-text" id="error-form"></div>
 
       <button type="submit" class="auth-button" id="submitBtn">
         <span>Create Account</span>
@@ -100,12 +94,43 @@
     </div>
   </div>
 
+  <!-- Success Card -->
+  <div class="auth-card hidden" id="successCard">
+    <div class="auth-header">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="fas fa-check-circle" style="color: #28a745"></i>
+        </div>
+        <h1>Welcome to ZeroWaste!</h1>
+      </div>
+      <p class="auth-subtitle">Your account has been created successfully</p>
+    </div>
+
+    <div class="success-message">
+      <p>
+        Welcome <strong id="userEmail"></strong>! You can now start exploring
+        our features.
+      </p>
+      <a href="{% url 'home' %}" class="auth-button">
+        <span>Get Started</span>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+
   <div class="auth-background">
     <div class="floating-element element-1"></div>
     <div class="floating-element element-2"></div>
     <div class="floating-element element-3"></div>
   </div>
 </div>
-{% endblock %} {% block extra_js %}
-<!-- <script src="{% static 'js/signup.js' %}"></script> -->
+
+<script>
+  // Check if user is already authenticated
+  if (document.body.dataset.authenticated === "true") {
+    window.location.href = "/";
+  }
+</script>
+
+<script src="{% static 'js/signup.js' %}"></script>
 {% endblock %}
