@@ -278,35 +278,6 @@
     </div>
   </div>
 
-  <!-- Statistics Display -->
-  {% if total_donations > 0 %}
-  <div class="stats-container mt-8">
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-bread-slice"></i>
-        </div>
-        <div class="stat-number">{{ total_donations }}</div>
-        <div class="stat-label">Available Food Items</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-number">{{ active_donations }}</div>
-        <div class="stat-label">Active Donors</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-hands-helping"></i>
-        </div>
-        <div class="stat-number">{{ completed_donations }}</div>
-        <div class="stat-label">Your Claimed Items</div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-</div>
 
 {% endblock %} {% block extra_js %}
 <script src="{% static 'js/donors.js' %}"></script>
