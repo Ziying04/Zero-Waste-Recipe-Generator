@@ -139,6 +139,11 @@ def admin_issues(request):
     """
     Display all issues for admin management - with debugging
     """
+    # Check if user is authenticated and is_staff
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You have been logged out from admin mode.")
+        return redirect('login')  # or your login page
+
     try:
         # Try to use the main IssueReport model first
         from report_issues_user.models import IssueReport
@@ -274,14 +279,14 @@ def edit_recipe(request, recipe_id):
                 ingredients = request.POST.get('ingredients')
                 is_shared = request.POST.get('is_shared') == 'on'
                 
-                # Update recipe
+                # Update the EXISTING recipe (not create new)
                 recipe.name = name
-                recipe.cooking_time = int(cooking_time)
+                recipe.cooking_time = int(cooking_time) if cooking_time else 0
                 recipe.steps = steps
                 recipe.image_url = image_url if image_url else ''
                 recipe.ingredients = ingredients
                 recipe.is_shared = is_shared
-                recipe.save()
+                recipe.save()  # This updates the existing recipe
                 
                 return JsonResponse({
                     "success": True,
@@ -294,6 +299,8 @@ def edit_recipe(request, recipe_id):
                         "image_url": recipe.image_url,
                         "ingredients": recipe.ingredients,
                         "is_shared": recipe.is_shared,
+                        "author": recipe.user.username,
+                        "date": recipe.created_at.strftime('%Y-%m-%d')
                     }
                 })
             except Exception as e:
@@ -363,17 +370,195 @@ def create_recipe(request):
     
     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
 
+# Add this function to your views.py file
+
+@user_passes_test(lambda u: u.is_staff)
+def create_donation(request):
+    """
+    Create a new donation post
+    """
+    if request.method == "POST":
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                # Get form data
+                food_name = request.POST.get('food_name')
+                description = request.POST.get('description')
+                quantity = request.POST.get('quantity')
+                location = request.POST.get('location')
+                category = request.POST.get('category')
+                expiry_date = request.POST.get('expiry_date')
+                status = request.POST.get('status', 'available')
+                
+                # Create new donation post
+                donation = DonationFoodPost.objects.create(
+                    food_name=food_name,
+                    description=description,
+                    quantity=quantity,
+                    location=location,
+                    category=category,
+                    expiry_date=expiry_date if expiry_date else None,
+                    status=status,
+                    donor=request.user  # Set the current user as the donor
+                )
+                
+                return JsonResponse({
+                    "success": True,
+                    "message": "Donation post created successfully",
+                    "donation": {
+                        "id": donation.id,
+                        "food_name": donation.food_name,
+                        "description": donation.description,
+                        "quantity": donation.quantity,
+                        "location": donation.location,
+                        "category": donation.category,
+                        "expiry_date": donation.expiry_date.strftime('%Y-%m-%d') if donation.expiry_date else None,
+                        "status": donation.status,
+                        "author": donation.donor.username,
+                        "created_at": donation.created_at.strftime('%Y-%m-%d') if hasattr(donation, 'created_at') else ''
+                    }
+                })
+            except Exception as e:
+                return JsonResponse({
+                    "success": False,
+                    "error": str(e)
+                }, status=400)
+    
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+
 @user_passes_test(lambda u: u.is_staff)
 def edit_donation(request, donation_id):
     post = get_object_or_404(DonationFoodPost, id=donation_id)
+    
     if request.method == "POST":
-        form = DonationEditForm(request.POST, instance=post)
-        if form.is_valid():
-            form.save()
-            return redirect('adminPanel:admin_content')
+        # Handle AJAX request
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                print(f"=== EDITING DONATION {donation_id} ===")
+                print(f"POST data: {request.POST}")
+                
+                # Extract fields from the form data with better validation
+                food_name = request.POST.get('food_name', '').strip()
+                description = request.POST.get('description', '').strip()
+                quantity = request.POST.get('quantity', '').strip()
+                location = request.POST.get('location', '').strip()
+                category = request.POST.get('category', '').strip()
+                expiry_date_str = request.POST.get('expiry_date', '').strip()
+                status = request.POST.get('status', 'available').strip()
+                
+                # Validate required fields
+                if not food_name:
+                    return JsonResponse({'success': False, 'error': 'Food name is required'}, status=400)
+                if not description:
+                    return JsonResponse({'success': False, 'error': 'Description is required'}, status=400)
+                if not quantity:
+                    return JsonResponse({'success': False, 'error': 'Quantity is required'}, status=400)
+                if not location:
+                    return JsonResponse({'success': False, 'error': 'Location is required'}, status=400)
+                
+                # Update fields
+                post.food_name = food_name
+                post.description = description
+                post.quantity = quantity
+                post.location = location
+                post.category = category
+                post.status = status
+                
+                # Handle expiry date
+                if expiry_date_str:
+                    try:
+                        from datetime import datetime
+                        post.expiry_date = datetime.strptime(expiry_date_str, '%Y-%m-%d').date()
+                    except ValueError as date_error:
+                        print(f"Date parsing error: {date_error}")
+                        return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
+                else:
+                    post.expiry_date = None
+                
+                # Save the post
+                post.save()
+                print(f"SUCCESS: Donation {donation_id} updated successfully")
+                
+                # Get the correct author field - check which field exists
+                author_name = ''
+                if hasattr(post, 'donor') and post.donor:
+                    author_name = post.donor.username
+                elif hasattr(post, 'user') and post.user:
+                    author_name = post.user.username
+                else:
+                    author_name = 'Unknown'
+                
+                return JsonResponse({
+                    "success": True,
+                    "message": "Donation post updated successfully",
+                    "donation": {
+                        "id": post.id,
+                        "food_name": post.food_name,
+                        "description": post.description,
+                        "quantity": post.quantity,
+                        "location": post.location,
+                        "category": post.category,
+                        "expiry_date": post.expiry_date.strftime('%Y-%m-%d') if post.expiry_date else '',
+                        "status": post.status,
+                        "author": author_name,
+                        "updated_at": post.updated_at.strftime('%Y-%m-%d') if hasattr(post, 'updated_at') else '',
+                        "created_at": post.created_at.strftime('%Y-%m-%d') if hasattr(post, 'created_at') else ''
+                    }
+                })
+                
+            except Exception as e:
+                print(f"ERROR in edit_donation: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return JsonResponse({'success': False, 'error': f'Server error: {str(e)}'}, status=500)
+
+        # Fallback to regular form submission
+        else:
+            form = DonationEditForm(request.POST, instance=post)
+            if form.is_valid():
+                form.save()
+                return redirect('adminPanel:admin_content')
+            else:
+                print(f"Form errors: {form.errors}")
+                return render(request, "admin_edit_donation.html", {"form": form, "post": post})
+
     else:
         form = DonationEditForm(instance=post)
+
     return render(request, "admin_edit_donation.html", {"form": form, "post": post})
+
+# Add this temporary debug function to your views.py
+@user_passes_test(lambda u: u.is_staff)
+def debug_donation_model(request, donation_id):
+    """Temporary debug function to check model structure"""
+    try:
+        post = get_object_or_404(DonationFoodPost, id=donation_id)
+        
+        # Get all field names
+        field_names = [field.name for field in post._meta.fields]
+        
+        # Get field values
+        field_values = {}
+        for field_name in field_names:
+            try:
+                field_values[field_name] = getattr(post, field_name)
+            except:
+                field_values[field_name] = "ERROR_GETTING_VALUE"
+        
+        debug_info = {
+            "model_name": post.__class__.__name__,
+            "field_names": field_names,
+            "field_values": field_values,
+            "has_donor": hasattr(post, 'donor'),
+            "has_user": hasattr(post, 'user'),
+        }
+        
+        return JsonResponse(debug_info, indent=2)
+        
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+# Add this URL to your urls.py temporarily:
+# path('debug/donation/<int:donation_id>/', debug_donation_model, name='debug_donation'),
 
 @require_GET
 @user_passes_test(lambda u: u.is_staff)
@@ -392,14 +577,21 @@ def recipe_detail_json(request, recipe_id):
 @require_GET
 @user_passes_test(lambda u: u.is_staff)
 def donation_detail_json(request, donation_id):
-    donation = get_object_or_404(DonationFoodPost, id=donation_id)
-    return JsonResponse({
-        "id": donation.id,
-        "food_name": donation.food_name,
-        "description": donation.description,
-        "quantity": donation.quantity,
-        "location": donation.location,
-        "category": donation.category,
-        "expiry_date": donation.expiry_date.strftime('%Y-%m-%d'),
-        "status": donation.status,
-    })
+    """Return donation details as JSON for modal population"""
+    post = get_object_or_404(DonationFoodPost, id=donation_id)
+    
+    data = {
+        "success": True,
+        "id": post.id,
+        "food_name": post.food_name,
+        "description": post.description,
+        "quantity": post.quantity,
+        "location": post.location,
+        "category": post.category,
+        "expiry_date": post.expiry_date.strftime('%Y-%m-%d') if post.expiry_date else '',
+        "status": post.status,
+        "author": post.donor.username if hasattr(post, 'donor') else '',
+        "created_at": post.created_at.strftime('%Y-%m-%d %H:%M') if hasattr(post, 'created_at') else '',
+    }
+
+    return JsonResponse(data)
