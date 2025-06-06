@@ -18,6 +18,9 @@ from recipe.utils import generate_recipe
 from recipe.models import Recipe  # Import Recipe model
 # from recipe.models import ForumPost  # Remove or comment out this line
 # from recipe.models import Comment  # Remove or comment out this line
+import re
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 def custom_login(request):
@@ -65,11 +68,42 @@ def custom_signup(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
+        # Enhanced validation
+        errors = []
+        
+        # Validate name
+        if not name or len(name.strip()) < 2:
+            errors.append("Name must be at least 2 characters long")
+            
+        # Validate email
+        if not email:
+            errors.append("Email is required")
+        elif not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            errors.append("Please enter a valid email address")
+
         # Check if user already exists
         if User.objects.filter(email=email).exists():
+            errors.append("User with this email already exists")
+
+        # Enhanced password validation
+        if not password:
+            errors.append("Password is required")
+        else:
+            # Check password strength
+            password_errors = validate_password_strength(password, email, name)
+            errors.extend(password_errors)
+            
+            # Django's built-in password validation
+            try:
+                validate_password(password)
+            except ValidationError as e:
+                errors.extend(e.messages)
+
+        if errors:
+            error_message = "; ".join(errors)
             if request.content_type == 'application/json':
-                return JsonResponse({"error": "User with this email already exists"}, status=400)
-            return render(request, "signup.html", {"error": "User with this email already exists"})
+                return JsonResponse({"error": error_message}, status=400)
+            return render(request, "signup.html", {"error": error_message})
 
         try:
             # Create new user
@@ -77,7 +111,7 @@ def custom_signup(request):
                 username=email,  # Use email as username
                 email=email,
                 password=password,
-                first_name=name
+                first_name=name.strip()
             )
             
             # Authenticate and login
@@ -94,6 +128,52 @@ def custom_signup(request):
             return render(request, "signup.html", {"error": "Failed to create account"})
     
     return render(request, "signup.html")
+
+def validate_password_strength(password, email=None, name=None):
+    """Custom password strength validation"""
+    errors = []
+    
+    # Length check
+    if len(password) < 8:
+        errors.append("Password must be at least 8 characters long")
+    
+    # Character type checks
+    if not re.search(r'[a-z]', password):
+        errors.append("Password must contain at least one lowercase letter")
+    
+    if not re.search(r'[A-Z]', password):
+        errors.append("Password must contain at least one uppercase letter")
+    
+    if not re.search(r'\d', password):
+        errors.append("Password must contain at least one number")
+    
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        errors.append("Password must contain at least one special character")
+    
+    # Common password check
+    common_passwords = [
+        'password', '123456', 'password123', 'admin', 'qwerty', 
+        'letmein', '123456789', 'welcome', 'monkey', 'dragon'
+    ]
+    if password.lower() in common_passwords:
+        errors.append("This password is too common. Please choose a stronger password")
+    
+    # Personal information check
+    if email and email.split('@')[0].lower() in password.lower():
+        errors.append("Password should not contain your email address")
+    
+    if name and name.lower() in password.lower():
+        errors.append("Password should not contain your name")
+    
+    # Sequential characters check
+    if re.search(r'(012|123|234|345|456|567|678|789|890|abc|bcd|cde|def)', password.lower()):
+        errors.append("Password should not contain sequential characters")
+    
+    # Repeated characters check
+    if re.search(r'(.)\1{2,}', password):
+        errors.append("Password should not contain repeated characters")
+    
+    return errors
 
 
 # Home view (redirects to recipe_ai if authenticated)
@@ -116,7 +196,6 @@ def home(request):
 @login_required
 def recipe_ai(request):
     return render(request, "recipe_ai.html")
-
 
 # Ingredient Search View
 @method_decorator(ensure_csrf_cookie, name='dispatch')
