@@ -49,7 +49,10 @@
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/notification.js' %}"></script>
+    <!-- Page-specific JS -->
     {% block extra_js %}{% endblock %}
+
+    <!-- Notification JS -->
+    <script src="{% static 'js/notification.js' %}"></script>
   </body>
 </html>

@@ -57,6 +57,80 @@
   transform: scale(1.1);
 }
 
+/* Notification Button Styles */
+.notification-btn {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff4b4b;
+  color: white;
+  font-size: 0.7rem;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  animation: pulse 2s infinite;
+}
+
+/* Notification Container and Dropdown */
+.notification-container {
+  position: relative;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: -100px;
+  width: 350px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-light);
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.notification-dropdown.show {
+  display: block;
+  animation: dropdown-fade 0.3s ease;
+}
+
+/* Animation keyframes */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes dropdown-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Professional Notification Badge */
 .notification-count {
   position: absolute;
@@ -86,44 +160,6 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-/* Enhanced Professional Dropdown */
-.notification-dropdown {
-  position: absolute;
-  top: 55px;
-  right: -120px;
-  width: 380px;
-  max-height: 450px;
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border-light);
-  display: none;
-  z-index: 1000;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-  transform: translateY(-10px);
-  opacity: 0;
-  transition: var(--transition);
-}
-
-.notification-dropdown.show {
-  display: block;
-  transform: translateY(0);
-  opacity: 1;
-  animation: dropdownSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes dropdownSlideIn {
-  from {
-    transform: translateY(-20px) scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
   }
 }
 
@@ -254,143 +290,67 @@
   }
 }
 
-/* Professional Notification Icons */
+/* Notification List Styles */
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 15px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: background-color 0.2s;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item.unread {
+  background-color: #f0f9ff;
+}
+
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+}
+
 .notification-icon {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 15px;
   flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
 }
 
-.notification-icon::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.notification-item.unread .notification-icon {
+  background-color: #10b981;
+  color: white;
 }
 
-.notification-item:hover .notification-icon::before {
-  opacity: 1;
-}
-
-.notification-icon i {
-  font-size: 1.2rem;
-  z-index: 1;
-}
-
-/* Icon Type Styles */
-.notification-icon.like {
-  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
-  border: 2px solid #fee2e2;
-}
-
-.notification-icon.like i {
-  color: #dc2626;
-}
-
-.notification-icon.expiry {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 2px solid #fef9c3;
-}
-
-.notification-icon.expiry i {
-  color: #d97706;
-}
-
-.notification-icon.admin {
-  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
-  border: 2px solid #ede9fe;
-}
-
-.notification-icon.admin i {
-  color: #7c3aed;
-}
-
-.notification-icon.default {
-  background: linear-gradient(135deg, var(--bg-light) 0%, #e5e7eb 100%);
-  border: 2px solid var(--border-light);
-}
-
-.notification-icon.default i {
-  color: var(--text-medium);
-}
-
-/* Enhanced Notification Content */
-.notification-content {
+.notification-text {
   flex: 1;
-  min-width: 0;
 }
 
-.notification-content p {
-  margin: 0 0 0.375rem 0;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  color: var(--text-dark);
-  font-weight: 500;
-  word-wrap: break-word;
+.notification-text p {
+  margin: 0 0 5px 0;
 }
 
-.notification-content small {
-  color: var(--text-medium);
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.notification-content small i {
-  font-size: 0.7rem;
-}
-
-/* Action Buttons */
 .notification-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.notification-action-btn {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-light);
-  background: var(--white);
-  color: var(--text-medium);
-  text-decoration: none;
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.notification-action-btn:hover {
-  background: var(--primary-green);
-  color: var(--white);
-  border-color: var(--primary-green);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.notification-action-btn.primary {
-  background: var(--primary-green);
-  color: var(--white);
-  border-color: var(--primary-green);
-}
-
-.notification-action-btn.primary:hover {
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
+  flex-direction: column;
+  gap: 5px;
+  margin-left: 10px;
 }
 
 /* Empty State */
