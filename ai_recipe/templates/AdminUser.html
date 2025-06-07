@@ -163,6 +163,16 @@
     color: #1f2937;
   }
   
+  .action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .action-button:disabled:hover {
+    background: transparent;
+    color: #6b7280;
+  }
+  
   .action-button.view:hover {
     color: #3b82f6;
   }
@@ -171,7 +181,7 @@
     color: #f59e0b;
   }
   
-  .action-button.delete:hover {
+  .action-button.delete:hover:not(:disabled) {
     color: #ef4444;
   }
   
@@ -195,6 +205,115 @@
   .user-email {
     font-size: 0.875rem;
     color: #6b7280;
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    color: #1f2937;
+  }
+  
+  .close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .warning-text {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  
+  .modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+  
+  .btn-cancel {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .btn-danger {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #ef4444;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  /* Message Styles */
+  .message-container {
+    margin-bottom: 1rem;
+  }
+  
+  .alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+  
+  .alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+  
+  .alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
   }
 </style>
 {% endblock %}
@@ -237,7 +356,6 @@
       </div>
     </header>
 
-
     <!-- User Management Section -->
     <div class="content-card">
       <div class="card-header">
@@ -260,13 +378,15 @@
         </div>
         
         <div class="toolbar-actions">
-          <select class="filter-dropdown" id="roleFilter">
+          <label id="roleFilterLabel" for="roleFilter" class="visually-hidden" style="position:absolute;left:-9999px;">Filter by role</label>
+          <select class="filter-dropdown" id="roleFilter" aria-labelledby="roleFilterLabel">
             <option value="all">All Roles</option>
             <option value="admin">Admin</option>
             <option value="user">Regular User</option>
           </select>
           
-          <select class="filter-dropdown" id="statusFilter">
+          <label id="statusFilterLabel" for="statusFilter" class="visually-hidden" style="position:absolute;left:-9999px;">Filter by status</label>
+          <select class="filter-dropdown" id="statusFilter" aria-labelledby="statusFilterLabel">
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -345,15 +465,16 @@
               </td>
               <td class="text-right">
                 <div class="action-buttons">
-                  <button class="action-button view" title="View Details" onclick="viewUser('{{ user.id }}')">
+                  <button class="action-button view" title="View Details" data-user-id="{{ user.id }}">
                     <i class="fas fa-eye"></i>
                   </button>
-                  <button class="action-button edit" title="Edit User" onclick="editUser('{{ user.id }}')">
+                  <button class="action-button edit" title="Edit User" data-user-id="{{ user.id }}">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button class="action-button delete" title="Delete User" 
-                    {% if user.is_superuser or user == request.user %}disabled{% endif %}
-                    onclick="confirmDeleteUser('{{ user.id }}', '{{ user.username|escapejs }}')">
+                    data-user-id="{{ user.id }}" 
+                    data-username="{{ user.username }}"
+                    {% if user.is_superuser or user == request.user %}disabled{% endif %}>
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </div>
@@ -422,6 +543,7 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
   // Get CSRF token
   function getCookie(name) {
     let cookieValue = null;
@@ -440,17 +562,9 @@
   const csrftoken = getCookie('csrftoken');
   
   // Search and filter functionality
-  document.getElementById('userSearchInput').addEventListener('input', function() {
-    filterTable();
-  });
-  
-  document.getElementById('roleFilter').addEventListener('change', function() {
-    filterTable();
-  });
-  
-  document.getElementById('statusFilter').addEventListener('change', function() {
-    filterTable();
-  });
+  document.getElementById('userSearchInput').addEventListener('input', filterTable);
+  document.getElementById('roleFilter').addEventListener('change', filterTable);
+  document.getElementById('statusFilter').addEventListener('change', filterTable);
   
   function filterTable() {
     const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
@@ -460,13 +574,17 @@
     const rows = document.querySelectorAll('#users-table-body tr');
     
     rows.forEach(row => {
-      if (row.id === '') return; // Skip header or template rows
+      if (!row.id.startsWith('user-row-')) return; // Skip non-user rows
       
-      const userName = row.querySelector('.user-name').textContent.toLowerCase();
-      const userEmail = row.querySelector('.user-email').textContent.toLowerCase();
+      const userNameElement = row.querySelector('.user-name');
+      const userEmailElement = row.querySelector('.user-email');
       const roleElement = row.querySelector('.role-badge');
       const statusElement = row.querySelector('.status-badge');
       
+      if (!userNameElement || !userEmailElement) return;
+      
+      const userName = userNameElement.textContent.toLowerCase();
+      const userEmail = userEmailElement.textContent.toLowerCase();
       const role = roleElement ? roleElement.textContent.trim().toLowerCase() : '';
       const status = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
       
@@ -478,15 +596,31 @@
     });
   }
   
-  // User Actions
+  // User Actions - Event Delegation
+  document.addEventListener('click', function(e) {
+    const target = e.target.closest('.action-button');
+    if (!target) return;
+    
+    const userId = target.getAttribute('data-user-id');
+    if (!userId) return;
+    
+    if (target.classList.contains('view')) {
+      viewUser(userId);
+    } else if (target.classList.contains('edit')) {
+      editUser(userId);
+    } else if (target.classList.contains('delete') && !target.disabled) {
+      const username = target.getAttribute('data-username');
+      confirmDeleteUser(userId, username);
+    }
+  });
+  
   function viewUser(userId) {
-    // Implement view user functionality or redirect to user detail page
     console.log(`View user ${userId}`);
     showMessage('info', 'View user functionality will be implemented soon.');
   }
   
   function editUser(userId) {
-    // Redirect to edit user page or show edit modal
+    // Adjust this URL to match your actual edit URL pattern
     window.location.href = `/admin-panel/admin/users/${userId}/edit/`;
   }
   
@@ -499,70 +633,144 @@
     usernameSpan.textContent = username;
     modal.style.display = 'flex';
     
+    // Remove any existing event listeners
+    confirmButton.replaceWith(confirmButton.cloneNode(true));
+    const newConfirmButton = document.getElementById('confirmDelete');
+    
     // Set up delete confirmation button
-    confirmButton.onclick = function() {
+    newConfirmButton.addEventListener('click', function() {
       deleteUser(userId, username);
       modal.style.display = 'none';
-    };
-    
-    // Close modal on cancel
-    document.getElementById('cancelDelete').onclick = function() {
-      modal.style.display = 'none';
-    };
-    
-    // Close modal on X button click
-    document.querySelector('.close-modal').onclick = function() {
-      modal.style.display = 'none';
-    };
-    
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    };
+    });
   }
   
+  // Modal close handlers
+  document.getElementById('cancelDelete').addEventListener('click', function() {
+    document.getElementById('deleteModal').style.display = 'none';
+  });
+  
+  document.querySelector('.close-modal').addEventListener('click', function() {
+    document.getElementById('deleteModal').style.display = 'none';
+  });
+  
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+  
   function deleteUser(userId, username) {
-    fetch(`/admin-panel/admin/users/${userId}/delete/`, {
+    console.log(`=== DELETE USER DEBUG ===`);
+    console.log(`User ID: ${userId}`);
+    console.log(`Username: ${username}`);
+    console.log(`CSRF Token: ${csrftoken}`);
+    
+    // Check if required data is present
+    if (!userId) {
+      console.error('ERROR: No user ID provided');
+      showMessage('error', 'Error: No user ID provided');
+      return;
+    }
+    
+    if (!csrftoken) {
+      console.error('ERROR: No CSRF token found');
+      showMessage('error', 'Error: No CSRF token found');
+      return;
+    }
+    
+    const deleteUrl = `/admin-panel/admin/users/${userId}/delete/`;
+    console.log(`Delete URL: ${deleteUrl}`);
+    
+    // Show loading state
+    showMessage('info', 'Deleting user...');
+    
+    // Create the request with detailed logging
+    const requestOptions = {
       method: 'POST',
       headers: {
         'X-CSRFToken': csrftoken,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
       },
       credentials: 'same-origin'
-    })
+    };
+    
+    console.log('Request options:', requestOptions);
+    
+    fetch(deleteUrl, requestOptions)
     .then(response => {
-      if (!response.ok) {
-        return response.json().then(data => {
-          throw new Error(data.error || 'An error occurred while deleting the user');
-        });
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        // Remove user row from the table
-        const userRow = document.getElementById(`user-row-${userId}`);
-        if (userRow) {
-          userRow.remove();
+      console.log(`Response received:`);
+      console.log(`Status: ${response.status}`);
+      console.log(`Status Text: ${response.statusText}`);
+      console.log(`Headers:`, response.headers);
+      
+      // Log response as text first to see what we're getting
+      return response.text().then(text => {
+        console.log(`Raw response text:`, text);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText} - ${text}`);
         }
         
-        // Update user count in the stats card
+        // Try to parse as JSON
+        try {
+          const data = JSON.parse(text);
+          console.log('Parsed JSON data:', data);
+          return data;
+        } catch (e) {
+          console.error('Failed to parse JSON:', e);
+          throw new Error(`Invalid JSON response: ${text}`);
+        }
+      });
+    })
+    .then(data => {
+      console.log('Processing delete response:', data);
+      
+      if (data && data.success) {
+        console.log('Delete successful, removing user row...');
+        
+        // Remove user row from the table
+        const userRow = document.getElementById(`user-row-${userId}`);
+        console.log('User row element:', userRow);
+        
+        if (userRow) {
+          userRow.remove();
+          console.log('User row removed from DOM');
+        } else {
+          console.warn(`Could not find user row with ID: user-row-${userId}`);
+        }
+        
+        // Update user count in the stats card if it exists
         const userCountElement = document.querySelector('.stats-value');
         if (userCountElement) {
           const currentCount = parseInt(userCountElement.textContent);
-          userCountElement.textContent = currentCount - 1;
+          console.log(`Current user count: ${currentCount}`);
+          if (!isNaN(currentCount)) {
+            userCountElement.textContent = currentCount - 1;
+            console.log(`Updated user count to: ${currentCount - 1}`);
+          }
         }
         
         showMessage('success', `User "${username}" has been deleted successfully.`);
       } else {
-        throw new Error(data.error || 'Failed to delete user');
+        const errorMsg = (data && data.error) ? data.error : 'Unknown error occurred';
+        console.error('Delete failed:', errorMsg);
+        throw new Error(errorMsg);
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      showMessage('error', error.message);
+      console.error('=== DELETE ERROR ===');
+      console.error('Error type:', error.constructor.name);
+      console.error('Error message:', error.message);
+      console.error('Full error:', error);
+      console.error('Stack trace:', error.stack);
+      
+      showMessage('error', `Error deleting user: ${error.message}`);
+    })
+    .finally(() => {
+      console.log('=== DELETE USER DEBUG END ===');
     });
   }
   
@@ -578,7 +786,7 @@
     if (type === 'success') icon = 'check-circle';
     if (type === 'error' || type === 'danger') icon = 'exclamation-triangle';
     
-    messageDiv.innerHTML = `<i class="fas fa-${icon} me-2"></i>${message}`;
+    messageDiv.innerHTML = `<i class="fas fa-${icon}" style="margin-right: 0.5rem;"></i>${message}`;
     container.appendChild(messageDiv);
     container.style.display = 'block';
     
@@ -589,5 +797,6 @@
       }, 5000);
     }
   }
+});
 </script>
 {% endblock %}
