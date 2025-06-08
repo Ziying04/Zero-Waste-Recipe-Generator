@@ -25,7 +25,7 @@
     <button  id="use-inventory" class="tab" data-tab="available_ingredient">By available ingredient</button>
   </div>
 
-  <!--form2 from ingredient inventoryuuuuuuuu-->
+  <!--form2 from ingredient inventory-->
   <div class="display-available-ingredient hidden" id="available-ingredient">
   <div class="ingredient-container">
     <label for="user-input" class="form-label">
@@ -35,26 +35,29 @@
 
     <form action="{% url 'recipe_ai' %}" method="POST" id="ingredient-form">
       {% csrf_token %}
-      <ul class="ingredient-list">
+      <ul class="ingredient-list ingredient-grid">
         {% for ingredient in ingredients %}
         <li>
           <label class="ingredient-card" data-status="{{ ingredient.status|lower }}">
             <input type="checkbox" class="select-checkbox" name="selected_ingredients" value="{{ ingredient.id }}" onchange="toggleSelect(this)">
             <div class="ingredient-content">
-              <h3>🥬 {{ ingredient.name }}</h3>
-              <p>Quantity: {{ ingredient.quantity }}</p>
-              <p>Status: 
+              <div class="ingredient-header">
+                <span class="ingredient-emoji">🥬</span>
+                <h3>{{ ingredient.name }}</h3>
                 <span class="badge {{ ingredient.status|slugify }}">{{ ingredient.status }}</span>
-              </p>
-              <p>Expires: {{ ingredient.expiry_date|date:"M d, Y" }}</p>
+              </div>
+              <div class="ingredient-details">
+                <p>Quantity: <b>{{ ingredient.quantity }}</b></p>
+                <p>Expires: <span>{{ ingredient.expiry_date|date:"M d, Y" }}</span></p>
+              </div>
             </div>
           </label>
         </li>
         {% empty %}
-        <p>No ingredients in your inventory.</p>
-        <a href="{% url 'ingredient_tracker:expiring_tracker' %}" class="add-ingredient">
-          Add ingredients to your inventory
-        </a>
+          <p>No ingredients in your inventory.</p>
+          <a href="{% url 'ingredient_tracker:expiring_tracker' %}" class="add-ingredient">
+            Add ingredients to your inventory
+          </a>
         {% endfor %}
       </ul>
     </form>
