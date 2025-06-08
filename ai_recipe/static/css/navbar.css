@@ -782,3 +782,23 @@
   color: var(--primary-green) !important; /* Force green color in dark theme */
   border-color: var(--primary-green) !important;
 }
+
+[data-theme="light"] {
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-light: #9ca3af;
+  --bg-white: #ffffff;
+  --bg-gray-50: #f9fafb;
+  --bg-gray-100: #f3f4f6;
+  --border-color: #e5e7eb;
+}
+
+[data-theme="light"] .profile-avatar {
+  color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+}
+
+[data-theme="light"] .logo-icon {
+  color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+}

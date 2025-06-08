@@ -124,36 +124,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Theme toggle
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = themeToggle?.querySelector('i');
+    // // Theme toggle
+    // const themeToggle = document.getElementById('themeToggle');
+    // const themeIcon = themeToggle?.querySelector('i');
     
-    if (themeToggle) {
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // if (themeToggle) {
+    //     // Check for saved theme preference
+    //     const savedTheme = localStorage.getItem('theme');
+    //     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
-        const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', currentTheme);
+    //     const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    //     document.documentElement.setAttribute('data-theme', currentTheme);
         
-        updateThemeIcon(currentTheme);
+    //     updateThemeIcon(currentTheme);
         
-        themeToggle.addEventListener('click', function() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    //     themeToggle.addEventListener('click', function() {
+    //         const currentTheme = document.documentElement.getAttribute('data-theme');
+    //         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+    //         document.documentElement.setAttribute('data-theme', newTheme);
+    //         localStorage.setItem('theme', newTheme);
             
-            updateThemeIcon(newTheme);
-        });
+    //         updateThemeIcon(newTheme);
+    //     });
         
-        function updateThemeIcon(theme) {
-            if (themeIcon) {
-                themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-            }
-        }
-    }
+    //     function updateThemeIcon(theme) {
+    //         if (themeIcon) {
+    //             themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    //         }
+    //     }
+    // }
 
     // Search functionality
     const searchForm = document.querySelector('.search-box');
@@ -230,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Enhanced Profile Section for Admin
-    const profileSection = document.querySelector('.profile-section');
     const adminItems = document.querySelectorAll('.admin-item');
     
     // Check if user is admin and add admin class
@@ -351,3 +350,38 @@ function toggleNotificationDropdown() {
     document.getElementById("notificationDropdown").classList.toggle("show");
 }
 
+
+function setupThemeToggle(){
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle?.querySelector('i');
+    
+    if (themeToggle) {
+         console.log('Theme toggle initialized');
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        updateThemeIcon(currentTheme);
+        
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            updateThemeIcon(newTheme);
+        });
+        
+        function updateThemeIcon(theme) {
+            if (themeIcon) {
+                themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', setupThemeToggle);
