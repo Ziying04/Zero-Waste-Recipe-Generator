@@ -17,6 +17,8 @@ from .views import (
     update_recipe,
     edit_recipe_view,
     create_recipe_view,
+    share_recipe,
+    parse_recipe,
 )
 
 urlpatterns = [
@@ -37,5 +39,7 @@ urlpatterns = [
     path("diary/", diary_view, name="diary"),
     path("sharing/", sharing_view, name="sharing"),
     path("create-recipe/", create_recipe_view, name="create_recipe"),
+    path("share-recipe/", share_recipe, name="share_recipe"),
+    path("parse-recipe/",parse_recipe, name="parse_recipe"),
  
 ]

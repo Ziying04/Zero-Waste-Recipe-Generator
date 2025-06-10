@@ -92,3 +92,15 @@ function toggleSelect(checkbox) {
       }
     });
   });
+
+  function submitRecipe() {
+  const recipeText = document.getElementById('recipe-output').value;
+  if(recipeText.trim() === "") {
+    alert("Please generate a recipe before submitting.");
+    return;
+  }
+  const hiddenInput = document.getElementById('hidden-recipe-input');
+  hiddenInput.value = recipeText;
+
+  document.getElementById('share-form').submit();
+}

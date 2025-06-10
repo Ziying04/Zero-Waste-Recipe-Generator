@@ -90,15 +90,22 @@
       <h3 class="yourRecipe"><i class="fas fa-book-open"></i> Your Recipe</h3>
         <div class="recipe-container">
           <textarea id="recipe-output" readonly>
-    {% if recipe %}{{ recipe }}{% endif %}</textarea
-          >
+             {% if recipe %}{{ recipe }}{% endif %}
+
+          </textarea>
           <button class="btn copy-btn" onclick="copyRecipe()">
             <i class="fas fa-copy"></i> Copy
           </button>
-          <button class="btn copy-btn" onclick="copyRecipe()">
+          <button class="btn copy-btn" onclick="submitRecipe()">
             <i class="fas fa-copy"></i> Share Recipe
           </button>
         </div>
+
+        <!-- Hidden form to post recipe to parse_ai_recipe view -->
+        <form id="share-form" method="POST" action="{% url 'parse_recipe' %}">
+          {% csrf_token %}
+          <input type="hidden" name="raw_recipe" id="hidden-recipe-input" />
+        </form>
     </div>
   </div>
 {% endblock %} {% block extra_js %}

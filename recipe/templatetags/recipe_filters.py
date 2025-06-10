@@ -69,3 +69,4 @@ def format_ingredients(value):
         formatted_ingredients.append(clean_line)
     
     return formatted_ingredients
+

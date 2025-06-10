@@ -7,7 +7,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import json
-from .utils import generate_recipe
+from .utils import generate_recipe, parse_ai_recipe
 from .models import Recipe, UserProfile, RecipeLike
 from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -17,6 +17,8 @@ from community.models import DonationFoodPost, ClaimedFood  # Updated import
 from ingredient_tracker.utils import get_user_ingredients
 from ingredient_tracker.models import Ingredient  # adjust import as needed
 from django.utils import timezone
+from django.http import HttpResponseBadRequest
+
 
 logger = logging.getLogger(__name__)
 @ensure_csrf_cookie
@@ -46,6 +48,10 @@ def recipe_ai(request):
 
         if isinstance(recipe_response, dict) and 'error' in recipe_response:
             return HttpResponse(f"Error: {recipe_response['error']}", status=500)
+        
+        # Parse the AI recipe and pass to template
+        #parsed_recipe = parse_ai_recipe(recipe_response)
+        #return render(request, "recipe_result.html", {"recipe": parsed_recipe})
 
         # Return recipe content
         return HttpResponse(recipe_response, content_type='text/plain')
@@ -53,6 +59,20 @@ def recipe_ai(request):
     # GET request — show ingredient inventory
     ingredients = get_user_ingredients(request.user)
     return render(request, 'recipe_ai.html', {'ingredients': ingredients})
+
+
+@csrf_exempt
+def parse_recipe(request):
+    if request.method == 'POST':
+        raw_text = request.POST.get('raw_recipe')
+        recipe = parse_ai_recipe(raw_text)
+
+        return render(request, 'recipe_result.html', {
+            'recipe': recipe
+        })
+    
+    return HttpResponseBadRequest("Invalid method")
+
 
 @csrf_exempt
 def recipe_generator(request):
@@ -296,6 +316,62 @@ def toggle_share_recipe(request, recipe_id):
     except Exception as e:
         logger.error(f"Error in toggle_share_recipe: {e}")
         return JsonResponse({'error': 'An error occurred'}, status=500)
+    
+
+@login_required
+def share_recipe(request):
+    if request.method == "POST":
+        try:
+            name = request.POST.get('name')
+            cooking_time = request.POST.get('cooking_time')
+
+            ingredients = request.POST.get('ingredients')
+            if isinstance(ingredients, list):
+                 ingredients = "<br>".join(ingredients)
+            elif isinstance(ingredients, str):
+                 ingredients = "<br>".join(ingredients.splitlines())
+
+            steps = request.POST.get('steps')
+            if isinstance(steps, list):
+                 ingredients = "<br>".join(ingredients)
+            elif isinstance(steps, str):
+                 ingredients = "<br>".join(ingredients.splitlines())
+
+            image_url = request.POST.get('image_url')
+
+            # If ingredients is a list, join it into a string
+            if isinstance(ingredients, list):
+                ingredients = " ".join(ingredients)
+            
+            # Validate required fields
+            if not name or not cooking_time or not ingredients or not steps:
+                messages.error(request, "Missing required recipe data.")
+                return redirect('recipe_ai')
+
+            
+            # Create the recipe
+            recipe = Recipe.objects.create(
+                name=name,
+                cooking_time=int(cooking_time),
+                ingredients=ingredients,
+                steps=steps,
+                image_url=image_url if image_url else None,
+                user=request.user
+            )
+            
+            # Automatically save to the user's collection
+            recipe.saved_by.add(request.user)
+            
+            messages.success(request, f'Recipe "{name}" created successfully!')
+            return redirect('collection')
+            
+        except Exception as e:
+            logger.error(f"Error creating recipe: {e}")
+            messages.error(request, f"An error occurred while saving the recipe.")
+            return redirect('recipe_ai')
+    
+    # GET request - show the recipe post display
+    return redirect('recipe_ai')
 
 @login_required
 def create_recipe_view(request):
