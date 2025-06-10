@@ -467,8 +467,13 @@
   }
 }
 
+
+.notification-item:hover {
+    background: #cde1ec;
+  }
+
 /* Dark mode support (optional) */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   .notification-dropdown {
     background: #1f2937;
     border-color: #374151;
@@ -489,4 +494,4 @@
   .notification-content small {
     color: #9ca3af;
   }
-}
+} */

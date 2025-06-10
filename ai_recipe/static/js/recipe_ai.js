@@ -47,7 +47,7 @@ document.getElementById("generate-btn").addEventListener("click", function () {
     const copyBtn = document.querySelector(".copy-btn");
     copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
     setTimeout(() => {
-      copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Recipe';
+      copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
     }, 2000);
   }
 

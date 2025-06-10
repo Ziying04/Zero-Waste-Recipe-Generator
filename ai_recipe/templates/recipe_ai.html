@@ -87,17 +87,20 @@
 
   <!--output section-->
   <div id="output-section" class="hidden">
-    <h3 class="yourRecipe"><i class="fas fa-book-open"></i> Your Recipe</h3>
-      <div class="recipe-container">
-        <textarea id="recipe-output" readonly>
-  {% if recipe %}{{ recipe }}{% endif %}</textarea
-        >
-        <button class="btn copy-btn" onclick="copyRecipe()">
-          <i class="fas fa-copy"></i> Copy
-        </button>
-      </div>
+      <h3 class="yourRecipe"><i class="fas fa-book-open"></i> Your Recipe</h3>
+        <div class="recipe-container">
+          <textarea id="recipe-output" readonly>
+    {% if recipe %}{{ recipe }}{% endif %}</textarea
+          >
+          <button class="btn copy-btn" onclick="copyRecipe()">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+          <button class="btn copy-btn" onclick="copyRecipe()">
+            <i class="fas fa-copy"></i> Share Recipe
+          </button>
+        </div>
+    </div>
   </div>
-</div>
 {% endblock %} {% block extra_js %}
 <script src="{% static 'js/recipe_ai.js' %}"></script>
 
