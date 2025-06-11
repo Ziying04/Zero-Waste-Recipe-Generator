@@ -47,7 +47,7 @@ document.getElementById("generate-btn").addEventListener("click", function () {
     const copyBtn = document.querySelector(".copy-btn");
     copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
     setTimeout(() => {
-      copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Recipe';
+      copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
     }, 2000);
   }
 
@@ -92,3 +92,15 @@ function toggleSelect(checkbox) {
       }
     });
   });
+
+  function submitRecipe() {
+  const recipeText = document.getElementById('recipe-output').value;
+  if(recipeText.trim() === "") {
+    alert("Please generate a recipe before submitting.");
+    return;
+  }
+  const hiddenInput = document.getElementById('hidden-recipe-input');
+  hiddenInput.value = recipeText;
+
+  document.getElementById('share-form').submit();
+}

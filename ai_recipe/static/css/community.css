@@ -42,7 +42,6 @@ body {
   color: white;
   padding: 4rem 0;
   margin-bottom: 3rem;
-  border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
@@ -75,6 +74,7 @@ body {
   margin-bottom: 1rem;
   letter-spacing: -0.025em;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
 }
 
 .hero-subtitle {

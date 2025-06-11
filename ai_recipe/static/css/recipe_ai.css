@@ -95,18 +95,29 @@ textarea.form-control {
 }
 
 button.btn-success {
-  margin-top: 10px;
-  background-color: #16a34a;
+  background: linear-gradient(90deg, #16a34a 0%, #43e97b 100%);
+  color: #fff;
   border: none;
-  color: white;
-  padding: 10px 18px;
-  font-size: 1em;
   border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 1.1em;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.10);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  margin-left: 12px;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   cursor: pointer;
 }
 
-button.btn-success:hover {
-  background-color: #218838;
+button.btn-success:hover, button.btn-success:focus {
+   background: linear-gradient(90deg, #43e97b 0%, #16a34a 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.18);
+  transform: translateY(-2px) scale(1.03);
+  text-decoration: none;
 }
 
 button.btn-success:disabled {
@@ -145,6 +156,21 @@ h3.yourRecipe {
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.share-btn {
+  margin-top: 10px;
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.share-btn:hover {
+  background-color: #43e97b;
+  color: #fff;
 }
 
 .tabs {
