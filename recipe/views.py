@@ -327,7 +327,7 @@ def share_recipe(request):
 
             ingredients = request.POST.get('ingredients')
             if isinstance(ingredients, list):
-                 ingredients = "<br>".join(ingredients)
+                 ingredients = ingredients
             elif isinstance(ingredients, str):
                  ingredients = "<br>".join(ingredients.splitlines())
 

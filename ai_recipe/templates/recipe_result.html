@@ -49,7 +49,7 @@
         <div class="recipe-section">
         <h3>Ingredients:</h3>
         <ul class="ingredients-list">
-            {% for ingredient in recipe.ingredients %}
+            {% for ingredient in recipe.ingredients%}
             <li class="ingredient-item">
             <input type="checkbox" id="ingredient-{{ forloop.counter }}">
             <label for="ingredient-{{ forloop.counter }}">{{ ingredient }}</label>
