@@ -41,12 +41,16 @@ def format_steps(value):
 
     formatted_steps = []
     step_number = 1
+    skip_rest = False
     for line in lines:
-        # Skip if the line is any URL (image or not)
-        if re.match(r'^\-?\s*(<)?https?://', line):
-            continue
-        # Skip if the line is "Sample image urls:" (case-insensitive, ignore spaces)
+        # If we hit "Sample image urls:", skip this and all following lines
         if re.match(r'^\s*sample\s+image\s+urls\s*:?$', line, re.IGNORECASE):
+            skip_rest = True
+            continue
+        if skip_rest:
+            continue
+        # Skip if the line is any URL (image or not)
+        if re.search(r'https?://', line):
             continue
         # Check if the line already starts with a number (like "1. " or "1) " or similar)
         if not re.match(r'^\d+[\.\)\-]?\s+', line):
