@@ -1,101 +1,124 @@
-# Zero-Waste Recipe Generator 🥗♻️
+# 🥗 Zero-Waste Recipe Generator ♻️
 
-A Django-based platform that leverages AI to generate recipes from ingredients you already have, helps track expiring food items, and enables community food sharing to reduce food waste.
+A Django-based web application that helps reduce food waste by allowing users to:
+- Generate AI-powered recipes based on available ingredients
+- Track expiring food items
+- Share surplus food with the community
+
+---
 
 ## 🌟 Features
 
-- **AI Recipe Generator**: Get creative recipes based on ingredients you have on hand
-- **Expiration Tracker**: Track food items in your pantry and receive notifications before they expire
-- **Community Food Sharing**: Share excess food with your local community
-- **User Profiles**: Save favorite recipes, track your waste reduction impact
-- **Sustainable Tips**: Learn tips and tricks for reducing food waste
+- **AI Recipe Generator** – Uses OpenAI to generate custom recipes based on ingredients you input  
+- **Ingredient Expiry Tracker** – Allows users to log food items and get expiry notifications  
+- **Community Food Sharing** – Share and claim surplus food items  
+- **User Dashboard** – View liked, saved, shared recipes and donation/claim history  
+- **Notification System** – Alerts users about ingredient expiry and system messages  
 
-## 🔧 Technologies
+---
 
-- **Backend**: Django, Python
-- **Frontend**: HTML, CSS, JavaScript
-- **Database**: PostgreSQL
-- **AI Integration**: OpenAI API for recipe generation
-- **Authentication**: Django Auth
+## 🛠️ Technologies Used
 
-## 📋 Prerequisites
+- **Backend:** Django (Python)
+- **Frontend:** HTML, CSS, JavaScript (Django templates)
+- **Database:** SQLite (via `db.sqlite3`)
+- **AI Integration:** OpenAI API
+- **Auth:** Django Authentication System
 
-- Python 3.8+
-- Django 3.2+
-- PostgreSQL
-- OpenAI API key
+---
 
-## 🚀 Installation
+## 🚀 Installation & Run Instructions
 
-1. Clone the repository:
-   ```
-   git clone <copy code link>
-   cd Zero-Waste-Recipe-Generator
-   ```
+### Prerequisites
 
-2. Create and activate a virtual environment:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+- Python 3.8+ installed
+- pip installed
 
-3. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+---
 
-4. Set up environment variables:
-   - Create a `.env` file in the project root
-   - Add your OpenAI API key and database configuration:
-     ```
-     OPENAI_API_KEY=your_api_key
-     DB_NAME=your_db_name
-     DB_USER=your_db_user
-     DB_PASSWORD=your_db_password
-     DB_HOST=localhost
-     ```
+### 🔧 1. Unzip the Project
+Unzip the folder you downloaded or received (e.g., `Zero-Waste-Recipe-Generator`).
 
-5. Run migrations:
-   ```
-   python manage.py migrate
-   ```
+---
 
-6. Start the development server:
-   ```
-   python manage.py runserver
-   ```
+### ⚙️ 2. Create & Activate a Virtual Environment
 
-## 📱 Usage
+**Windows:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
 
-1. **Register/Login**: Create an account or login to your existing account
-2. **Add Ingredients**: Input ingredients you have in your pantry
-3. **Generate Recipes**: Get AI-generated recipes based on your available ingredients
-4. **Track Expiration**: Add expiration dates to your food items and receive notifications
-5. **Share Food**: List excess food items for community sharing
+**macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-## 💡 How It Works
+---
 
-1. **Input Ingredients**: Enter whatever ingredients you have available
-2. **AI Processing**: Our AI analyzes your ingredients and generates suitable recipes
-3. **Reduce Waste**: Cook with what you have instead of buying more ingredients
-4. **Track & Share**: Keep track of what's expiring soon and share what you can't use
+### 📦 3. Install Required Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-## 🤝 Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### 🗄️ 4. Database Setup
+You do not need to run migrations — db.sqlite3 is already included with preloaded data.
+If needed, you can run:
+```bash
+python manage.py migrate
+```
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+---
 
-## 📜 License
+### ▶️ 5. Start the Server
+```bash
+python manage.py runserver
+```
+Then open your browser and visit:
+http://127.0.0.1:8000/
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
 
-## 🙏 Acknowledgments
+### 💡 Usage Guide
+- Register/Login to access features
+- Add Ingredients with optional expiry dates
+- Generate Recipes using AI based on what you have
+- Share or Save Recipes, or track them in your dashboard
+- Get Notifications when ingredients are expiring soon
+- Share Surplus Food or claim it from others
 
-- OpenAI for providing the API for recipe generation
-- All contributors who have helped build this project
-- The sustainable food community for inspiration
+---
+
+### 🧪 Sample Accounts 
+- Email: hello@gmail.com
+- Password: hello123
+
+---
+
+### 📂 Project Structure
+```javascript
+Zero-Waste-Recipe-Generator/
+├── ai_recipe/
+├── ingredient_tracker/
+├── notification/
+├── recipe/
+├── community/
+├── db.sqlite3
+├── manage.py
+├── requirements.txt
+└── README.md
+
+```
+---
+### 📜 License
+This project is submitted for academic purposes. The Hugging Face API is used under free-tier credits.
+
+---
+
+### 🙏 Acknowledgments
+- Hugging Face AI – for recipe generation
+- Django – for web framework
+- Team members and instructors – for collaboration and guidance
