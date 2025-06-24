@@ -3,61 +3,185 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/claimed_food.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
 <div class="container mx-auto py-12 px-4 max-w-6xl">
+    <!-- Header Section -->
     <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">My Claimed Food</h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Track food items you've claimed and their pickup status.
+        <h1 class="text-4xl font-bold mb-4">My Claimed Food</h1>
+        <p class="text-xl max-w-3xl mx-auto">
+            Track your food claims and coordinate pickups with donors in your community.
         </p>
     </div>
 
-    <div class="space-y-6">
-        {% for claim in claimed_food %}
-        <div class="card flex flex-col md:flex-row overflow-hidden">
-            <div class="p-4 md:p-6 flex-1">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="card-title">{{ claim.food_name }}</h3>
-                        <p class="card-description">{{ claim.category }}</p>
-                    </div>
-                    <span class="badge {% if claim.status == 'Completed' %}bg-gray-200 text-gray-800{% else %}bg-purple-100 text-purple-800{% endif %}">
-                        {{ claim.status }}
-                    </span>
-                </div>
-                <div class="mt-4 space-y-2">
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fa-solid fa-location-pin mr-2"></i>
-                        <span>{{ claim.location }}</span>
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fa-regular fa-clock mr-2"></i>
-                        <span>Quantity: {{ claim.quantity }}</span>
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fa-regular fa-calendar mr-2"></i>
-                        <span>Pickup Date: {{ claim.pickup_date|date:"Y-m-d" }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 p-4 md:p-6 md:w-64 flex flex-col justify-between">
-                <div>
-                    <p class="font-medium text-gray-700">Donor</p>
-                    <p class="font-semibold text-gray-800">{{ claim.donor_name }}</p>
-                </div>
-                <button class="button mt-4">
-                    <i class="fa-regular fa-comment-dots mr-2"></i> Message
-                </button>
-                {% if claim.status != 'Completed' %}
-                <button class="button mt-2 bg-green-600 text-white">
-                    Mark as Completed
-                </button>
-                {% endif %}
-            </div>
+    <!-- Statistics Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-number">{{ pending_claims|default:0 }}</span>
+            <span class="stat-label">Pending Pickups</span>
         </div>
-        {% endfor %}
+        <div class="stat-card">
+            <span class="stat-number">{{ completed_claims|default:0 }}</span>
+            <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ claimed_food|length }}</span>
+            <span class="stat-label">Total Claims</span>
+        </div>
     </div>
+
+    <!-- Main Content -->
+    {% if claimed_food %}
+        <div class="space-y-6">
+            {% for claim in claimed_food %}
+            <div class="card" tabindex="0" data-claim-id="{{ claim.id }}">
+                <!-- Food Image Section -->
+                <div class="food-image-section">
+                    <div class="image-overlay">
+                        <span class="category-tag">{{ claim.food_post.category }}</span>
+                    </div>
+                    {% if claim.food_post.image %}
+                        <img src="{{ claim.food_post.image.url }}" alt="{{ claim.food_post.food_name }}" class="food-image">
+                    {% else %}
+                        <div class="food-image-placeholder">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Main Content Section -->
+                <div class="flex-1 p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="card-title">{{ claim.food_post.food_name }}</h3>
+                            <p class="card-description">{{ claim.food_post.description|truncatewords:15 }}</p>
+                        </div>
+                        <span class="badge {% if claim.status == 'Completed' %}completed{% elif claim.status == 'Pending' %}pending{% else %}claimed{% endif %}">
+                            {{ claim.status|upper }}
+                        </span>
+                    </div>
+
+                    <!-- Food Details (location always visible, others collapsed) -->
+                    <div class="space-y-3">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ claim.food_post.location }}</span>
+                        </div>
+                        <details class="collapse-details" {% if forloop.first %}open{% endif %}>
+                            <summary>More Details</summary>
+                            <div class="info-item">
+                                <i class="fas fa-weight-hanging"></i>
+                                <span>Quantity: {{ claim.food_post.quantity }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Expires: {{ claim.food_post.expiry_date|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Claimed: {{ claim.claimed_date|date:"M d, Y g:i A" }}</span>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill {% if claim.status == 'Completed' %}completed{% elif claim.status == 'Pending' %}pending{% else %}claimed{% endif %}"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>Claimed</span>
+                            <span>Pending</span>
+                            <span>Completed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Panel (Donor info always visible) -->
+                <div class="action-panel">
+                    <div class="donor-info">
+                        <span class="donor-label">DONOR</span>
+                        <div class="donor-details">
+                            <div class="donor-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <span class="donor-name">{{ claim.food_post.donor.first_name|default:claim.food_post.donor.username }}</span>
+                                <div class="donor-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <span class="ml-1 text-sm">5.0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="button message w-full" data-donor="{{ claim.food_post.donor.username }}">
+                            <i class="fas fa-comments mr-2"></i>
+                            Message Donor
+                        </button>
+                        {% if claim.status != 'Completed' %}
+                        <form method="post" action="{% url 'community:mark_received' claim.id %}" style="width: 100%;">
+                            {% csrf_token %}
+                            <button type="submit" class="button success w-full mt-3" data-claim-id="{{ claim.id }}">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Mark as Received
+                            </button>
+                        </form>
+                        {% else %}
+                        <div class="completion-badge">
+                            <i class="fas fa-trophy mr-2"></i>
+                            <span>Successfully Received!</span>
+                        </div>
+                        {% endif %}
+                        <button class="button secondary w-full mt-3" onclick="window.location.href='tel:{{ claim.food_post.donor.phone|default:"+1234567890" }}'">
+                            <i class="fas fa-phone mr-2"></i>
+                            Call Donor
+                        </button>
+                    </div>
+
+                    <!-- Emergency Contact -->
+                    <div class="emergency-contact mt-4">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Report issues: <a href="#" class="text-blue-600">Support</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-shopping-basket"></i>
+            </div>
+            <h3>No Claimed Food Yet</h3>
+            <p>You haven't claimed any food items yet. Browse available donations in the community to get started!</p>
+            <a href="{% url 'community:seekers' %}" class="button mt-4">
+                <i class="fas fa-search mr-2"></i>
+                Browse Available Food
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Floating Action Button -->
+<div class="floating-action-button">
+    <a href="{% url 'community:seekers' %}" class="fab-button" title="Find More Food">
+        <i class="fas fa-plus"></i>
+    </a>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/claimed_food.js' %}"></script>
+{% endblock %}
+<script src="{% static 'js/claimed_food.js' %}"></script>
+
