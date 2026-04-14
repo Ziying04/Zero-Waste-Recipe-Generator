@@ -9,7 +9,7 @@ A Django-based web application that helps reduce food waste by allowing users to
 
 ## 🌟 Features
 
-- **AI Recipe Generator** – Uses OpenAI to generate custom recipes based on ingredients you input  
+- **AI Recipe Generator** – Uses HuggingFace to generate custom recipes based on ingredients you input  
 - **Ingredient Expiry Tracker** – Allows users to log food items and get expiry notifications  
 - **Community Food Sharing** – Share and claim surplus food items  
 - **User Dashboard** – View liked, saved, shared recipes and donation/claim history  
@@ -22,7 +22,7 @@ A Django-based web application that helps reduce food waste by allowing users to
 - **Backend:** Django (Python)
 - **Frontend:** HTML, CSS, JavaScript (Django templates)
 - **Database:** SQLite (via `db.sqlite3`)
-- **AI Integration:** OpenAI API
+- **AI Integration:** Hugging  API
 - **Auth:** Django Authentication System
 
 ---
