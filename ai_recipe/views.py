@@ -99,31 +99,37 @@ def custom_signup(request):
             except ValidationError as e:
                 errors.extend(e.messages)
 
+        wants_json = request.headers.get('Accept') == 'application/json' or request.content_type == 'application/json'
+
         if errors:
             error_message = "; ".join(errors)
-            if request.content_type == 'application/json':
+            if wants_json:
                 return JsonResponse({"error": error_message}, status=400)
             return render(request, "signup.html", {"error": error_message})
-
+        
         try:
             # Create new user
+            print("TRYING TO CREATE USER...")
             user = User.objects.create_user(
                 username=email,  # Use email as username
                 email=email,
                 password=password,
                 first_name=name.strip()
             )
+
+            print("USER CREATED:", user)
             
             # Authenticate and login
             user = authenticate(request, username=email, password=password)
             if user:
                 login(request, user)
-                if request.content_type == 'application/json':
+                if wants_json:
                     return JsonResponse({"success": True, "redirect": "/"})
                 return redirect("home")
                 
         except Exception as e:
-            if request.content_type == 'application/json':
+            print("Signup error:", e)
+            if wants_json:
                 return JsonResponse({"error": "Failed to create account"}, status=400)
             return render(request, "signup.html", {"error": "Failed to create account"})
     

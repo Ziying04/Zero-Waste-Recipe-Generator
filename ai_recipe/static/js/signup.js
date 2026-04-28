@@ -176,6 +176,9 @@ document.getElementById("signupForm").addEventListener("submit", async function 
       const response = await fetch("/signup/", {
         method: "POST",
         body: formData,
+        headers: {
+            "Accept": "application/json"  
+        },
         credentials: 'same-origin'
       });
 

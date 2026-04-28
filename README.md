@@ -94,7 +94,7 @@ http://127.0.0.1:8000/
 
 ### 🧪 Sample Accounts 
 - Email: hello@gmail.com
-- Password: hello123
+- Password: World11!
 
 ---
 
