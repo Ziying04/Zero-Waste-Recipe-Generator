@@ -1,0 +1,106 @@
+[33m86ce272[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Remove __pycache__ files and resolve merge conflicts
+[33m2098d9c[m Remove cached pycache files
+[33mfe0a7c0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Sign up bug
+[33m15902d2[m Update Readme
+[33mc930b35[m Enhance Claimed Food Page with New UI Features and Interactivity
+[33m9dbb882[m Update README.md
+[33mef4fafb[m add requirement.txt
+[33m5e40dbd[m Stop tracking db.sqlite3
+[33m509a7d9[m ....
+[33m0bb2dd8[m Merge branch 'main' of https://github.com/Ziying04/Zero-Waste-Recipe-Generator
+[33mef2dbd1[m ....
+[33m2355aa0[m share recipe (parse) done
+[33mf6c60d1[m share recipe
+[33m34d6ee5[m commit
+[33mf8e9b64[m commit
+[33m32ed8d7[m fix the ai generator (use available ingredient)
+[33m3e1eaa1[m theme toggle for nav bar
+[33m83e0069[m .....
+[33md78e2a4[m Stop tracking venv folder
+[33m8dd56ff[m The user page delete function done
+[33m0e0ae15[m testing 1
+[33mbf1c17b[m Remove unused sidebar styles for cleaner CSS
+[33mc84f2dc[m Refactor code structure for improved readability and maintainability
+[33m6901236[m Simplify add user URL and update button to link for better usability
+[33m07c7d3c[m Swap email and username labels and placeholders in user form for clarity
+[33ma80ab05[m Add user creation form with validation and password strength indicator
+[33meae7720[m Enhance notification system with new styles and dropdown functionality
+[33m64f53c1[m Add notification button to navbar with unread count display
+[33mfca544e[m Merge branch 'main' of https://github.com/Ziying04/Zero-Waste-Recipe-Generator
+[33ma15bfe5[m Fix AI Url
+[33m210d398[m The user page design done
+[33m31c27ab[m add
+[33m7f92536[m hvn done
+[33mc450c0d[m add recipe
+[33m3a8541a[m ...
+[33m59d22f3[m Fix formatting in AdminUser.html and update db.sqlite3
+[33mce174ff[m Remove statistics display from donor page
+[33m3f83a2c[m Enhance donor page functionality and UI
+[33m2d8ec8d[m Resolved conflict: kept db.sqlite3
+[33m0ae8f08[m Refactor donor page functionality and improve user experience
+[33m54360bc[m The content page and issues page are done
+[33mbcf1818[m Stop tracking db.sqlite3 and update .gitignore
+[33m756cf85[m Content Page done
+[33m858820d[m Enhance signup process with password strength validation and user feedback
+[33mea1dcfe[m Implement user authentication checks and enhance login/signup functionality
+[33m91c6a21[m Remove db.sqlite3 from tracking and add to .gitignore
+[33mbe064fc[m ....
+[33m6565eeb[m admin content
+[33ma84a551[m Merge completely
+[33mb6d845a[m Stop tracking db.sqlite3
+[33m1a91cc1[m Update Content
+[33mb30a15b[m Update Content
+[33m86387cf[m Update Contente
+[33mc9c252e[m Enhance admin dashboard to count users and issues with fallback model imports
+[33ma3f7ab9[m Implement admin dashboard features and enhancements
+[33m39626c7[m commit
+[33m1b27505[m commit
+[33m90b4b02[m Merge branch 'main' of https://github.com/Ziying04/Zero-Waste-Recipe-Generator
+[33m54f47ad[m solve commit issues
+[33m78ba900[m Stop tracking db.sqlite3 and add to .gitignore
+[33me23db23[m admin Issues updated
+[33m69bb076[m Update migrations
+[33mb849c50[m Update adminPanel for resolve issues
+[33mde2307e[m Fix navbar layout: add missing closing div for dropdown menu
+[33mbb59775[m Update icon background colors in adminContent.css; change h1 icon color in diary.css
+[33m7080ea8[m Refactor navbar and authentication templates; enhance mobile menu and dropdown functionality; remove unused files; update home page layout and styles; implement theme toggle and search overlay features.
+[33m6bb4855[m .....
+[33m9aee486[m ...
+[33mf610f6c[m Enhance notification system: improve styles, add animations, and implement error handling
+[33m97eba12[m Remove unnecessary images and update clone command in README
+[33med22112[m Enhance UI and functionality across templates
+[33m96d722b[m Enhance UI and functionality for recipe management: update styles, improve search with debounce, and add visual feedback for save/like actions.
+[33m3462699[m Implement recipe sharing feature with UI updates and validation
+[33m2d22536[m Add notification feature with models, views, and templates
+[33mf324d07[m resolve
+[33m8ddc043[m edit readme
+[33m34110f8[m Merge pull request #1 from Pinaeee/branch-2
+[33ma5749ee[m editing
+[33md491975[m Update README.md with detailed features, installation instructions, and usage guidelines
+[33mefd703a[m Save changes before pulling
+[33m6b115ed[m Updated
+[33m3225d22[m Updated
+[33m2c43dd5[m Updated
+[33m21b49ea[m Updated
+[33mf916603[m Updated
+[33m9612001[m Updated
+[33m96da6f5[m Updated
+[33mfd9fa25[m Updated
+[33m312d664[m Updated
+[33mff80f78[m update gigignore
+[33m0b491ae[m Updated
+[33m6c2ac81[m Updated
+[33m0031be1[m Updated
+[33mbfadee2[m Updated
+[33m4704411[m Updated
+[33mce9f4e6[m Add updated on the file
+[33m75b0e38[m Add updated on the file
+[33m6e3ec5a[m Add updated on the file
+[33mb5a0733[m Update routing and logic in urls.py and views.py
+[33m6efb3e3[m modify ingredient tracker
+[33mf482d4c[m changes on ai generator
+[33ma543907[m Wei ting code
+[33mad543a8[m try commit
+[33md5504bc[m Resolved merge conflicts
+[33m414cd48[m first commit
+[33m123e970[m Initial commit
