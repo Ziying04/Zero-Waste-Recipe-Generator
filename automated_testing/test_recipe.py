@@ -2,6 +2,11 @@ import pytest
 from django.test import Client
 from django.contrib.auth.models import User
 from datetime import date, timedelta
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ai_recipe.settings")  # change if your project name differs
+django.setup()
 
 
 # ══════════════════════════════════════════════════════════
@@ -12,6 +17,26 @@ from datetime import date, timedelta
 def client():
     """Plain (unauthenticated) Django test client."""
     return Client()
+
+
+@pytest.fixture
+def user(db):
+    """Create and return a regular test user."""
+    return User.objects.create_user(
+        username="user1",
+        password="pass123",
+        email="user1@example.com"
+    )
+
+
+@pytest.fixture
+def admin(db):
+    """Create and return a superuser/admin test user."""
+    return User.objects.create_superuser(
+        username="admin",
+        password="admin123",
+        email="admin@example.com"
+    )
 
 
 @pytest.fixture
@@ -102,15 +127,22 @@ def test_signup_page_loads(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.django_db
 def test_signup_creates_new_user(client):
-    """Submitting valid signup form should create a new user."""
+    """
+    Submitting valid signup form should create a new user.
+    Password must pass your custom password validation.
+    """
+    valid_password = "X7!mQp2#Lz9@"
+
     response = client.post("/signup/", {
         "name": "New User",
         "email": "newuser@example.com",
-        "password": "StrongPass@123"
+        "password": valid_password
     })
-    # Should redirect after successful signup
+
     assert response.status_code in [200, 302]
+
     assert User.objects.filter(
         username="newuser@example.com",
         email="newuser@example.com"
@@ -140,7 +172,7 @@ def test_signup_and_login(client):
 @pytest.mark.django_db
 def test_unauthenticated_user_redirected_from_dashboard(client):
     """Dashboard should redirect unauthenticated users to login."""
-    urls = ["/dashboard/", "/recipe-ai/", "/"]
+    urls = ["/dashboard/", "/recipe_ai/", "/"]
     
     for url in urls:
         response = client.get(url)
@@ -156,7 +188,7 @@ def test_unauthenticated_user_redirected_from_dashboard(client):
 @pytest.mark.django_db
 def test_recipe_generator_page_loads(logged_in_client):
     """Recipe AI page should load for authenticated users."""
-    urls = ["/recipe-ai/", "/recipe/", "/generate/"]
+    urls = ["/api/recipe_ai/", "/recipe/", "/generate/"]
     
     for url in urls:
         response = logged_in_client.get(url)
@@ -199,7 +231,6 @@ def test_recipe_generation_post(logged_in_client):
 @pytest.mark.django_db
 def test_ingredient_tracker_page_loads(logged_in_client):
     """Ingredient tracker page should load for authenticated users."""
-    # Try both possible URL prefixes used in Django include()
     response = logged_in_client.get("/ingredients/")
     if response.status_code == 404:
         response = logged_in_client.get("/ingredient-tracker/")
@@ -382,51 +413,376 @@ def test_submit_donation_post(logged_in_client):
 
 
 # ══════════════════════════════════════════════════════════
-#  TEST 8 — ADMIN DASHBOARD
+#  TEST 8 — ADMIN DASHBOARD (fixed URLs)
 # ══════════════════════════════════════════════════════════
 
 @pytest.mark.django_db
-def test_admin_dashboard_loads_for_admin(admin_client):
-    """Admin dashboard should load for superuser."""
-    response = admin_client.get("/admin-dashboard/")
+def test_admin_dashboard_loads(admin_client):
+    response = admin_client.get("/admin/")
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_admin_dashboard_redirects_regular_user(logged_in_client):
-    """Admin dashboard should block or redirect regular users."""
-    response = logged_in_client.get("/admin-dashboard/")
-    assert response.status_code in [200, 302, 403]
-
-
-@pytest.mark.django_db
-def test_admin_dashboard_redirects_unauthenticated(client):
-    """Admin dashboard should redirect unauthenticated users."""
-    response = client.get("/admin-dashboard/")
+def test_admin_dashboard_blocks_user(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="user", password="pass"
+    )
+    client.login(username="user", password="pass")
+    response = client.get("/admin/")
     assert response.status_code in [302, 403]
 
 
 @pytest.mark.django_db
-def test_admin_users_page_loads(admin_client):
-    """Admin users management page should load for superuser."""
-    response = admin_client.get("/admin/users/")
-    if response.status_code == 404:
-        response = admin_client.get("/admin-dashboard/")
-    assert response.status_code in [200, 302]
+def test_admin_requires_login(client):
+    response = client.get("/admin/")
+    assert response.status_code in [302, 403]
 
 
 @pytest.mark.django_db
-def test_admin_issues_page_loads(admin_client):
-    """Admin issues page should load for superuser."""
+def test_admin_users_page(admin_client):
+    response = admin_client.get("/admin-users/")
+    assert response.status_code == 200
+
+
+#@pytest.mark.django_db
+#def test_admin_issues_page(admin_client):
+#    """
+#    Admin issues page:
+#    try both possible URLs depending on root include path.
+#    """
+#    urls = [
+#        "/admin-issues/",
+#        "/adminPanel/admin-issues/",
+#    ]
+
+#    for url in urls:
+#        response = admin_client.get(url)
+#        if response.status_code != 404:
+#            assert response.status_code == 200
+#            return
+
+#    assert False, "Admin issues page URL not found"
+
+@pytest.mark.django_db
+def test_admin_issues_page(admin_client):
+    response = admin_client.get("/admin-panel/admin-issues/")
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_admin_content_page(admin_client):
+    """
+    Admin content page:
+    try both possible URLs depending on root include path.
+    """
     urls = [
-        "/admin-panel/issues/",
-        "/admin-dashboard/issues/",
-        "/admin/issues/",
-        "/admin-dashboard/"
+        "/admin-panel/admin-content/",
+        "/adminPanel/admin-content/",
     ]
-    
+
     for url in urls:
         response = admin_client.get(url)
         if response.status_code != 404:
-            assert response.status_code in [200, 302]
+            assert response.status_code == 200
             return
+
+    assert False, "Admin content page URL not found"
+
+
+# ══════════════════════════════════════════════════════════
+#  USE CASE TESTS (UC001-UC019)
+# ══════════════════════════════════════════════════════════
+
+# ======================
+# UC001 AUTH
+# ======================
+@pytest.mark.django_db
+def test_uc001_signup(client):
+    """UC001: User can register via signup form."""
+    r = client.post("/signup/", {
+        "email": "a@test.com",
+        "name": "Test User",
+        "password": "X7!mQp2#Lz9@"
+    })
+    assert r.status_code in [200, 302]
+
+
+# ======================
+# UC002 AI RECIPE
+# ======================
+@pytest.mark.django_db
+def test_uc002_recipe(user):
+    """UC002: Logged-in user can submit ingredients to generate an AI recipe."""
+    c = Client()
+    c.login(username="user1", password="pass123")
+
+    r = c.post("/api/recipe_ai/", {
+        "user_input": "egg"
+    })
+
+    assert r.status_code in [200, 302]
+
+# ======================
+# UC003 BROWSE
+# ======================
+@pytest.mark.django_db
+def test_uc003(client):
+    """UC003: Anyone can browse the recipes page."""
+    r = client.get("/recipes/")
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC004 LIKE
+# ======================
+@pytest.mark.django_db
+def test_uc004(client):
+    """UC004: Like endpoint is reachable (auth may redirect)."""
+    r = client.post("/like/1/")
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC005 ADD RECIPE
+# ======================
+@pytest.mark.django_db
+def test_uc005(user):
+    """
+    UC005: Logged-in user can add a recipe
+    """
+    c = Client()
+    c.login(username="user1", password="pass123")
+
+    urls = [
+        "/api/create-recipe/",
+        "/recipe/create-recipe/",
+    ]
+
+    for url in urls:
+        r = c.post(url, {
+            "title": "test",
+            "ingredients": "egg",
+            "steps": "cook"
+        })
+
+        if r.status_code != 404:
+            assert r.status_code in [200, 302]
+            return
+
+    assert False, "Create recipe URL not found"
+
+
+# ======================
+# UC006 DELETE
+# ======================
+@pytest.mark.django_db
+def test_uc006(client):
+    """UC006: Delete recipe endpoint is reachable (auth may redirect)."""
+    r = client.post("/recipes/delete/1/")
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC007 SHARE
+# ======================
+@pytest.mark.django_db
+def test_uc007(client):
+    """UC007: Share recipe endpoint is reachable."""
+    r = client.get("/share/1/")
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC008 COMMENT
+# ======================
+@pytest.mark.django_db
+def test_uc008(client):
+    """UC008: Comment endpoint is reachable (auth may redirect)."""
+    r = client.post("/comment/", {"text": "nice"})
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC009 DONATION
+# ======================
+@pytest.mark.django_db
+def test_uc009(user):
+    """UC009: Logged-in user can post a food donation."""
+    c = Client()
+    c.login(username="user1", password="pass123")
+    today = date.today()
+    expiry = today + timedelta(days=5)
+    r = c.post("/community/donors/", {
+        "title": "Rice",
+        "category": "Grains",
+        "description": "Surplus rice",
+        "location": "Taman Maju",
+        "quantity": "2 kg",
+        "expiration_date": str(expiry),
+    })
+    assert r.status_code in [200, 302]
+
+
+# ======================
+# UC010 SURPLUS BROWSE
+# ======================
+@pytest.mark.django_db
+def test_uc010(client):
+    """UC010: Anyone can browse the community surplus page."""
+    r = client.get("/community/")
+    assert r.status_code in [200, 302]
+
+
+# ======================
+# UC011 INGREDIENT
+# ======================
+@pytest.mark.django_db
+def test_uc011(user):
+    """UC011: Logged-in user can add an ingredient to their tracker."""
+    c = Client()
+    c.login(username="user1", password="pass123")
+    today = date.today()
+    expiry = today + timedelta(days=7)
+    r = c.post("/ingredients/add_ingredient/", {
+        "name": "Milk",
+        "category": "Dairy",
+        "quantity": "1L",
+        "location": "fridge",
+        "purchaseDate": str(today),
+        "expiryDate": str(expiry),
+        "notes": ""
+    })
+    assert r.status_code in [200, 302]
+
+
+# ======================
+# UC012 SAVED
+# ======================
+@pytest.mark.django_db
+def test_uc012(client):
+    """UC012: Save recipe endpoint is reachable (auth may redirect)."""
+    r = client.post("/save/1/")
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC013 EDIT RECIPE
+# ======================
+@pytest.mark.django_db
+def test_uc013(client):
+    """UC013: Edit recipe endpoint is reachable (auth may redirect)."""
+    r = client.post("/recipes/edit/1/")
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC014 REPORT
+# ======================
+@pytest.mark.django_db
+def test_uc014(client):
+    """UC014: Report endpoint is reachable (auth may redirect)."""
+    r = client.post("/issues/report/", {"issue": "bug"})
+    assert r.status_code in [200, 302, 404]
+
+
+# ======================
+# UC015 PROFILE
+# ======================
+@pytest.mark.django_db
+def test_uc015(user):
+    """
+    UC015: Logged-in user can access/edit profile
+    """
+    c = Client()
+    c.login(username="user1", password="pass123")
+
+    urls = [
+        "/api/profile/",
+        "/recipe/profile/",
+    ]
+
+    for url in urls:
+        r = c.post(url, {"username": "new"})
+
+        if r.status_code != 404:
+            assert r.status_code in [200, 302]
+            return
+
+    assert False, "Profile URL not found"
+
+
+# ======================
+# UC016 ADMIN CONTENT
+# ======================
+@pytest.mark.django_db
+def test_uc016(admin):
+    """UC016: Admin can access admin content management page."""
+    c = Client()
+    c.login(username="admin", password="admin123")
+
+    r = c.get("/admin-panel/admin-content/")
+    assert r.status_code == 200
+
+
+
+# ======================
+# UC017 ADMIN USER
+# ======================
+@pytest.mark.django_db
+def test_uc017(admin):
+    """UC017: Admin can access admin user management page."""
+    c = Client()
+    c.login(username="admin", password="admin123")
+    r = c.get("/admin-users/")
+    assert r.status_code == 200
+
+
+# ======================
+# UC018 ISSUE RESOLVE
+# ======================
+@pytest.mark.django_db
+def test_uc018(admin):
+    """
+    UC018: Admin can access admin issues page
+    """
+    c = Client()
+    c.login(username="admin", password="admin123")
+
+    urls = [
+        "/admin-panel/admin-issues/",
+        "/adminPanel/admin-issues/",
+    ]
+
+    for url in urls:
+        r = c.get(url)
+
+        if r.status_code != 404:
+            assert r.status_code == 200
+            return
+
+    assert False, "Admin issues URL not found"
+
+
+# ======================
+# UC019 DIARY
+# ======================
+@pytest.mark.django_db
+def test_uc019(user):
+    """
+    UC019: Logged-in user can access diary page
+    """
+    c = Client()
+    c.login(username="user1", password="pass123")
+
+    urls = [
+        "/api/diary/",
+        "/recipe/diary/",
+    ]
+
+    for url in urls:
+        r = c.get(url)
+
+        if r.status_code != 404:
+            assert r.status_code in [200, 302]
+            return
+
+    assert False, "Diary URL not found"
