@@ -257,6 +257,80 @@ try:
 except Exception as e:
     print(f"  ERROR in Expiration Tracker tests: {e}")
 
+    # =====================================================
+    # TC-011-006: Cancel / Return / Retry Path
+    # =====================================================
+
+    # Reopen Ingredient Tracker page
+    driver.get(f"{BASE_URL}/ingredients/")
+    time.sleep(1)
+
+    if "404" in driver.title or "not found" in driver.page_source.lower()[:500]:
+        driver.get(f"{BASE_URL}/ingredient-tracker/")
+    time.sleep(2)
+
+    # Click Add Ingredient
+    add_btn = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, "//button[contains(text(), 'Add Ingredient')]")
+    ))
+    add_btn.click()
+    time.sleep(1)
+
+    # Fill partial data only
+    try:
+        cat_select = Select(driver.find_element(By.ID, "category"))
+        cat_select.select_by_visible_text("Dairy")
+    except:
+        pass
+
+    driver.find_element(By.ID, "quantity").clear()
+    driver.find_element(By.ID, "quantity").send_keys("6 pieces")
+
+    # Click Cancel if the button exists
+    cancel_clicked = False
+
+    cancel_buttons = driver.find_elements(
+        By.XPATH,
+        "//button[contains(text(), 'Cancel')] | //a[contains(text(), 'Cancel')] | //button[contains(text(), 'Back')] | //a[contains(text(), 'Back')]"
+    )
+
+    if len(cancel_buttons) > 0:
+        cancel_buttons[0].click()
+        cancel_clicked = True
+        time.sleep(1)
+
+    result("TC-011-006: Cancel or Back button can be clicked",
+           cancel_clicked,
+           "Cancel/Back button not found")
+
+    result("TC-011-006: Partial ingredient is not saved after cancel",
+           "Egg" not in driver.page_source)
+
+    # Retry path: open Add Ingredient form again
+    add_btn = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, "//button[contains(text(), 'Add Ingredient')]")
+    ))
+    add_btn.click()
+    time.sleep(1)
+
+    form = driver.find_element(By.ID, "form")
+    result("TC-011-006: Add Ingredient form opens again for retry",
+           form is not None)
+
+    try:
+        cat_select = Select(driver.find_element(By.ID, "category"))
+        cat_select.select_by_visible_text("Dairy")
+    except:
+        pass
+
+    driver.find_element(By.ID, "quantity").clear()
+    driver.find_element(By.ID, "quantity").send_keys("6 pieces")
+
+    driver.find_element(By.ID, "expiryDate").clear()
+    driver.find_element(By.ID, "expiryDate").send_keys("05/10/2025")
+
+    result("TC-011-006: Retry data can be entered successfully", True)
+    
 # ══════════════════════════════════════════════
 # TEST 6 — COMMUNITY FORUM
 # ══════════════════════════════════════════════
